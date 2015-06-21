@@ -1,12 +1,12 @@
 refNum vers Mets
 ================
 
-[refnum2Mets] est un outil pour convertir des fichiers xml du format [refNum]
+[refNum2Mets] est un outil pour convertir des fichiers xml du format [refNum]
 vers le format [Mets], deux formats utilisés pour gérer des documents numérisés
 et pour construire des bibliothèques numériques.
 
-Le format [refNum] est un format défini par la [Bibliothèque nationale de France]
-(BnF) pour gérer les numérisations de documents (livres, journaux, objets,
+Le format [refNum] est un format défini par la [Bibliothèque nationale de France],
+ou [BnF], pour gérer les numérisations de documents (livres, journaux, objets,
 audio). Il est officiellement abandonné depuis décembre 2014 au profit du Mets
 (mais officieusement encore utilisé et toujours mis à jour) .
 
@@ -32,7 +32,7 @@ possible de s'en écarter pour simplifier ou enrichir le résultat.
 Utilisation
 -----------
 
-La feuille utilise la version 2 du language [xslt] établie par le
+La feuille utilise le langage [xslt] dans sa version 2, conçu par le
 [World Wide Web Consortium], qui doit être installé préalablement, par exemple
 la version libre de [Saxonica]. Elle est utilisable en ligne de commandes ou via
 un éditeur de texte tel que l'éditeur libre multiplateforme [jEdit], avec les
@@ -41,7 +41,7 @@ un éditeur de texte tel que l'éditeur libre multiplateforme [jEdit], avec les
 Consulter les remarques figurant dans la feuille xslt et dans le fichier de
 configuration.
 
-L'ensemble des paramètres doivent être indiqué dans le fichier de configuration
+L'ensemble des paramètres doivent être indiqués dans le fichier de configuration
 associé "refNum2Mets_config.xml".
 
 
@@ -116,7 +116,7 @@ Copyright
 [Saxonica]: http://www.saxonica.com/download/opensource.xml
 [jEdit]: http://www.jedit.org
 [plugins xml et xslt]: http://plugins.jedit.org/list.php?category=4
-[issues]: https://github.com/Daniel-KM/refNum2Mets/issues
+[problèmes]: https://github.com/Daniel-KM/refNum2Mets/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-fr.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org

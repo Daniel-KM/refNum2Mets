@@ -1,0 +1,631 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Ce fichier de configuration permet de paramétrer la conversion des notices
+refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refNum2Mets.xsl".
+-->
+<XMLlist>
+    <!-- ==============================================================
+    FICHIERS ASSOCIÉS
+    Xsl n'est pas en mesure de déterminer certaines informations qui ne se
+    trouvent pas dans le refNum, mais qui sont nécessaires au Mets, par exemple
+    la taille des images, le format, le hash, etc. Ces informations sont simples
+    à obtenir par d'autres scripts ou outils.
+    =============================================================== -->
+
+    <!-- Listes des codes du format refNum (types de page, pagination, supports,
+    etc., afin de les traduire en langue compréhensible. -->
+    <codes>refNum2Mets_codes.xml</codes>
+
+    <!-- Ce fichier liste les hashs et chemins de tous les fichiers, ce qui peut
+    être requis pour certains profils et calculés auparavant. Le chemin doit
+    correspondre à l'adresse href utilisé pour la localisation du fichier.
+    Exemples de commande sans et avec sous-dossiers :
+    find . -type f | sort | xargs md5sum > fichiers.hash
+    find . -type f | cut -sd / -f 2- | sort | xargs sha1sum > fichiers.hash
+    -->
+    <checksum>
+        <liste>fichiers_hash.txt</liste>
+        <type>SHA-1</type>
+    </checksum>
+
+    <tailles>
+        <liste>fichiers_taille.txt</liste>
+    </tailles>
+
+    <!-- ==============================================================
+    INIFORMATIONS DIVERSES
+    =============================================================== -->
+
+    <!-- L'identifiant ark est unique, court, opaque et pérenne et permet
+    d'identifier l'insititution qui dispose des documents -->
+    <ark>
+        <liste>notices_ark.txt</liste>
+        <!-- Numéro d'autorité nommante attribué gratuitement par la
+        California Digital Library. La BnF est le 12148, 12345 indique un exemple. -->
+        <institution>12345</institution>
+    </ark>
+
+     <!-- Indiquer les infos relatives au périodique, le cas échéant. -->
+    <periodique remplir='true'>
+        <!-- Numero ark de la notice du périodique ("fk" indique un exemple ou un "fake"). -->
+        <!-- Par exemple : La Presse littéraire. Échos de la littérature, des sciences et des arts : bc6p03rq6 -->
+        <ark>fkbv6a9q</ark>
+        <!-- Pour l'exemple de la BnF, utiliser 2399431. -->
+        <processingSet>1234567</processingSet>
+    </periodique>
+
+    <spar>
+        <linkingAgentIdentifier>
+            <!-- BnF -->
+            <!--
+            <type>BnfApplication</type>
+            <valueBase>br2d27h/act</valueBase>
+            -->
+            <type>Script refnum2Mets.xsl</type>
+            <valueBase>s1/</valueBase>
+        </linkingAgentIdentifier>
+    </spar>
+
+    <formatsObjetsAssocies>
+        <entry code="ALTO" xmlns:textmd="info:lc/xmlns/textMD-v3">
+            <!-- Exemple de la source BnF (Windows) -->
+            <!--
+            <textmd:textMD>
+                <textmd:character_info>
+                    <textmd:charset>ISO-8859-1</textmd:charset>
+                    <textmd:byte_order>little</textmd:byte_order>
+                    <textmd:byte_size>8</textmd:byte_size>
+                    <textmd:character_size>1</textmd:character_size>
+                    <textmd:linebreak>CR/LF</textmd:linebreak>
+                </textmd:character_info>
+                <textmd:markup_basis version="1.0">XML</textmd:markup_basis>
+                <textmd:markup_language>http://bibnum.bnf.fr/ns/alto_prod</textmd:markup_language>
+            </textmd:textMD>
+            -->
+            <textmd:textMD>
+                <textmd:character_info>
+                    <textmd:charset>UTF-8</textmd:charset>
+                    <textmd:byte_size>8</textmd:byte_size>
+                    <textmd:character_size encoding="UTF-8">variable</textmd:character_size>
+                    <textmd:linebreak>LF</textmd:linebreak>
+                </textmd:character_info>
+                <textmd:markup_basis version="1.0">XML</textmd:markup_basis>
+                <textmd:markup_language>http://bibnum.bnf.fr/ns/alto_prod</textmd:markup_language>
+            </textmd:textMD>
+        </entry>
+    </formatsObjetsAssocies>
+
+    <!-- Les profils et adresses regroupent différentes options (cf. plus bas) et
+    permettent de les définir d'un coup.
+    La liste ci-dessous indiique les profils et adresses qui ont été nécessaire pour
+    traiter les refNum. C'est le premier profil avec l'attribut 'utiliser' à "true" qui
+    est choisi (le mettre en premier our mettre à false les autres).
+    -->
+    <formats>
+        <profil_mets nom="Complet" utiliser="true" />
+        <profil_mets nom="OAI-PMH" utiliser="false" />
+        <profil_mets nom="Mets SIP BnF" utiliser="false" />
+        <profil_mets nom="Développement" utiliser="false" />
+
+        <adresse_fichier nom="Base" utiliser="true" />
+        <adresse_fichier nom="Simple" utiliser="false" />
+        <adresse_fichier nom="Première lettre" utiliser="false" />
+        <adresse_fichier nom="URL" utiliser="false" />
+    </formats>
+
+    <!-- ==============================================================
+    RACINE ET SECTIONS DU METS
+    Les paramètres ci-dessous correspondent aux paramètres par défaut pour
+    chaque section du Mets. Ils sont complémentaires des paramètres du profil
+    choisi.
+    =============================================================== -->
+    <racine>
+        <!-- Il n'y a pas d'espace de nom officiel pour NISOIMG, format utilisé
+        par défaut pour les images. -->
+        <namespace prefix="niso">http://www.niso.org/Z39-87-2006.pdf</namespace>
+        <namespace prefix="textmd">info:lc/xmlns/textMD-v3</namespace>
+        <!-- Base de l'url de l'identifiant unique du document (non obligatoire). -->
+        <baseUrlObjId>https://patrimoine.mines-paristech.fr/document/</baseUrlObjId>
+    </racine>
+
+    <section>
+        <MetsHeader xmlns="http://www.loc.gov/METS/">
+            <!-- Ces agents seront copiés directement dans l'entête. -->
+            <agent ROLE="CREATOR" TYPE="ORGANIZATION">
+                <name>École nationale supérieure des Mines de Paris (Mines ParisTech)</name>
+            </agent>
+            <agent ROLE="ARCHIVIST" TYPE="INDIVIDUAL">
+                <name>Daniel Berthereau</name>
+            </agent>
+            <agent ROLE="OTHER" OTHERROLE="BUILDER" TYPE="OTHER" OTHERTYPE="SOFTWARE">
+                <name>Script refNum2Mets.xsl version 20150316 (https://github.com/Daniel-KM/refNum2Mets)</name>
+            </agent>
+            <!--
+            <agent ROLE="OTHER" TYPE="ORGANIZATION">
+                <name>Mon prestataire</name>
+                <note>Prestataire de numérisation</note>
+            </agent>
+            -->
+        </MetsHeader>
+
+        <!-- Les valeurs par défaut sont toujours ajoutées, sauf pour defautType,
+        ajouté seulement si aucune n'est trouvé via les informations du fichier refNum source. -->
+        <DescriptiveMetadataSection>
+            <elementsCommuns>
+              <!-- Type par défaut (dcmi vocabulary pour dc:type), utilisé pour le genre
+              "Multimédia" ou en son absence. -->
+                <dc>
+                    <type>Moving Image</type>
+                    <source></source>
+                    <language>fre</language>
+                    <coverage></coverage>
+                    <rights>Domaine public</rights>
+                </dc>
+                <dcterms>
+                    <provenance></provenance>
+                </dcterms>
+            </elementsCommuns>
+
+            <!-- Mots utilisés dans la tomaison qui correspondent à une date, utilisée
+            pour enrichir en l'absence de date. -->
+            <tomaisonTypes>
+                <date>année</date>
+                <date>annee</date>
+                <date>trimestre</date>
+                <date>mois</date>
+                <date>semaine</date>
+                <date>jour</date>
+                <date>date</date>
+                <date>période</date>
+                <date>periode</date>
+            </tomaisonTypes>
+        </DescriptiveMetadataSection>
+
+        <DescriptiveMetadataSection_fichiers>
+        </DescriptiveMetadataSection_fichiers>
+
+        <AdministrativeMetadataSection>
+            <techMD>
+                <!-- Un format vide implique le format par défaut (copie du refNum). -->
+                <format>
+                    <texte></texte>
+                    <!-- Le schema METS SIP BnF n'impose rien, mais l'exemple est MIX v1.0.
+                    L'utilisation du format MIX impose l'extraction de données depuis les
+                    images, puisqu'elles ne sont pas disponibles dans le fichier refNum.
+                    En pratique, ce format est basé sur un dictionnaire d'éléments
+                    "NISOIMG" : ils sont utilisées directement, sur le modèle de l'exemple
+                    donné dans le standard METS.
+                    Remarque : le dictionaire NISOIMG n'a pas de namespace, donc un
+                    namespace de nom spécifique est defini au niveau de la racine.
+                    -->
+                    <image>NISOIMG</image>
+                    <audio></audio>
+                </format>
+                <!-- Le code de résolution n'est pas normalisé et rarement présent,
+                mais généralement "pouce" (dpi ou ppp), seul autorisé avec "cm". -->
+                <uniteResolution>pouce</uniteResolution>
+                <!-- Permet de retrouver la dimension originale de la source (l'image,
+                pas l'objet). Doit être "pouce" ou "cm". -->
+                <uniteSource>cm</uniteSource>
+                <!-- Une précision de quatre chiffres après la virgule suffit à retrouver
+                le plus souvent la résolution exacte en cas de conversion pouce/cm. -->
+                <unitePrecision>0.####</unitePrecision>
+                <info>
+                    <!-- Orientation "1" veut dire que la page est dans le sens de l'original
+                    (il faut peut-être la tourner pour la lire).-->
+                    <orientation>1</orientation>
+                    <producteur>Mines ParisTech</producteur>
+                    <prestataire>Mon prestataire</prestataire>
+                </info>
+            </techMD>
+            <digiprovMD remplir="true">
+                <ajouterType>
+                    <entree remplir="true" />
+                    <description remplir="true" />
+                    <resultat remplir="true" />
+                </ajouterType>
+                <ajouterDate>
+                    <entree remplir="true">Date de début : </entree>
+                    <description remplir="true">Date de description : </description>
+                    <resultat remplir="true">Date de fin : </resultat>
+                </ajouterDate>
+            </digiprovMD>
+        </AdministrativeMetadataSection>
+
+        <FileSection>
+        </FileSection>
+
+        <StructuralMap>
+            <!-- Permet d'indiquer un label pour le groupe de la carte physique, c'est-à-dire
+            le livre, le numéro de périodique, le volume. Si n'est pas défini, le genre sera
+            utilisé (monographie imprimée...). -->
+            <labelPhysicalGroup></labelPhysicalGroup>
+            <!-- Structure par défaut, si elle n'est pas défini dans le profil. -->
+            <!-- Cf. la liste des structures en bas. -->
+            <structure_types nom="Document" />
+        </StructuralMap>
+    </section>
+
+    <!-- ==============================================================
+    PROFILS
+    Les profils rassemblent différentes options sur chaque section du Mets de
+    façon à les choisir simplement et clairement.
+    =============================================================== -->
+
+    <profil nom="Complet">
+        <!-- Choix des sections Mets  à remplir (seule Structural Map est obligatoire). -->
+        <section>
+            <MetsHeader remplir="true" />
+            <DescriptiveMetadataSection remplir="true">
+                <descriptiveFormatWrapper>dc:dc</descriptiveFormatWrapper>
+                <!-- Conversion de la tomaison en Dublin Core -->
+                <tomaison>
+                    <ajoutPremierTitre remplir="false" />
+                    <ajoutAutreTitre remplir="true" />
+                    <ajoutDescription remplir="false" />
+                    <ajoutDescriptionSepare remplir="false" />
+                    <ajoutDate remplir="true" />
+                </tomaison>
+            </DescriptiveMetadataSection>
+            <DescriptiveMetadataSection_fichiers remplir="true">
+                <titre>
+                    <!-- Page paginée : 'numéro" ou "nom" (le préfixe est déterminé
+                    selon le type de pagination). -->
+                    <titreFichier>nom</titreFichier>
+                    <!-- Page non paginée : "vide", "fixe", "ordre", "numéro NP", "numéro déduit", "nom". -->
+                    <titreFichierNP>nom</titreFichierNP>
+                    <!-- Utilisés en fonction du choix "titreFichierNP". -->
+                    <titreFichierNPTexte>NP [</titreFichierNPTexte>
+                    <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+                </titre>
+            </DescriptiveMetadataSection_fichiers>
+            <AdministrativeMetadataSection remplir="true">
+                <!-- Ajoute les événements Spar : création du paquet, info sur chaque
+                groupe, numéros ark, contrôle final. -->
+                <spar fin="8" remplir="true" />
+                <techMD remplir="true">
+                    <meta remplir="true" />
+                    <info remplir="true" />
+                </techMD>
+                <!-- Non géré actuellement. -->
+                <rightsMD remplir="false" />
+                <!-- Rarement utilisé dans les exemples disponibles.
+                Dans le refNum, il est seulement uUtilisé pour indiquer le support, la
+                plupart du temps unique, et l'éventuel identifiant de la source.
+                Remplir cet élément est plus compliqué lorsqu'il y a plusieurs supports,
+                puisqu'il faut gérer les liens.
+                - soit AMD.1 : support A & support B & identifiant
+                - soit AMD.1 : support A / AMD.2 : identifiant / AMD3 : support B
+                - soit AMD.1 : support A & identifiant / AMD.2 : support B & identifiant
+                Actuellement, seule la première structure est prise en compte.
+                La situation est la même pour le traitement "Manuel" ou "Auto" ou
+                "Complexe".
+                -->
+                <sourceMD remplir="true">
+                </sourceMD>
+                <digiprovMD remplir="true">
+                    <eventIdentifierFormat nom="identifiant index" utiliser="true" separateur=":amd." />
+                    <eventIdentifierFormat nom="uuid" utiliser="false" />
+                    <valide remplir="true" />
+                </digiprovMD>
+            </AdministrativeMetadataSection>
+            <FileSection remplir="true" />
+            <StructuralMap remplir="true">
+                <!-- Si le nom est vide, le paramètre par défaut sera utilisé. -->
+                <structure_types nom="" />
+                <orderLabel remplir="true">
+                    <titreFichier>numéro</titreFichier>
+                    <titreFichierNP>numéro déduit</titreFichierNP>
+                    <titreFichierNPTexte>NP [</titreFichierNPTexte>
+                    <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+                </orderLabel>
+                <!-- Pour mémoire, doit être différent du "orderLabel". -->
+                <label remplir="true">
+                    <titreFichier>nom</titreFichier>
+                    <titreFichierNP>nom</titreFichierNP>
+                    <titreFichierNPTexte>NP [</titreFichierNPTexte>
+                    <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+                </label>
+            </StructuralMap>
+            <!-- Non géré et inutile pour le refNum. -->
+            <StructuralLinks remplir="false" />
+            <!-- Non géré et inutile pour le refNum. -->
+            <Behavior remplir="false" />
+        </section>
+    </profil>
+
+    <!-- Seules les données descriptives sont prises en compte, car c'est public. -->
+    <profil nom="OAI-PMH">
+        <section>
+            <MetsHeader remplir="true" />
+            <DescriptiveMetadataSection remplir="true">
+                <descriptiveFormatWrapper>dc:dc</descriptiveFormatWrapper>
+                <tomaison>
+                    <ajoutPremierTitre remplir="false" />
+                    <ajoutAutreTitre remplir="true" />
+                    <ajoutDescription remplir="false" />
+                    <ajoutDescriptionSepare remplir="false" />
+                    <ajoutDate remplir="true" />
+                </tomaison>
+            </DescriptiveMetadataSection>
+            <DescriptiveMetadataSection_fichiers remplir="true">
+                <titre>
+                    <titreFichier>nom</titreFichier>
+                    <titreFichierNP>nom</titreFichierNP>
+                    <titreFichierNPTexte>NP [</titreFichierNPTexte>
+                    <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+                </titre>
+            </DescriptiveMetadataSection_fichiers>
+            <AdministrativeMetadataSection remplir="false">
+                <spar fin="8" remplir="true" />
+                <techMD remplir="true">
+                    <meta remplir="true" />
+                    <info remplir="true" />
+                </techMD>
+                <rightsMD remplir="false" />
+                <sourceMD remplir="true">
+                </sourceMD>
+                <digiprovMD remplir="true">
+                    <eventIdentifierFormat nom="identifiant index" utiliser="true" separateur=":amd." />
+                    <eventIdentifierFormat nom="uuid" utiliser="false" />
+                    <valide remplir="true" />
+                </digiprovMD>
+            </AdministrativeMetadataSection>
+            <FileSection remplir="true" />
+            <StructuralMap remplir="true">
+                <structure_types nom="" />
+                <orderLabel remplir="true">
+                    <titreFichier>numéro</titreFichier>
+                    <titreFichierNP>numéro déduit</titreFichierNP>
+                    <titreFichierNPTexte>NP [</titreFichierNPTexte>
+                    <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+                </orderLabel>
+                <label remplir="true">
+                    <titreFichier>nom</titreFichier>
+                    <titreFichierNP>nom</titreFichierNP>
+                    <titreFichierNPTexte>NP [</titreFichierNPTexte>
+                    <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+                </label>
+            </StructuralMap>
+            <StructuralLinks remplir="false" />
+            <Behavior remplir="false" />
+        </section>
+    </profil>
+
+    <!-- Profil Spar de la BnF : http://bibnum.bnf.fr/mets/profile_SIP_global_20120822.xml -->
+    <profil nom="Mets SIP BnF">
+        <namespace prefix="spar_dc">http://bibnum.bnf.fr/ns/spar_dc</namespace>
+        <profile>http://bibnum.bnf.fr/mets/profile_SIP_global_20120822.xml</profile>
+        <section>
+            <MetsHeader remplir="false" />
+            <DescriptiveMetadataSection remplir="true">
+                <descriptiveFormatWrapper>spar_dc:spar_dc</descriptiveFormatWrapper>
+                <tomaison>
+                    <ajoutPremierTitre remplir="true" />
+                    <ajoutAutreTitre remplir="false" />
+                    <ajoutDescription remplir="false" />
+                    <ajoutDescriptionSepare remplir="true" />
+                    <ajoutDate remplir="false" />
+                    <attributes nom="xsi:type">
+                        <attribute>spar_dc:sequentialDesignation1</attribute>
+                        <attribute>spar_dc:sequentialDesignation2</attribute>
+                        <attribute>spar_dc:sequentialDesignation3</attribute>
+                    </attributes>
+                </tomaison>
+                <genreSelect>spar_dc</genreSelect>
+            </DescriptiveMetadataSection>
+            <DescriptiveMetadataSection_fichiers remplir="true">
+                <titre>
+                    <titreFichier>numéro</titreFichier>
+                    <titreFichierNP>numéro déduit</titreFichierNP>
+                    <titreFichierNPTexte>NP [</titreFichierNPTexte>
+                    <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+                </titre>
+                <typePaginationSelect>spar_dc</typePaginationSelect>
+            </DescriptiveMetadataSection_fichiers>
+            <AdministrativeMetadataSection remplir="true">
+                <spar fin="8" remplir="true" />
+                <techMD remplir="true">
+                    <meta remplir="true" />
+                    <info remplir="true" />
+                </techMD>
+                <!-- Interdit.-->
+                <rightsMD remplir="false" />
+                <sourceMD remplir="true">
+                    <codeBarreSelect>spar_dc:barCode</codeBarreSelect>
+                </sourceMD>
+                <!-- Un unique digiprovMD comprenant un premis:event de type 'packageCreation est requis.-->
+                <digiprovMD remplir="true">
+                    <eventIdentifierFormat nom="uuid" utiliser="true" />
+                    <valide remplir="true" />
+                </digiprovMD>
+            </AdministrativeMetadataSection>
+            <FileSection remplir="true" />
+            <StructuralMap remplir="true">
+                <structure_types nom="Mets SIP BnF" />
+                <orderLabel remplir="true">
+                    <titreFichier>numéro</titreFichier>
+                    <titreFichierNP>fixe</titreFichierNP>
+                    <titreFichierNPTexte>NP</titreFichierNPTexte>
+                    <titreFichierNPTexteAp></titreFichierNPTexteAp>
+                </orderLabel>
+                <label remplir="true">
+                    <titreFichier>nom</titreFichier>
+                    <titreFichierNP>nom</titreFichierNP>
+                    <titreFichierNPTexte>NP [</titreFichierNPTexte>
+                    <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+                </label>
+            </StructuralMap>
+            <StructuralLinks remplir="false" />
+            <Behavior remplir="false" />
+        </section>
+    </profil>
+
+    <!-- Profil utilisé uniquement pour le développement. -->
+    <profil nom="Développement">
+        <section>
+            <MetsHeader remplir="false" />
+            <DescriptiveMetadataSection remplir="true">
+                <descriptiveFormatWrapper>dc:dc</descriptiveFormatWrapper>
+                <tomaison>
+                    <ajoutPremierTitre remplir="false" />
+                    <ajoutAutreTitre remplir="true" />
+                    <ajoutDescription remplir="false" />
+                    <ajoutDescriptionSepare remplir="true" />
+                    <ajoutDate remplir="true" />
+                </tomaison>
+            </DescriptiveMetadataSection>
+            <DescriptiveMetadataSection_fichiers remplir="true">
+                <titre>
+                    <titreFichier>nom</titreFichier>
+                    <titreFichierNP>nom</titreFichierNP>
+                    <titreFichierNPTexte>NP [</titreFichierNPTexte>
+                    <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+                </titre>
+            </DescriptiveMetadataSection_fichiers>
+            <AdministrativeMetadataSection remplir="true">
+                <spar fin="8" remplir="true" />
+                <techMD remplir="true">
+                    <meta remplir="true" />
+                    <info remplir="true" />
+                </techMD>
+                <rightsMD remplir="false" />
+                <sourceMD remplir="true">
+                </sourceMD>
+                <digiprovMD remplir="true">
+                    <eventIdentifierFormat nom="identifiant index" utiliser="true" separateur=":amd." />
+                    <eventIdentifierFormat nom="uuid" utiliser="false" />
+                    <valide remplir="true" />
+                </digiprovMD>
+            </AdministrativeMetadataSection>
+            <FileSection remplir="true" />
+            <StructuralMap remplir="true">
+                <structure_types nom="" />
+                <orderLabel remplir="true">
+                    <titreFichier>numéro</titreFichier>
+                    <titreFichierNP>numéro déduit</titreFichierNP>
+                    <titreFichierNPTexte>NP [</titreFichierNPTexte>
+                    <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+                </orderLabel>
+                <label remplir="true">
+                    <titreFichier>nom</titreFichier>
+                    <titreFichierNP>nom</titreFichierNP>
+                    <titreFichierNPTexte>NP [</titreFichierNPTexte>
+                    <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+                </label>
+            </StructuralMap>
+            <StructuralLinks remplir="false" />
+            <Behavior remplir="false" />
+        </section>
+    </profil>
+
+    <!-- ==============================================================
+    ADRESSE
+    Les adresses de fichiers dépendent du plan de nommage et du classement des
+    fichiers. Dans l'idéal, le classement devrait être normalisé.
+    Comme pour les profils, le choix d'un type d'adresse permet de définir
+    simplement les paramètres associés.
+    =========================================================== -->
+
+    <adresse nom="Base">
+        <!--Au choix: URL (profil Mets Sip BnF), PURL, OTHER. -->
+        <loctype>URL</loctype>
+        <otherloctype>fileid</otherloctype>
+        <!-- Mettre "simple" si loctype est "URL" (profil Mets Sip BnF). -->
+        <xlinkType>simple</xlinkType>
+        <!-- Base à ajouter à l'url ou à l'adresse du fichier. -->
+        <baseUri></baseUri>
+        <!-- Ajouter la première lettre de l'extension au sous-dossier (nécessaire pour
+        chez certains fonds). -->
+        <sousDossierDocumentPremiereLettreExtension>false</sousDossierDocumentPremiereLettreExtension>
+        <!-- Sous-dossier par document avec l'identifiant. -->
+        <sousDossierDocument>false</sousDossierDocument>
+        <!-- Sous-dossier selon les fichiers et objets associés. -->
+        <sousDossierType>false</sousDossierType>
+        <!-- Nom de fichier des objets associés : vide par défaut (identique),
+        "première lettre" (chez certains prestataires, la première lettre
+        correspond à l'extension). -->
+        <!-- TODO Utiliser une feuille fille si besoin. -->
+        <nomFichierAssocie></nomFichierAssocie>
+        <!-- Permet de standardiser le nom du fichier (mise en minuscule) si besoin. -->
+        <minusculeNomFichier>false</minusculeNomFichier>
+        <minusculeExtension>true</minusculeExtension>
+    </adresse>
+
+    <adresse nom="Simple">
+        <loctype>URL</loctype>
+        <otherloctype>fileid</otherloctype>
+        <xlinkType>simple</xlinkType>
+        <baseUri></baseUri>
+        <sousDossierDocumentPremiereLettreExtension>true</sousDossierDocumentPremiereLettreExtension>
+        <sousDossierDocument>true</sousDossierDocument>
+        <sousDossierType>false</sousDossierType>
+        <nomFichierAssocie></nomFichierAssocie>
+        <minusculeNomFichier>false</minusculeNomFichier>
+        <minusculeExtension>true</minusculeExtension>
+    </adresse>
+
+    <adresse nom="Première lettre">
+        <loctype>OTHER</loctype>
+        <otherloctype>fileid</otherloctype>
+        <xlinkType></xlinkType>
+        <baseUri></baseUri>
+        <sousDossierDocumentPremiereLettreExtension>true</sousDossierDocumentPremiereLettreExtension>
+        <sousDossierDocument>true</sousDossierDocument>
+        <sousDossierType>false</sousDossierType>
+        <nomFichierAssocie></nomFichierAssocie>
+        <minusculeNomFichier>false</minusculeNomFichier>
+        <minusculeExtension>true</minusculeExtension>
+    </adresse>
+
+    <adresse nom="URL">
+        <loctype>URL</loctype>
+        <otherloctype></otherloctype>
+        <xlinkType>simple</xlinkType>
+        <baseUri></baseUri>
+        <sousDossierDocumentPremiereLettreExtension>true</sousDossierDocumentPremiereLettreExtension>
+        <sousDossierDocument>true</sousDossierDocument>
+        <sousDossierType>false</sousDossierType>
+        <nomFichierAssocie></nomFichierAssocie>
+        <minusculeNomFichier>false</minusculeNomFichier>
+        <minusculeExtension>true</minusculeExtension>
+    </adresse>
+
+    <!-- ==============================================================
+    STRUCTURAL MAP
+    Types pour la liste des objets.
+    =========================================================== -->
+
+    <structure_types nom="Document">
+        <niveau_0></niveau_0>
+        <niveau_1>document</niveau_1>
+        <niveau_objet>page</niveau_objet>
+    </structure_types>
+
+    <structure_types nom="Monographie">
+        <niveau_0></niveau_0>
+        <niveau_1>volume</niveau_1>
+        <niveau_objet>page</niveau_objet>
+    </structure_types>
+
+    <structure_types nom="Périodique">
+        <niveau_0>série</niveau_0>
+        <niveau_1>numéro</niveau_1>
+        <niveau_objet>page</niveau_objet>
+    </structure_types>
+
+    <!-- Conformément au Mets BnF, trois niveaux de division sont requis, et
+    aucun autre n'est accepté dans la carte de structure physique :
+    - "set" pour le "paquet d'informations" (le lot général de numérisation) ;
+    - "group" pour le livre, le fascicule, l'image, le volume ;
+    - "objet" pour la page.
+    D'autres divisions peuvent être ajoutées, mais dans d'autre types. Cela
+    n'est pas possible à partir d'un fichier refNum.
+    Un label est néanmoins ajouté pour chaque "group" et "objects".
+    -->
+    <structure_types nom="Mets SIP BnF">
+        <niveau_0>set</niveau_0>
+        <niveau_1>group</niveau_1>
+        <niveau_objet>object</niveau_objet>
+    </structure_types>
+</XMLlist>
+

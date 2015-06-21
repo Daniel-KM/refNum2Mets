@@ -1,0 +1,343 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Description : Liste des codes du modèle refNum.
+Version : 20150316
+Auteur : Daniel Berthereau pour l'École des Ponts (http://bibliotheque.enpc.fr)
+et l'École des Mines (http://bib.mines-paristech.fr)
+
+Notes
+- Contient uniquement les codes nécessaires à la mise en place de la bibliothèque numérique.
+
+TODO
+- Utiliser directement les données du schéma tout en ajoutant les données des variantes.
+
+Historique :
+2015/03/16 Mise à jour du schéma par la Bnf
+2012/10/05 Version initiale (Ponts ParisTech)
+
+@see http://bibnum.bnf.fr/ns/refNum.xsd
+@see https://github.com/Daniel-KM/refNum2Mets
+@copyright Daniel Berthereau, 2012-2015
+@license http://www.cecill.info/licences/Licence_CeCILL_V2.1-fr.html
+-->
+
+<XMLlist>
+    <genre>
+      <!-- TODO Le "spar_dc" n'a pas été vérifié. -->
+      <entry code="LOT" type="Still Image" spar_dc="batch" nomPage="Image">Lot</entry>
+      <entry code="MONOGRAPHIE" type="Text" spar_dc="monograph" nomPage="Page">Monographie imprimée</entry>
+      <entry code="MULTIMEDIA" type="Moving Image" spar_dc="multimedia" nomPage="Fichier">Multimédia</entry>
+      <entry code="PERIODIQUE" type="Text" spar_dc="periodical" nomPage="Page">Publication en série imprimée</entry>
+      <!-- Non standard. -->
+      <entry code="MANUSCRIT" type="Text" spar_dc="monograph" nomPage="Page">Manuscrit</entry>
+    </genre>
+
+    <!-- Permet de définir l'identifiant, le media type, l'extension et le sous-dossier
+    éventuel des fichiers associés. -->
+    <objetAssocie>
+        <!-- Code par défaut pour les originaux. -->
+        <entry code="master" use="master" sousDossier="master" extensionType="typeFichier" eventType="digitization" eventDetail="automatic treatment">Master</entry>
+        <entry code="" use="master" sousDossier="master" extensionType="typeFichier" eventType="digitization" eventDetail="automatic treatment">Master</entry>
+
+        <!-- Ni définition, ni exemple. -->
+        <entry code="ADAPTATIF" use="adaptatif" sousDossier="Adaptatif">Adaptatif</entry>
+        <entry code="ALTO" use="ocr" sousDossier="OCR" mimetype="text/xml" extension="xml" eventType="ocerization" eventDetail="Génération du produit de la reconnaissance optique de caractères">OCR</entry>
+        <entry code="EPUB" use="epub" sousDossier="ePub" mimetype="application/epub+zip" extension="epub">ePub</entry>
+        <entry code="EXTRAIT" use="extrait" sousDossier="Extrait" extensionType="typeFichier">Extrait</entry>
+        <entry code="TDM" use="tdm" sousDossier="TDM" mimetype="text/xml" extension="xml">Table des matières</entry>
+        <!-- Ni définition, ni exemple. -->
+        <entry code="TUILES" use="tuiles" sousDossier="Tuiles" mimetype="image/jpeg" extension="jpg">Tuiles</entry>
+        <entry code="TXT" use="texte" sousDossier="Texte" mimetype="text/plain" extension="txt">Texte</entry>
+    </objetAssocie>
+
+    <typeFichier>
+        <!-- Texte. -->
+        <entry code="XML" mimetype="text/xml" />
+        <entry code="HTML" mimetype="text/html" />
+        <!-- See http://www.w3.org/TR/2002/NOTE-xhtml-media-types-20020801/#summary -->
+        <entry code="XHTML" mimetype="application/xhtml+xml" />
+        <!-- Image. -->
+        <entry code="JPG" mimetype="image/jpeg" byteOrder="big-endian" />
+        <entry code="JP2" mimetype="image/jp2" />
+        <entry code="TIF" mimetype="image/tiff" byteOrder="" />
+        <!-- Audio. -->
+        <entry code="MP3" mimetype="audio/mpeg" />
+
+        <!-- Non standard -->
+        <entry code="PDF" mimetype="application/pdf" />
+        <entry code="JPEG" mimetype="image/jpeg" byteOrder="big-endian" />
+        <entry code="JP2000" mimetype="image/jp2" />
+        <entry code="TIFF" mimetype="image/tiff" byteOrder="" />
+        <entry code="GIF" mimetype="image/gif" byteOrder="little-endian" />
+        <entry code="PNG" mimetype="image/png" byteOrder="big-endian" />
+        <entry code="OGG" mimetype="audio/ogg" byteOrder="little-endian" />
+        <entry code="FLAC" mimetype="audio/flac" byteOrder="" />
+    </typeFichier>
+
+    <typePagination>
+        <entry code="A" spar_dc="paginationA">Chiffres arabes</entry>
+        <entry code="F" spar_dc="paginationF">Foliotation</entry>
+        <entry code="N">Non paginée</entry>
+        <entry code="R" spar_dc="paginationR">Chiffres romains</entry>
+        <entry code="X" spar_dc="paginationX">Autre type</entry>
+    </typePagination>
+
+    <typePage>
+      <entry code="A">Publicités ou catalogues d'éditeurs</entry>
+      <entry code="C">Couverture ou couvrure</entry>
+      <entry code="D">Dessins ou illustrations</entry>
+      <entry code="E">Première page à afficher</entry>
+      <entry code="I">Index</entry>
+      <entry code="L">Logo</entry>
+      <entry code="N">Normale</entry>
+      <entry code="P">Page de titre</entry>
+      <entry code="R">Index ou tables des matières sans renvoi</entry>
+      <entry code="T">Table des matières</entry>
+      <entry code="Y">Page d’index déqualifié</entry>
+      <entry code="Z">Page de table des matières déqualifiée</entry>
+    </typePage>
+
+    <supportOrigine>
+        <entry code="CALQUE">Calque</entry>
+        <entry code="CYLINDRE">Cylindre</entry>
+        <entry code="DIA 35 CO POS">Diapositive 35 mm en couleur positive</entry>
+        <entry code="DIA 35 DT POS">Diapositive 35 mm en demi-teinte positive</entry>
+        <entry code="DISQUE">Disque audio de tous formats</entry>
+        <entry code="FICHE P1 CO POS">Microfiche mono vue en couleur positive</entry>
+        <entry code="FICHE P1 DT NEG">Microfiche mono vue en demi-teinte négative</entry>
+        <entry code="FICHE P1 DT POS">Microfiche mono vue en demi-teinte positive</entry>
+        <entry code="FICHE P1 NB NEG">Microfiche mono vue en noir et blanc négative</entry>
+        <entry code="FICHE P1 NB POS">Microfiche mono vue en noir et blanc positive</entry>
+        <entry code="FICHE P30 NB NEG">Microfiche de partition 30 vues en noir et blanc négative</entry>
+        <entry code="FICHE P30 NB POS">Microfiche de partition 30 vues en noir et blanc positive</entry>
+        <entry code="FICHE P49 DT NEG">Microfiche de partition 49 vues en demi-teinte négative</entry>
+        <entry code="FICHE P49 DT POS">Microfiche de partition 49 vues en demi-teinte positive</entry>
+        <entry code="FICHE P49 NB NEG">Microfiche de partition 49 vues en noir et blanc négative</entry>
+        <entry code="FICHE P49 NB POS">Microfiche de partition 49 vues en noir et blanc positive</entry>
+        <entry code="FICHE P60 NB NEG">Microfiche de partition 60 vues en noir et blanc négative</entry>
+        <entry code="FICHE P60 NB POS">Microfiche de partition 60 vues en noir et blanc positive</entry>
+        <entry code="FICHE P98 DT NEG">Microfiche de partition 98 vues en demi-teinte négative</entry>
+        <entry code="FICHE P98 DT POS">Microfiche de partition 98 vues en demi-teinte positive</entry>
+        <entry code="FICHE P98 NB NEG">Microfiche de partition 98 vues en noir et blanc négative</entry>
+        <entry code="FICHE P98 NB POS">Microfiche de partition 98 vues en noir et blanc positive</entry>
+        <entry code="FICHE PX DT NEG">Microfiche de partition non définie en demi-teinte négative</entry>
+        <entry code="FICHE PX DT POS">Microfiche de partition non définie en demi-teinte positive</entry>
+        <entry code="FICHE PX NB NEG">Microfiche de partition non définie en noir et blanc négative</entry>
+        <entry code="FICHE PX NB POS">Microfiche de partition non définie en noir et blanc positive</entry>
+        <entry code="FILM 16 DT POS">Film 16 mm en demi teinte positif</entry>
+        <entry code="FILM 16 NB NEG">Film 16 mm en noir et blanc négatif</entry>
+        <entry code="FILM 16 NB POS">Film 16 mm en noir et blanc positif</entry>
+        <entry code="FILM 35 CO POS">Film 35 mm en couleur positif</entry>
+        <entry code="FILM 35 DT NEG">Film 35 mm en demi-teinte négatif</entry>
+        <entry code="FILM 35 DT POS">Film 35 mm en demi-teinte positif</entry>
+        <entry code="FILM 35 NB NEG">Film 35 mm en noir et blanc négatif</entry>
+        <entry code="FILM 35 NB POS">Film 35 mm en noir et blanc positif</entry>
+        <entry code="NEGATIF SUR PAPIER">Négatif sur papier</entry>
+        <entry code="OBJET">Objet</entry>
+        <entry code="PAPIER FEU CO">Papier en feuille en couleur</entry>
+        <entry code="PAPIER FEU DT">Papier en feuille en demi-teinte</entry>
+        <entry code="PAPIER FEU NB">Papier en feuille en noir et blanc</entry>
+        <entry code="PAPIER MAS CO">Papier massicoté en couleur</entry>
+        <entry code="PAPIER MAS DT">Papier massicoté en demi-teinte</entry>
+        <entry code="PAPIER MAS NB">Papier massicoté en noir et blanc</entry>
+        <entry code="PAPIER REL CO">Papier relié en couleur</entry>
+        <entry code="PAPIER REL DT">Papier relié en demi-teinte</entry>
+        <entry code="PAPIER REL NB">Papier relié en noir et blanc</entry>
+        <entry code="PF 13X18 CO POS">Plan film 13x18 en couleur positif</entry>
+        <entry code="PF 13X18 DT POS">Plan film 13x18 en demi-teinte positif</entry>
+        <entry code="PF 18X24 CO POS">Plan film 18x24 en couleur positif</entry>
+        <entry code="PF 18X24 DT POS">Plan film 18x24 en demi-teinte positif</entry>
+        <entry code="PF 20X25 CO POS">Plan film 20x25 en couleur positif</entry>
+        <entry code="PF 4X5 CO POS">Plan film 4x5 en couleur positif</entry>
+        <entry code="PF 4X5 DT POS">Plan film 4x5 en demi-teinte positif</entry>
+        <entry code="PF 9X12 CO POS">Plan film 9x12 en couleur positif</entry>
+        <entry code="PF 9X12 DT POS">Plan film 9x12 en demi-teinte positif</entry>
+        <entry code="PHOTO PAPIER CO">Photo papier couleur</entry>
+        <entry code="PHOTO PAPIER NB">Photo papier noir et blanc</entry>
+        <entry code="PV 9X12 DT NEG">Plaque de verre 9x12 en demi-teinte négative</entry>
+        <entry code="PV CO NEG">Plaque de verre couleur négatif</entry>
+        <entry code="PV CO POS">Plaque de verre couleur positif</entry>
+        <entry code="PV DT NEG">Plaque de verre demi-teinte négatif</entry>
+        <entry code="PV DT POS">Plaque de verre demi-teinte positif</entry>
+        <entry code="PV NB NEG">Plaque de verre noir et blanc négatif</entry>
+        <entry code="PV NB POS">Plaque de verre noir et blanc positif</entry>
+    </supportOrigine>
+
+    <traitement>
+        <entry code="type" premis="treatmentType" note="non vérifié"/>
+        <entry code="ordre" premis="treatmentOrder" />
+        <entry code="dateDebut" premis="treatmentStart" note="non vérifié"/>
+        <entry code="dateFin" premis="treatmentEnd" note="non vérifié"/>
+    </traitement>
+
+    <agent>
+        <entry code="agentOperation" premis="performer" />
+        <entry code="agentAutorisation" premis="manager" note="non vérifié"/>
+        <!-- Agent n'existe pas (pour les commentaires objets). -->
+        <entry code="agent" premis="creator" note="non vérifié" />
+    </agent>
+
+    <operation>
+        <entry code="type" premis="operationType" note="séparé">Type d'opération</entry>
+        <entry code="ordre" premis="operationOrder">Ordre de l'opération</entry>
+        <entry code="dateDebut" premis="operationStart" note="non vérifié">Début d'opération</entry>
+        <entry code="dateFin" premis="operationEnd" note="non vérifié">Fin d'opération</entry>
+    </operation>
+
+    <operationElement>
+        <entry code="entree" premis="Entry"  note="non vérifié"/>
+        <entry code="description" premis="Description"  note="non vérifié"/>
+        <entry code="resultat" premis="Result" />
+    </operationElement>
+
+    <operationType>
+        <entry code="analyse" premis="" />
+        <entry code="expertise" premis="" />
+        <entry code="generationepub" premis="" />
+        <entry code="transcription" premis="" />
+        <entry code="transformation" premis="" />
+        <entry code="numerisation" premis="digitization" />
+        <entry code="exemplarisation" premis="groupDefinition" />
+        <entry code="ocerisation" premis="ocerization" />
+        <entry code="" premis="packageCreation" />
+        <entry code="" premis="preIngest" />
+        <entry code="" premis="fileProcessing" />
+        <entry code="" premis="packageReception" />
+        <entry code="" premis="requestAudit" />
+        <entry code="" premis="metsValidation" />
+        <entry code="" premis="packageSearch" />
+        <entry code="" premis="packageAudit" />
+        <entry code="" premis="idGeneration" />
+        <entry code="" premis="setProcessing" />
+        <entry code="" premis="ingestCompletion" />
+        <entry code="" premis="producerComment" />
+    </operationType>
+
+    <!-- Valable pour les refNum entrée / description / résultat et commentaire. -->
+    <operationTypeCommentaire>
+        <entry code="CONTROL" premis="controlComment" note="non vérifié">Motivations de rejet effectué par le contrôle qualité BnF</entry>
+        <entry code="INSTNUM" premis="processComment" note="non vérifié">Instructions particulières de traitement</entry>
+        <entry code="PREVERS" premis="predeliveryComment" note="non vérifié">Indication relative à un préversement</entry>
+        <!-- Code par défaut. -->
+        <entry code="PRODUCT" premis="producerComment">Indications liées à la production du document</entry>
+        <entry code="" premis="producerComment">Indications liées à la production du document</entry>
+        <entry code="REJPREST" premis="rejetionDeliveryComment" note="non vérifié">Motivations d'un rejet avant numérisation par le producteur</entry>
+        <entry code="USAGER" premis="userComment" note="non vérifié">Commentaires à destination de l'usager du document</entry>
+    </operationTypeCommentaire>
+
+    <detailsOperation>
+        <typeAgentType>
+            <entry code="ATELIER" note="non vérifié">Atelier</entry>
+            <entry code="OPERATEUR" note="non vérifié">Opérateur</entry>
+            <entry code="SOCIETE" note="non vérifié">Société</entry>
+        </typeAgentType>
+
+        <roleAgentType>
+            <entry code="CLASSIFICATIONDEWEY" note="non vérifié">Classification Dewey</entry>
+            <entry code="CONTROLEALTO" note="non vérifié">Contrôle ALTO</entry>
+            <entry code="CONTROLEIMAGES" note="non vérifié">Contrôle images</entry>
+            <entry code="CONTROLEPOSTPRODUCTION" note="non vérifié">Contrôle post-production</entry>
+            <entry code="CONVERSIONALTO" note="non vérifié">Conversion ALTO</entry>
+            <entry code="CONVERSIONOCR" note="non vérifié">Conversion OCR</entry>
+            <entry code="CORRECTIONOCRHQ" note="non vérifié">Correcton OCR haute qualité</entry>
+            <entry code="INTEGRATIONFICHIERS" note="non vérifié">Intégration fichiers</entry>
+            <entry code="NUMERISATIONMASSICOT" note="non vérifié">Numérisation massicot</entry>
+            <entry code="NUMERISATIONMICROFORMES" note="non vérifié">Numérisation microformes</entry>
+            <entry code="NUMERISATIONPATRIMOINE" note="non vérifié">Numérisation patrimoine</entry>
+            <entry code="SAISIEOCRHQ" note="non vérifié">Saisie OCR haute qualité</entry>
+            <entry code="SAISIETDM" note="non vérifié">Saisie table des matières</entry>
+            <entry code="SEGMENTATIONOCR" note="non vérifié">Ségmentation OCR</entry>
+            <entry code="TYPAGE" note="non vérifié">Typage</entry>
+            <entry code="CONVERSIONEPUB" note="non vérifié">Conversion e-pub</entry>
+            <entry code="GENERATIONEPUB" note="non vérifié">Génération e-pub</entry>
+            <entry code="GENERATIONADAPTATIF" note="non vérifié">Génération adaptatif</entry>
+        </roleAgentType>
+
+        <specificiteAgentType>
+            <entry code="NUMERISATIONARCHIVES" note="non vérifié">Numérisation archives</entry>
+            <entry code="NUMERISATIONCHEQUES" note="non vérifié">Numérisation chèques</entry>
+            <entry code="NUMERISATIONFORMULAIRES" note="non vérifié">Numérisation formulaires</entry>
+            <entry code="NUMERISATIONMASSICOT" note="non vérifié">Numérisation massicot</entry>
+            <entry code="NUMERISATIONMICROFORMES" note="non vérifié">Numérisation microformes</entry>
+            <entry code="NUMERISATIONPATRIMOINE" note="non vérifié">Numérisation patrimoine</entry>
+            <entry code="PAGINATION" note="non vérifié">Pagination</entry>
+            <entry code="SAISIEOCRHQ" note="non vérifié">Saisie OCR haute qualité</entry>
+            <entry code="SAISIETDM" note="non vérifié">Saisie table des matières</entry>
+            <entry code="TRAITEMENTIMAGE" note="non vérifié">Traitement image</entry>
+            <entry code="TYPAGE" note="non vérifié">Typage</entry>
+        </specificiteAgentType>
+
+        <typeOutilType>
+            <entry code="LOGICIELAUTRE" note="non vérifié">Logiciel autre</entry>
+            <entry code="LOGICIELOCR" note="non vérifié">Logiciel d'OCR</entry>
+            <entry code="LOGICIELSAISIE" note="non vérifié">Logiciel de saisie</entry>
+            <entry code="LOGICIELTRAITEMENTDIMAGE" note="non vérifié">Logiciel de traitement d'image</entry>
+            <entry code="LOGICIELTYPAGE" note="non vérifié">Logiciel de typage</entry>
+            <entry code="NUMERISEUR" note="non vérifié">Numériseur</entry>
+            <entry code="PILOTE" note="non vérifié">Pilote</entry>
+            <entry code="POSTE" note="non vérifié">Poste</entry>
+            <entry code="SERVEUR" note="non vérifié">Serveur</entry>
+            <entry code="LOGICIELCREATIONEPUB" note="non vérifié">Logiciel création e-pub</entry>
+            <entry code="LOGICIELCREATIONADAPTATIF" note="non vérifié">Logiciel création adaptatif</entry>
+        </typeOutilType>
+
+        <description>
+            <entry code="BINARISATION" note="non vérifié">Binarisation</entry>
+            <entry code="CONVERSIONALTO" note="non vérifié">Conversion ALTO</entry>
+            <entry code="CONVERSIONTIFF" note="non vérifié">Conversion TIFF</entry>
+            <entry code="CORRECTIONOCRHQ" note="non vérifié">Correction OCR haute qualité</entry>
+            <entry code="DECOUPAGE" note="non vérifié">Découpage</entry>
+            <entry code="DEQUALIFICATIONHQOCRHQ" note="non vérifié">Déqualification haute qualité OCR haute qualité</entry>
+            <entry code="DEQUALIFICATIONHQTDM" note="non vérifié">Déqualification haute qualité Table des matières</entry>
+            <entry code="DETOURAGE" note="non vérifié">Détourage</entry>
+            <entry code="DETYPAGETDM" note="non vérifié">Détypage Table des matières</entry>
+            <entry code="OCERISATION" note="non vérifié">Océrisation</entry>
+            <entry code="PAGINATION" note="non vérifié">Pagination</entry>
+            <entry code="REDRESSEMENT">Redressement</entry>
+            <entry code="ROTATION" note="non vérifié">Rotation</entry>
+            <entry code="SAISIETDM" note="non vérifié">Saisie Table des matières</entry>
+            <entry code="SEGMENTATIONOCR" note="non vérifié">Segmentation OCR</entry>
+            <entry code="TYPAGE" note="non vérifié">Typage</entry>
+        </description>
+
+        <resultat>
+            <entry code="NOMBREDEPAGESTYPEESINDEX" note="non vérifié">Nombre de pages typées "Index"</entry>
+            <entry code="NOMBREDEPAGESTYPEESLOGO" note="non vérifié">Nombre de pages typées "Logo"</entry>
+            <entry code="NOMBREDEPAGESTYPEESTDM" note="non vérifié">Nombre de pages typées "Table des matières"</entry>
+            <entry code="NOMBREDEPAGESTYPEESTITRE" note="non vérifié">Nombre de pages typées "Titre"</entry>
+            <entry code="NOMBRESDEPAGESSAISIESINDEX" note="non vérifié">Nombre de pages saisies pour l'Index</entry>
+            <entry code="NOMBRESDEPAGESSAISIESOCRHQ" note="non vérifié">Nombre de pages saisies pour l'OCR haute qualité</entry>
+            <entry code="NOMBRESDEPAGESSAISIESTDM" note="non vérifié">Nombre de pages saisies pour la table des matières</entry>
+            <entry code="NQAMOYEN">NQA moyen</entry>
+            <entry code="STATUT" note="non vérifié">Statut</entry>
+            <entry code="CONTENUNONSIGNIFICATIF" note="non vérifié">Contenu non significatif</entry>
+            <entry code="PAGEDEPUBLICITE" note="non vérifié">Page de publicité</entry>
+            <entry code="PROBLEMEDESEGMENTATION" note="non vérifié">Problème de ségmentation</entry>
+            <entry code="TAUXOCRDEBASE">Taux OCR de base</entry>
+            <entry code="TAUXOCRDEBASECORRIGE">Taux OCR de base corrigé</entry>
+            <entry code="TRANSPARENCEPAPIER" note="non vérifié">Transparence papier</entry>
+            <entry code="DENSITEMICROFORME" note="non vérifié">Densité microforme</entry>
+            <entry code="POIDS" note="non vérifié">Poids</entry>
+            <entry code="QUALITEEPUB" note="non vérifié">Qualité ePub</entry>
+            <entry code="ACCESSIBILITEEPUB" note="non vérifié">Accessibilité e-pub</entry>
+            <entry code="CONSULTATIONADAPTATIF" note="non vérifié">Consultation adaptatif</entry>
+            <entry code="CONSULTATIONEPUB" note="non vérifié">Consultation e-pub</entry>
+            <entry code="SIGNALEMENTADAPTATIF" note="non vérifié">Signalement adaptatif</entry>
+            <entry code="SIGNALEMENTEPUB" note="non vérifié">Signalement e-pub</entry>
+            <entry code="TAUXQUALITEADAPTATIF" note="non vérifié">Taux de qualité adaptatif</entry>
+            <entry code="TAUXQUALITEEPUB" note="non vérifié">Taux de qualité e-pub</entry>
+            <entry code="TYPEADAPTATIF" note="non vérifié">Type adaptatif</entry>
+            <entry code="TYPEEPUB" note="non vérifié">Type e-pub</entry>
+            <entry code="VERSIONADAPTATIF" note="non vérifié">Version adaptatif</entry>
+            <entry code="VERSIONEPUB" note="non vérifié">Version e-pub</entry>
+        </resultat>
+    </detailsOperation>
+
+    <formatPremis>
+        <!-- TODO Est-ce le format alto ou xml ? -->
+        <entry code="text/xml" version="1.0" registryName="BnF SPAR" registryKey="ark:/12148/br2d2gz" />
+        <entry code="image/tiff" version="6.0" registryName="BnF SPAR" registryKey="ark:/12148/br2d2wf" />
+        <!-- Autres formats à ajouter -->
+    </formatPremis>
+</XMLlist>
+

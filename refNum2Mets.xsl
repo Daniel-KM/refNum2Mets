@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Description : Convertit un fichier refNum en Mets.
-Version : 20150622
+Version : 20150907
 Auteur : Daniel Berthereau pour l'École des Mines de Paris [http://bib.mines-paristech.fr]
 
 refnum2Mets est un outil pour convertir des fichiers xml du format refNum
@@ -79,6 +79,7 @@ TODO
 - Ajouter périodique
 
 Historique
+2015/09/07 Corrections de détails et ajout d'un script pour traiter les dossiers
 2015/06/22 Version pour publication
 2015/03/16 Version initiale (Mines ParisTech)
 

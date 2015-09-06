@@ -9,6 +9,10 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
     trouvent pas dans le refNum, mais qui sont nécessaires au Mets, par exemple
     la taille des images, le format, le hash, etc. Ces informations sont simples
     à obtenir par d'autres scripts ou outils.
+    L'attribut "chemin" permet de définir le dossier dans lequel il se trouve,
+    par priorité ("xsl" pour le dossier de l'outil, par défaut, ou "xml" pour le
+    dossier du refnum). Cela évite une erreur lorsque la fonction "unparsed-text-available()"
+    n'est pas disponible.
     =============================================================== -->
 
     <!-- Listes des codes du format refNum (types de page, pagination, supports,
@@ -18,18 +22,15 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
     <!-- Ce fichier liste les hashs et chemins de tous les fichiers, ce qui peut
     être requis pour certains profils et calculés auparavant. Le chemin doit
     correspondre à l'adresse href utilisé pour la localisation du fichier.
-    Exemples de commande sans et avec sous-dossiers :
-    find . -type f | sort | xargs md5sum > fichiers.hash
-    find . -type f | cut -sd / -f 2- | sort | xargs sha1sum > fichiers.hash
     -->
     <checksum>
-        <liste>fichiers_hash.txt</liste>
+        <liste chemin="xml">filehashs.txt</liste>
         <type>SHA-1</type>
     </checksum>
 
-    <tailles>
-        <liste>fichiers_taille.txt</liste>
-    </tailles>
+    <filesize>
+        <liste chemin="xml">filesizes.txt</liste>
+    </filesize>
 
     <!-- ==============================================================
     INIFORMATIONS DIVERSES
@@ -38,7 +39,7 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
     <!-- L'identifiant ark est unique, court, opaque et pérenne et permet
     d'identifier l'insititution qui dispose des documents -->
     <ark>
-        <liste>notices_ark.txt</liste>
+        <liste chemin="xsl">arks.txt</liste>
         <!-- Numéro d'autorité nommante attribué gratuitement par la
         California Digital Library. La BnF est le 12148, 12345 indique un exemple. -->
         <institution>12345</institution>

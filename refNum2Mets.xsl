@@ -448,7 +448,7 @@ Historique
 
                         <!-- dc:creator -->
                         <!-- Plusieurs auteurs peuvent être séparés par des points-virgules. -->
-                        <xsl:for-each select="tokenize(normalize-space(refNum:document/refNum:bibliographie/refNum:auteur), ';')">
+                        <xsl:for-each select="tokenize(normalize-space(refNum:document/refNum:bibliographie/refNum:auteur), ';')[normalize-space(.) != '']">
                             <dc:creator>
                                 <xsl:value-of select="normalize-space(.)" />
                             </dc:creator>
@@ -458,9 +458,9 @@ Historique
                         </xsl:call-template>
 
                         <!-- dc:subject -->
-                        <xsl:for-each select="normalize-space(refNum:document/refNum:bibliographie/refNum:reference[@type = 'CADRECLASSEMENTDEWEY'])">
+                        <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'CADRECLASSEMENTDEWEY'][normalize-space(.) != '']">
                             <dc:subject>
-                                <xsl:value-of select="." />
+                                <xsl:value-of select="normalize-space(.)" />
                             </dc:subject>
                         </xsl:for-each>
                         <xsl:call-template name="ajout_metadonnees">
@@ -468,9 +468,9 @@ Historique
                         </xsl:call-template>
 
                         <!-- dc:description -->
-                        <xsl:for-each select="normalize-space(refNum:document/refNum:bibliographie/refNum:description)">
+                        <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:description[normalize-space(.) != '']">
                             <dc:description>
-                                <xsl:value-of select="." />
+                                <xsl:value-of select="normalize-space(.)" />
                             </dc:description>
                         </xsl:for-each>
                         <xsl:if test="$tomaisonTitle != ''">
@@ -521,9 +521,9 @@ Historique
                         </xsl:call-template>
 
                         <!-- dc:date (dcterms:issued) -->
-                        <xsl:for-each select="normalize-space(refNum:document/refNum:bibliographie/refNum:dateEdition)">
+                        <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:dateEdition[normalize-space(.) != '']">
                             <dc:date>
-                                <xsl:value-of select="." />
+                                <xsl:value-of select="normalize-space(.)" />
                             </dc:date>
                         </xsl:for-each>
                         <xsl:if test="$tomaisonDate != '' and $profil/section/DescriptiveMetadataSection/tomaison/ajoutDate/@remplir = 'true'">
@@ -601,10 +601,10 @@ Historique
                             </dc:identifier>
                         </xsl:if>
                         <!-- TODO En section descriptive ou administrative ? -->
-                        <xsl:for-each select="normalize-space(refNum:document/refNum:bibliographie/refNum:reference[@type = 'IDDOCUMENT'])">
+                        <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'IDDOCUMENT'][normalize-space(.) != '']">
                             <dc:identifier>
                                 <xsl:text>ID document : </xsl:text>
-                                <xsl:value-of select="." />
+                                <xsl:value-of select="normalize-space(.)" />
                             </dc:identifier>
                         </xsl:for-each>
                         <xsl:call-template name="ajout_metadonnees">
@@ -613,21 +613,21 @@ Historique
 
                         <!-- dc:source -->
                         <!-- Voir http://dublincore.org/documents/usageguide/elements.shtml#source -->
-                        <xsl:for-each select="normalize-space(refNum:document/refNum:bibliographie/refNum:reference[@type = 'COTEORIGINAL'])">
+                        <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'COTEORIGINAL'][normalize-space(.) != '']">
                             <dc:source>
                                 <xsl:text>Cote original : </xsl:text>
-                                <xsl:value-of select="." />
+                                <xsl:value-of select="normalize-space(.)" />
                             </dc:source>
                         </xsl:for-each>
-                        <xsl:for-each select="normalize-space(refNum:document/refNum:bibliographie/refNum:reference[@type = 'COTEOBJETREPRODUIT'])">
+                        <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'COTEOBJETREPRODUIT'][normalize-space(.) != '']">
                             <dc:source>
                                 <xsl:text>Cote objet reproduit : </xsl:text>
-                                <xsl:value-of select="." />
+                                <xsl:value-of select="normalize-space(.)" />
                             </dc:source>
                         </xsl:for-each>
-                        <xsl:for-each select="normalize-space(refNum:document/refNum:bibliographie/refNum:reference[@type = 'SOURCE'])">
+                        <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'SOURCE'][normalize-space(.) != '']">
                             <dc:source>
-                                <xsl:value-of select="." />
+                                <xsl:value-of select="normalize-space(.)" />
                             </dc:source>
                         </xsl:for-each>
                         <xsl:call-template name="ajout_metadonnees">
@@ -645,16 +645,16 @@ Historique
                         </xsl:call-template>
 
                         <!-- dc:relation -->
-                        <xsl:for-each select="normalize-space(refNum:document/refNum:bibliographie/refNum:reference[@type = 'NOTICEBIBLIOGRAPHIQUE'])">
+                        <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'NOTICEBIBLIOGRAPHIQUE'][normalize-space(.) != '']">
                             <dc:relation>
-                                <xsl:value-of select="." />
+                                <xsl:value-of select="normalize-space(.)" />
                             </dc:relation>
                         </xsl:for-each>
                         <!-- TODO En section descriptive ou administrative ? -->
-                        <xsl:for-each select="normalize-space(refNum:document/refNum:bibliographie/refNum:reference[@type = 'CODEBARREBNF'])">
+                        <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'CODEBARREBNF'][normalize-space(.) != '']">
                             <dc:relation>
                                 <xsl:text>Code-barre BnF : </xsl:text>
-                                <xsl:value-of select="." />
+                                <xsl:value-of select="normalize-space(.)" />
                             </dc:relation>
                         </xsl:for-each>
                         <xsl:call-template name="ajout_metadonnees">
@@ -782,7 +782,7 @@ Historique
             </xsl:if>
         </xsl:element>
 
-<!--
+    <!--
         // Production.
         $production = &$this->_xml->document->production;
 
@@ -827,7 +827,7 @@ Historique
             $doc['metadata']['refNum']['Historique'][] = $production->historique->asXML();
         }
         */
--->
+    -->
     </xsl:template>
 
     <xsl:template match="refNum:vueObjet/refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio']"
@@ -1282,6 +1282,8 @@ Historique
                 <xsl:element name="xmlData">
                     <xsl:element name="{$profil/section/DescriptiveMetadataSection/descriptiveFormatWrapper}">
 
+                        <!-- A la BnF, le format de la source est en "description",
+                        pas en "format" ou "Medium". -->
                         <!-- dc:description -->
                         <xsl:for-each-group select="refNum:document/refNum:structure/refNum:vueObjet/refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio']"
                             group-by="@supportOrigine">
@@ -1291,14 +1293,14 @@ Historique
                         </xsl:for-each-group>
 
                         <!-- dc:identifier -->
-                        <xsl:for-each select="normalize-space(refNum:document/refNum:bibliographie/refNum:reference[@type = 'CODEBARREPROVENANCE'])">
+                        <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'CODEBARREPROVENANCE'][normalize-space(.) != '']">
                             <xsl:element name="dc:identifier">
                                 <xsl:if test="$profil/section/AdministrativeMetadataSection/sourceMD/codeBarreSelect">
                                     <xsl:attribute name="xsi:type">
                                         <xsl:value-of select="$profil/section/AdministrativeMetadataSection/sourceMD/codeBarreSelect" />
                                     </xsl:attribute>
                                 </xsl:if>
-                                <xsl:value-of select="." />
+                                <xsl:value-of select="normalize-space(.)" />
                             </xsl:element>
                         </xsl:for-each>
 
@@ -3622,5 +3624,6 @@ Historique
 
         <xsl:value-of select="substring($chaine, string-length($chaine) - $longueur + 1)" />
     </xsl:function>
+
 </xsl:stylesheet>
 

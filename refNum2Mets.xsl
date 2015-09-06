@@ -123,6 +123,89 @@ Historique
     <xsl:variable name="profil" select="$parametres/profil[@nom = ../formats/profil_mets[@utiliser = 'true'][1]/@nom]" />
     <xsl:variable name="adresse" select="$parametres/adresse[@nom = ../formats/adresse_fichier[@utiliser = 'true'][1]/@nom]" />
 
+    <!-- Fichiers additionnels : utilise ceux présents à côté du fichier refNum,
+    sinon ceux du présent dossier. -->
+    <xsl:variable name="dirname" as="xs:string" select="
+            string-join(tokenize(document-uri(/), '/')[position() &lt; last()], '/')" />
+    <xsl:variable name="checksums" as="xs:string">
+        <xsl:choose>
+            <xsl:when test="function-available('unparsed-text-available')">
+                <xsl:value-of select="
+                    if ($parametres/checksum/liste/@chemin = 'xml')
+                        then if (unparsed-text-available(concat($dirname, '/', $parametres/checksum/liste), 'UTF-8'))
+                            then concat($dirname, '/', $parametres/checksum/liste)
+                            else if (unparsed-text-available(resolve-uri($parametres/checksum/liste)))
+                                then resolve-uri($parametres/checksum/liste)
+                                else ''
+                    else if (unparsed-text-available(resolve-uri($parametres/checksum/liste)))
+                        then resolve-uri($parametres/checksum/liste)
+                        else if (unparsed-text-available(concat($dirname, '/', $parametres/checksum/liste), 'UTF-8'))
+                            then concat($dirname, '/', $parametres/checksum/liste)
+                            else ''
+                    " />
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="
+                        if ($parametres/checksum/liste/@chemin = 'xml')
+                        then concat($dirname, '/', $parametres/checksum/liste)
+                        else resolve-uri($parametres/checksum/liste)
+                        " />
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="filesizes" as="xs:string">
+         <xsl:choose>
+            <xsl:when test="function-available('unparsed-text-available')">
+                <xsl:value-of select="
+                    if ($parametres/filesize/liste/@chemin = 'xml')
+                        then if (unparsed-text-available(concat($dirname, '/', $parametres/filesize/liste), 'UTF-8'))
+                            then concat($dirname, '/', $parametres/filesize/liste)
+                            else if (unparsed-text-available(resolve-uri($parametres/filesize/liste)))
+                                then resolve-uri($parametres/filesize/liste)
+                                else ''
+                    else if (unparsed-text-available(resolve-uri($parametres/filesize/liste)))
+                        then resolve-uri($parametres/filesize/liste)
+                        else if (unparsed-text-available(concat($dirname, '/', $parametres/filesize/liste), 'UTF-8'))
+                            then concat($dirname, '/', $parametres/filesize/liste)
+                            else ''
+                    " />
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="
+                        if ($parametres/filesize/liste/@chemin = 'xml')
+                        then concat($dirname, '/', $parametres/filesize/liste)
+                        else resolve-uri($parametres/filesize/liste)
+                        " />
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
+   <xsl:variable name="arks" as="xs:string">
+        <xsl:choose>
+            <xsl:when test="function-available('unparsed-text-available')">
+                <xsl:value-of select="
+                    if ($parametres/ark/liste/@chemin = 'xml')
+                        then if (unparsed-text-available(concat($dirname, '/', $parametres/ark/liste), 'UTF-8'))
+                            then concat($dirname, '/', $parametres/ark/liste)
+                            else if (unparsed-text-available(resolve-uri($parametres/ark/liste)))
+                                then resolve-uri($parametres/ark/liste)
+                                else ''
+                    else if (unparsed-text-available(resolve-uri($parametres/ark/liste)))
+                        then resolve-uri($parametres/ark/liste)
+                        else if (unparsed-text-available(concat($dirname, '/', $parametres/ark/liste), 'UTF-8'))
+                            then concat($dirname, '/', $parametres/ark/liste)
+                            else ''
+                    " />
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="
+                        if ($parametres/ark/liste/@chemin = 'xml')
+                        then concat($dirname, '/', $parametres/ark/liste)
+                        else resolve-uri($parametres/ark/liste)
+                        " />
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
+
     <!-- Identifiant ark de la notice en cours, si possible. -->
     <xsl:variable name="arkId" as="xs:string">
         <xsl:choose>
@@ -2225,7 +2308,7 @@ Historique
                 </xsl:if>
             </xsl:if>
 
-            <xsl:if test="$parametres/tailles/liste">
+            <xsl:if test="$filesizes">
                 <xsl:variable name="tailleFichier" select="r2m:trouveTaille($href)" />
                 <xsl:if test="$tailleFichier != ''">
                     <xsl:attribute name="SIZE">
@@ -2851,7 +2934,7 @@ Historique
 
         <!-- TODO Optimiser si besoin. -->
         <xsl:variable name="resultat">
-            <xsl:for-each select="tokenize(unparsed-text($parametres/checksum/liste, 'UTF-8'), '\r?\n')">
+            <xsl:for-each select="tokenize(unparsed-text($checksums, 'UTF-8'), '\r?\n')">
                 <xsl:if test="normalize-space(substring-after(., ' ')) = $fichier">
                     <xsl:value-of select="normalize-space(substring-before(., ' '))" />
                 </xsl:if>
@@ -2860,16 +2943,16 @@ Historique
         <xsl:value-of select="string($resultat)" />
     </xsl:function>
 
-    <!-- Récupère l'identifiant ark à partir de l'identifiant du document. -->
+    <!-- Récupère la taille d'un fichier. -->
     <xsl:function name="r2m:trouveTaille">
         <!-- Identifiant du document -->
-        <xsl:param name="identifiant" />
+        <xsl:param name="fichier" />
 
         <!-- TODO Optimiser si besoin. -->
         <xsl:variable name="resultat">
-            <xsl:for-each select="tokenize(unparsed-text($parametres/tailles/liste, 'UTF-8'), '\r?\n')">
-                <xsl:if test="normalize-space(substring-before(., ' ')) = $identifiant">
-                    <xsl:value-of select="normalize-space(substring-after(., ' '))" />
+            <xsl:for-each select="tokenize(unparsed-text($filesizes, 'UTF-8'), '\r?\n')">
+                <xsl:if test="normalize-space(substring-after(., ' ')) = $fichier">
+                    <xsl:value-of select="normalize-space(substring-before(., ' '))" />
                 </xsl:if>
             </xsl:for-each>
         </xsl:variable>
@@ -2883,7 +2966,7 @@ Historique
 
         <!-- TODO Optimiser si besoin. -->
         <xsl:variable name="resultat">
-            <xsl:for-each select="tokenize(unparsed-text($parametres/ark/liste, 'UTF-8'), '\r?\n')">
+            <xsl:for-each select="tokenize(unparsed-text($arks, 'UTF-8'), '\r?\n')">
                 <xsl:if test="normalize-space(substring-before(., ' ')) = $identifiant">
                     <xsl:value-of select="normalize-space(substring-after(., ' '))" />
                 </xsl:if>

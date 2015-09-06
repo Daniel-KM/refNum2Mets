@@ -603,7 +603,7 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
         <!-- Sous-dossier par document avec l'identifiant. -->
         <sousDossierDocument>false</sousDossierDocument>
         <!-- Sous-dossier selon les fichiers et objets associés. -->
-        <sousDossierType>false</sousDossierType>
+        <sousDossierType>true</sousDossierType>
         <!-- Nom de fichier des objets associés : vide par défaut (identique),
         "première lettre" (chez certains prestataires, la première lettre
         correspond à l'extension). -->

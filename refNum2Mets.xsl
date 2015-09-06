@@ -3148,7 +3148,9 @@ Historique
         <xsl:param name="format" />
 
         <xsl:choose>
-            <xsl:when test="$format/titreFichierNP = 'vide'"></xsl:when>
+            <xsl:when test="$format/titreFichierNP = 'vide'">
+                <xsl:text></xsl:text>
+            </xsl:when>
             <xsl:when test="$format/titreFichierNP = 'fixe'">
                 <xsl:value-of select="$format/titreFichierNPTexte" />
             </xsl:when>
@@ -3341,7 +3343,7 @@ Historique
                     <xsl:when test="$trouve = true()">
                         <xsl:value-of select="string($numero)" />
                     </xsl:when>
-                    <xsl:when test="$trouve = 'folio'">
+                    <xsl:when test="string($trouve) = 'folio'">
                         <xsl:value-of select="concat(string($numero), ' (verso)')" />
                     </xsl:when>
                     <xsl:otherwise>

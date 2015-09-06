@@ -40,14 +40,14 @@ Historique :
         <entry code="" use="master" sousDossier="master" extensionType="typeFichier" eventType="digitization" eventDetail="automatic treatment">Master</entry>
 
         <!-- Ni définition, ni exemple. -->
-        <entry code="ADAPTATIF" use="adaptatif" sousDossier="Adaptatif">Adaptatif</entry>
-        <entry code="ALTO" use="ocr" sousDossier="OCR" mimetype="text/xml" extension="alto.xml" eventType="ocerization" eventDetail="Génération du produit de la reconnaissance optique de caractères">OCR</entry>
-        <entry code="EPUB" use="epub" sousDossier="ePub" mimetype="application/epub+zip" extension="epub">ePub</entry>
-        <entry code="EXTRAIT" use="extrait" sousDossier="Extrait" extensionType="typeFichier">Extrait</entry>
-        <entry code="TDM" use="tdm" sousDossier="TDM" mimetype="text/xml" extension="xml">Table des matières</entry>
+        <entry code="ADAPTATIF" use="adaptatif" sousDossier="adaptatif">Adaptatif</entry>
+        <entry code="ALTO" use="ocr" sousDossier="ocr" mimetype="text/xml" extension="alto.xml" eventType="ocerization" eventDetail="Génération du produit de la reconnaissance optique de caractères">OCR</entry>
+        <entry code="EPUB" use="epub" sousDossier="epub" mimetype="application/epub+zip" extension="epub">ePub</entry>
+        <entry code="EXTRAIT" use="extrait" sousDossier="extrait" extensionType="typeFichier">Extrait</entry>
+        <entry code="TDM" use="tdm" sousDossier="tdm" mimetype="text/xml" extension="xml">Table des matières</entry>
         <!-- Ni définition, ni exemple. -->
-        <entry code="TUILES" use="tuiles" sousDossier="Tuiles" mimetype="image/jpeg" extension="jpg">Tuiles</entry>
-        <entry code="TXT" use="texte" sousDossier="Texte" mimetype="text/plain" extension="txt">Texte</entry>
+        <entry code="TUILES" use="tuiles" sousDossier="tuiles" mimetype="image/jpeg" extension="jpg">Tuiles</entry>
+        <entry code="TXT" use="texte" sousDossier="texte" mimetype="text/plain" extension="txt">Texte</entry>
     </objetAssocie>
 
     <typeFichier>

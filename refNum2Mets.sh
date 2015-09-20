@@ -29,8 +29,8 @@ then
     dossier=$(pwd)
 fi
 
-filehashs='filehashs.txt'
-filesizes='filesizes.txt'
+filehashs='fichiers_hashs.txt'
+filesizes='fichiers_tailles.txt'
 arks='arks.txt'
 
 # Directory du script

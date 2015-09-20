@@ -19,18 +19,21 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
     etc., afin de les traduire en langue compréhensible. -->
     <codes>refNum2Mets_codes.xml</codes>
 
-    <!-- Ce fichier liste les hashs et chemins de tous les fichiers, ce qui peut
-    être requis pour certains profils et calculés auparavant. Le chemin doit
-    correspondre à l'adresse href utilisé pour la localisation du fichier.
-    -->
-    <checksum>
-        <liste chemin="xml">filehashs.txt</liste>
-        <type>SHA-1</type>
-    </checksum>
+    <fichiers>
+        <!-- Ce fichier liste les hashs et chemins de tous les fichiers, ce qui peut
+        être requis pour certains profils et calculés auparavant. Le chemin doit
+        correspondre à l'adresse href utilisé pour la localisation du fichier: soit
+        le dossier des fichiers (xml), soit le dossier du script (xsl).
+        -->
+        <checksums>
+            <liste chemin="xml">fichiers_hashs.txt</liste>
+            <type>SHA-1</type>
+        </checksums>
 
-    <filesize>
-        <liste chemin="xml">filesizes.txt</liste>
-    </filesize>
+        <tailles>
+            <liste chemin="xml">fichiers_tailles.txt</liste>
+        </tailles>
+    </fichiers>
 
     <!-- ==============================================================
     INIFORMATIONS DIVERSES

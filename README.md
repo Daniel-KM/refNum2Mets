@@ -44,20 +44,29 @@ configuration.
 L'ensemble des paramètres doivent être indiqués dans le fichier de configuration
 associé "refNum2Mets_config.xml".
 
+La feuille peut utiliser les informations sur les documents et sur les fichiers
+qui se trouvent dans les fichiers associés pour les identifiants arks, les
+hashs, les tailles de fichiers et les métadonnées complémentaires. Pour ces
+derniers, le fichier correspond à "content.xml" qui se trouve dans un fichier
+Open Document Spreadsheet. Pour l'obtenir, créer un tableau avec LibreOffice ou
+tout autre tableur respectueux des standards, l'enregistrer au format "ods", et
+dézipper ce fichier. Un exemple est fourni. Le script utilise directement l'un
+ou l'autre format.
+
 
 Avertissement
 -------------
 
 À utiliser à vos risques et périls.
 
-Il est toujours recommandé de sauvegarder ses fichiers régulièrement afin de
-pouvoir les retrouver en cas de besoin.
+Il est toujours recommandé de sauvegarder ses fichiers et ses métadonnées
+régulièrement afin de pouvoir les retrouver en cas de besoin.
 
 
 Problèmes
 ---------
 
-Signaler les remarques en ligne sur la page des [problèmes] de GitHub.
+Signaler les remarques en ligne sur la page des [questions] de GitHub.
 
 
 License
@@ -116,7 +125,7 @@ Copyright
 [Saxonica]: http://www.saxonica.com/download/opensource.xml
 [jEdit]: http://www.jedit.org
 [plugins xml et xslt]: http://plugins.jedit.org/list.php?category=4
-[problèmes]: https://github.com/Daniel-KM/refNum2Mets/issues
+[questions]: https://github.com/Daniel-KM/refNum2Mets/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-fr.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org

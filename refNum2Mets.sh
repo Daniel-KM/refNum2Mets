@@ -7,12 +7,14 @@
 # - Les noms de fichiers ne doivent pas contenir d'espace (problème dans
 # l'extraction des tailles de fichiers).
 #
+# Les noms de fichiers doivent correspondre à ceux de refNum2Mets_config.xml.
+#
 # Utilise :
 # - xmllint
 # - saxon-he
 #
 # Auteur Daniel Berthereau <daniel.berthereau@mines-paristech.fr>
-# Copyright Daniel Berthereau, 2015-09-07
+# Copyright Daniel Berthereau, 2015-09-21
 # Licence CeCILL v2.1
 #
 # Commande :
@@ -29,8 +31,12 @@ then
     dossier=$(pwd)
 fi
 
+# Si ods est présent, on sauve ses métadonnées en xml, sinon on prend le xml.
+filemetadata='fichiers_metadata.ods'
+filemetadataxml='fichiers_metadata.xml'
 filehashs='fichiers_hashs.txt'
 filesizes='fichiers_tailles.txt'
+
 arks='arks.txt'
 
 # Directory du script
@@ -75,6 +81,21 @@ do
     taillefichiers=$(du -sh | cut -f 1)
 
     echo $filename '=>' $metsfilename \($nombrefichiers fichiers, $taillefichiers\)
+
+    # Extraction des métadonnées si besoin.
+    if [ -f "$filemetadata" ]
+    then
+        echo '  ' Utilisation des métadonnées de "$filemetadata" décompressées dans "$filemetadataxml".
+        unzip -p "$filemetadata" content.xml > "$filemetadataxml"
+    else
+        if [ -f "$filemetadataxml" ]
+        then
+            echo '  ' Utilisation des métadonnées de "$filemetadataxml".
+        else
+            echo '  ' Pas de métadonnées pour les fichiers.
+            metadatapath=""
+        fi
+    fi
 
     # Préparation des taille des fichiers du dossier courant.
     taillepath="$dirname/$filesizes"

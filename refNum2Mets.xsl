@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Description : Convertit un fichier refNum en Mets.
-Version : 20150907
+Version : 20150921
 Auteur : Daniel Berthereau pour l'École des Mines de Paris [http://bib.mines-paristech.fr]
 
 refnum2Mets est un outil pour convertir des fichiers xml du format refNum
@@ -79,6 +79,7 @@ TODO
 - Ajouter périodique
 
 Historique
+2015/09/21 Ajout des métadonnées descriptives des pages
 2015/09/07 Corrections de détails et ajout d'un script pour traiter les dossiers
 2015/06/22 Version pour publication
 2015/03/16 Version initiale (Mines ParisTech)
@@ -110,10 +111,15 @@ Historique
     xmlns:niso="http://www.niso.org/Z39-87-2006.pdf"
     xmlns:textmd="info:lc/xmlns/textMD-v3"
 
+    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+    xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+    xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+
     exclude-result-prefixes="
         xsl fn xs r2m refNum detailsOperation
         spar_dc alto
         mets textmd
+        office text table
         ">
 
     <xsl:output method="xml" indent="yes" encoding="UTF-8"/>
@@ -186,6 +192,33 @@ Historique
                         if ($parametres/fichiers/tailles/liste/@chemin = 'xml')
                         then concat($dirname, '/', $parametres/fichiers/tailles/liste)
                         else resolve-uri($parametres/fichiers/tailles/liste)
+                        " />
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="fichier_metadata" as="xs:string">
+        <xsl:choose>
+            <xsl:when test="function-available('unparsed-text-available')">
+                <xsl:value-of select="
+                    if ($parametres/fichiers/metadata/liste/@chemin = 'xml')
+                        then if (unparsed-text-available(concat($dirname, '/', $parametres/fichiers/metadata/liste), 'UTF-8'))
+                            then concat($dirname, '/', $parametres/fichiers/metadata/liste)
+                            else if (unparsed-text-available(resolve-uri($parametres/fichiers/metadata/liste)))
+                                then resolve-uri($parametres/fichiers/metadata/liste)
+                                else ''
+                    else if (unparsed-text-available(resolve-uri($parametres/fichiers/metadata/liste)))
+                        then resolve-uri($parametres/fichiers/metadata/liste)
+                        else if (unparsed-text-available(concat($dirname, '/', $parametres/fichiers/metadata/liste), 'UTF-8'))
+                            then concat($dirname, '/', $parametres/fichiers/metadata/liste)
+                            else ''
+                    " />
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="
+                        if ($parametres/fichiers/metadata/liste/@chemin = 'xml')
+                        then concat($dirname, '/', $parametres/fichiers/metadata/liste)
+                        else resolve-uri($parametres/fichiers/metadata/liste)
                         " />
             </xsl:otherwise>
         </xsl:choose>
@@ -701,23 +734,57 @@ Historique
                 <xsl:attribute name="LABEL">Notice de vue</xsl:attribute>
                 <xsl:element name="xmlData">
                     <xsl:element name="{$profil/section/DescriptiveMetadataSection/descriptiveFormatWrapper}">
-                        <!-- TODO Texte et Audio -->
-                        <!-- Seul le titre est utile, le reste est au niveau du document et
-                        le lien est fait au niveau de "fileSec". -->
-                        <xsl:element name="dc:title">
-                            <xsl:variable name="typePaginationSelect"
-                            select="$profil/section/DescriptiveMetadataSection_fichiers/typePaginationSelect" />
-                            <xsl:if test="$typePaginationSelect">
-                                <xsl:if test="$codes/typePagination/entry[@code = current()/../@typePagination]/@*[name() = $typePaginationSelect]">
-                                    <xsl:attribute name="xsi:type">
-                                        <xsl:value-of select="$typePaginationSelect" />
-                                        <xsl:text>:</xsl:text>
-                                        <xsl:value-of select="$codes/typePagination/entry[@code = current()/../@typePagination]/@*[name() = $typePaginationSelect]" />
-                                    </xsl:attribute>
-                                </xsl:if>
+                        <!-- Préparation des métadonnées du tableur pour l'objet numérisé. -->
+                        <xsl:variable name="metadata">
+                            <xsl:if test="$fichier_metadata">
+                                <xsl:variable name="href" select="r2m:adresseFichier(., 'master')" />
+                                <!-- Trouve la ligne. -->
+                                <xsl:sequence select="r2m:trouveMetadata($href)" />
                             </xsl:if>
-                            <xsl:value-of select="r2m:nomImage(., $profil/section/DescriptiveMetadataSection_fichiers/titre)" />
-                        </xsl:element>
+                        </xsl:variable>
+
+                        <!-- Préparation du titre depuis le refnum. -->
+                        <xsl:variable name="refnum_titre">
+                            <!-- TODO Texte et Audio -->
+                            <!-- Seul le titre est utile, le reste est au niveau du document et
+                            le lien est fait au niveau de "fileSec". -->
+                            <xsl:element name="dc:title">
+                                <xsl:variable name="typePaginationSelect"
+                                select="$profil/section/DescriptiveMetadataSection_fichiers/typePaginationSelect" />
+                                <xsl:if test="$typePaginationSelect">
+                                    <xsl:if test="$codes/typePagination/entry[@code = current()/../@typePagination]/@*[name() = $typePaginationSelect]">
+                                        <xsl:attribute name="xsi:type">
+                                            <xsl:value-of select="$typePaginationSelect" />
+                                            <xsl:text>:</xsl:text>
+                                            <xsl:value-of select="$codes/typePagination/entry[@code = current()/../@typePagination]/@*[name() = $typePaginationSelect]" />
+                                        </xsl:attribute>
+                                    </xsl:if>
+                                </xsl:if>
+                                <xsl:value-of select="r2m:nomImage(., $profil/section/DescriptiveMetadataSection_fichiers/titre)" />
+                            </xsl:element>
+                        </xsl:variable>
+
+                        <!-- Ajout des métadonnées de la table. -->
+                        <xsl:sequence select="$metadata" />
+
+                        <!-- Ajout éventuel du titre refnum. -->
+                        <xsl:choose>
+                            <!-- Ajout systématique du titre refnum. -->
+                            <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers/titre
+                                    /metadata/@ordre = 'table et refnum'">
+                                <xsl:sequence select="$refnum_titre" />
+                            </xsl:when>
+                            <!-- Pas de titre refnum -->
+                            <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers/titre
+                                    /metadata/@ordre = 'table seulement'">
+                            </xsl:when>
+                            <!-- On ajoute le titre refnum seulement s'il n'est pas défini dans
+                            la table des métadonnées. -->
+                            <xsl:when test="empty($metadata/dc:title)">
+                                <xsl:sequence select="$refnum_titre" />
+                            </xsl:when>
+                        </xsl:choose>
+
                     </xsl:element>
                 </xsl:element>
             </xsl:element>
@@ -2971,6 +3038,64 @@ Historique
             </xsl:for-each>
         </xsl:variable>
         <xsl:value-of select="string($resultat)" />
+    </xsl:function>
+
+    <!-- Récupère les métadonnées d'un fichier. -->
+    <xsl:function name="r2m:trouveMetadata">
+        <!-- Nom du fichier -->
+        <xsl:param name="fichier" />
+
+        <!-- TODO Optimiser si besoin. -->
+        <xsl:variable name="row" select="document($fichier_metadata)
+                /office:document-content/office:body/office:spreadsheet/table:table[1]
+                /table:table-row[table:table-cell[1]/text:p = $fichier]" />
+
+        <xsl:if test="not(empty($row))">
+            <!-- D'abord, reconstruire la liste des cellules pour gérer les cellules
+            identiques ou vides. -->
+            <xsl:variable name="row_simple">
+                <xsl:for-each select="$row/table:table-cell">
+                    <xsl:choose>
+                        <xsl:when test="@table:number-columns-repeated">
+                            <xsl:variable name="current_cell" select="." />
+                            <xsl:for-each select="1 to  @table:number-columns-repeated">
+                                <xsl:sequence select="$current_cell" />
+                            </xsl:for-each>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:sequence select="." />
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:for-each>
+            </xsl:variable>
+
+            <!-- Ensuite, lier les cellules au nom des colonnes (qui doivent être du Dublin Core). -->
+            <xsl:variable name="result">
+                <xsl:for-each select="document($fichier_metadata)
+                        /office:document-content/office:body/office:spreadsheet
+                        /table:table[1]/table:table-row[1]/table:table-cell
+                        ">
+                    <!-- La première cellule est le nom du fichier, inutile désormais. -->
+                    <xsl:if test="position() != 1" >
+                        <xsl:variable name="position" select="position()" />
+                        <xsl:if test="$row_simple/table:table-cell[$position] != ''">
+                            <xsl:variable name="name" select="
+                                if (starts-with(text:p[1], 'dc:'))
+                                then text:p[1]
+                                else if (starts-with(text:p[1], 'Dublin Core'))
+                                    then concat('dc:', lower-case(normalize-space(substring-after(text:p[1], ':'))))
+                                    else concat('dc:', lower-case(normalize-space(text:p[1])))
+                                " />
+                            <xsl:element name="{$name}">
+                                <xsl:sequence select="$row_simple/table:table-cell[$position]/text:p/text()" />
+                            </xsl:element>
+                        </xsl:if>
+                    </xsl:if>
+                </xsl:for-each>
+            </xsl:variable>
+
+            <xsl:sequence select="$result" />
+        </xsl:if>
     </xsl:function>
 
     <!-- Récupère l'identifiant ark à partir de l'identifiant du document. -->

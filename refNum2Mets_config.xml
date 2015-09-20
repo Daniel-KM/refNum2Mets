@@ -20,6 +20,13 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
     <codes>refNum2Mets_codes.xml</codes>
 
     <fichiers>
+        <!-- Mets permet d'ajouter des métadonnées au niveau de chaque fichier. -->
+        <!-- Les données sont au format Open Document Spreadsheet : c'est le
+        fichier principal et décompressé d'un tableur LibreOffice ou autre. -->
+        <metadata>
+            <liste chemin="xml">fichiers_metadata.xml</liste>
+        </metadata>
+
         <!-- Ce fichier liste les hashs et chemins de tous les fichiers, ce qui peut
         être requis pour certains profils et calculés auparavant. Le chemin doit
         correspondre à l'adresse href utilisé pour la localisation du fichier: soit
@@ -142,7 +149,7 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
                 <name>Daniel Berthereau</name>
             </agent>
             <agent ROLE="OTHER" OTHERROLE="BUILDER" TYPE="OTHER" OTHERTYPE="SOFTWARE">
-                <name>Script refNum2Mets.xsl version 20150907 (https://github.com/Daniel-KM/refNum2Mets)</name>
+                <name>Script refNum2Mets.xsl version 20150921 (https://github.com/Daniel-KM/refNum2Mets)</name>
             </agent>
             <!--
             <agent ROLE="OTHER" TYPE="ORGANIZATION">
@@ -275,6 +282,13 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
             </DescriptiveMetadataSection>
             <DescriptiveMetadataSection_fichiers remplir="true">
                 <titre>
+                    <!-- Métadonnées : ajout du titre depuis la table, sinon refNum. -->
+                    <metadata ordre="table sinon refnum" />
+                    <!-- Autres possibilités. -->
+                    <!--
+                    <metadata ordre="table et refnum" />
+                    <metadata ordre="table seulement" />
+                     -->
                     <!-- Page paginée : 'numéro" ou "nom" (le préfixe est déterminé
                     selon le type de pagination). -->
                     <titreFichier>nom</titreFichier>
@@ -358,6 +372,7 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
             </DescriptiveMetadataSection>
             <DescriptiveMetadataSection_fichiers remplir="true">
                 <titre>
+                    <metadata ordre="table sinon refnum" />
                     <titreFichier>nom</titreFichier>
                     <titreFichierNP>nom</titreFichierNP>
                     <titreFichierNPTexte>NP [</titreFichierNPTexte>
@@ -416,6 +431,7 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
             </DescriptiveMetadataSection>
             <DescriptiveMetadataSection_fichiers remplir="true">
                 <titre>
+                    <metadata ordre="table sinon refnum" />
                     <titreFichier>nom</titreFichier>
                     <titreFichierNP>nom</titreFichierNP>
                     <titreFichierNPTexte>NP [</titreFichierNPTexte>
@@ -482,6 +498,7 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
             </DescriptiveMetadataSection>
             <DescriptiveMetadataSection_fichiers remplir="true">
                 <titre>
+                    <metadata ordre="table sinon refnum" />
                     <titreFichier>numéro</titreFichier>
                     <titreFichierNP>numéro déduit</titreFichierNP>
                     <titreFichierNPTexte>NP [</titreFichierNPTexte>
@@ -543,6 +560,7 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
             </DescriptiveMetadataSection>
             <DescriptiveMetadataSection_fichiers remplir="true">
                 <titre>
+                    <metadata ordre="table sinon refnum" />
                     <titreFichier>nom</titreFichier>
                     <titreFichierNP>nom</titreFichierNP>
                     <titreFichierNPTexte>NP [</titreFichierNPTexte>

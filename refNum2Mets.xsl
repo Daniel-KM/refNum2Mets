@@ -331,6 +331,12 @@ Historique
         </xsl:choose>
     </xsl:variable>
 
+    <xsl:variable name="separateur" select="replace(
+            $parametres/separateur,
+            '(\.|\[|\]|\\|\||\-|\^|\$|\?|\*|\+|\{|\}|\(|\))',
+            '\\$1')
+            "/>
+
     <!-- ==============================================================
     Template principal
     =============================================================== -->
@@ -3134,15 +3140,17 @@ Historique
             </xsl:variable>
 
             <!-- Ensuite, lier les cellules au nom des colonnes (qui doivent être du Dublin Core). -->
-            <xsl:variable name="result">
+            <xsl:variable name="cellules">
                 <xsl:for-each select="document($tableur)
                         /office:document-content/office:body/office:spreadsheet/table:table[1]
                         /table:table-row[1]/table:table-cell
                         ">
                     <!-- La première cellule est le nom du fichier, inutile désormais. -->
-                    <xsl:if test="position() != 1" >
+                    <xsl:if test="position() != 1">
                         <xsl:variable name="position" select="position()" />
-                        <xsl:if test="$row_simple/table:table-cell[$position] != ''">
+
+                        <!-- Ne crée la métadonnée que s'il y a un contenu. -->
+                        <xsl:if test="normalize-space($row_simple/table:table-cell[$position]) != ''">
                             <xsl:variable name="name" select="
                                 if (starts-with(text:p[1], 'dc:'))
                                 then text:p[1]
@@ -3150,15 +3158,54 @@ Historique
                                     then concat('dc:', lower-case(normalize-space(substring-after(text:p[1], ':'))))
                                     else concat('dc:', lower-case(normalize-space(text:p[1])))
                                 " />
-                            <xsl:element name="{$name}">
-                                <xsl:sequence select="$row_simple/table:table-cell[$position]/text:p/text()" />
-                            </xsl:element>
-                        </xsl:if>
+
+                            <!-- Prise en compte les cellules multivaluées s'il y a un séparateur. -->
+                            <xsl:choose>
+                                <!-- Le séparateur est le saut de ligne interne à une cellule. -->
+                                <xsl:when test="$separateur = 'EOL'">
+                                    <xsl:for-each select="$row_simple/table:table-cell[$position]/text:p">
+                                        <!-- Évite de créer un contenu pour un double saut. -->
+                                        <xsl:if test="normalize-space(.)">
+                                            <xsl:element name="{$name}">
+                                                <!-- Nettoie le résultat (trim). -->
+                                                <xsl:sequence select="replace(., '^\s*(.+?)\s*$', '$1')" />
+                                            </xsl:element>
+                                        </xsl:if>
+                                    </xsl:for-each>
+                                </xsl:when>
+
+                                <!-- Autre séparateur ou pas de séparateur. -->
+                                <xsl:otherwise>
+                                    <xsl:variable name="contenu"
+                                        select="string-join($row_simple/table:table-cell[$position]/text:p/text(), '')" />
+                                    <xsl:choose>
+                                        <xsl:when test="$separateur != '' and contains(string($contenu), $parametres/separateur)">
+                                            <xsl:for-each select="tokenize(string($contenu), $separateur)">
+                                                <!-- Évite de créer un contenu pour un séparateur oublié. -->
+                                                <xsl:if test="normalize-space(.)">
+                                                    <xsl:element name="{$name}">
+                                                        <!-- Nettoie le résultat (trim). -->
+                                                        <xsl:sequence select="replace(., '^\s*(.+?)\s*$', '$1')" />
+                                                    </xsl:element>
+                                                </xsl:if>
+                                            </xsl:for-each>
+                                        </xsl:when>
+
+                                        <!-- Pas de séparateur. -->
+                                        <xsl:otherwise>
+                                            <xsl:element name="{$name}">
+                                                <xsl:sequence select="$contenu" />
+                                            </xsl:element>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                       </xsl:if>
                     </xsl:if>
                 </xsl:for-each>
             </xsl:variable>
 
-            <xsl:sequence select="$result" />
+            <xsl:sequence select="$cellules" />
         </xsl:if>
     </xsl:function>
 

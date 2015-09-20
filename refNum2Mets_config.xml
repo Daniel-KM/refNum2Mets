@@ -59,6 +59,12 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
         </tailles>
     </fichiers>
 
+    <!-- Permet d'avoir éventuellement plusieurs données dans une seule cellule
+    pour les tableurs. Recommandés : "|" ou saut de ligne ("EOL"). -->
+    <separateur>|</separateur>
+    <!-- <separateur>EOL</separateur> -->
+    <!-- <separateur>||</separateur> -->
+
     <!-- ==============================================================
     INIFORMATIONS DIVERSES
     =============================================================== -->

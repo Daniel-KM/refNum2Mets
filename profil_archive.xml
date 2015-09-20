@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Ce format de profil contient toutes les options spécifiques à chaque section du
+Mets afin de les choisir simplement et clairement.
+
+Le profil Archive permet de créer un mets pour l'archivage, à l'exemple de celui
+de la BnF. -->
+<profil nom="Archive">
+    <!-- Choix des sections Mets  à remplir (seule Structural Map est obligatoire). -->
+    <section>
+        <MetsHeader remplir="true" />
+        <DescriptiveMetadataSection remplir="true">
+            <descriptiveFormatWrapper>dc:dc</descriptiveFormatWrapper>
+            <!-- Notices : soit la "table", soit le "refnum", soit "table sinon refnum". -->
+            <metadata ordre="table sinon refnum" />
+            <!-- Conversion de la tomaison en Dublin Core pour le refnum. -->
+            <tomaison>
+                <ajoutPremierTitre remplir="false" />
+                <ajoutAutreTitre remplir="true" />
+                <ajoutDescription remplir="false" />
+                <ajoutDescriptionSepare remplir="false" />
+                <ajoutDate remplir="true" />
+            </tomaison>
+        </DescriptiveMetadataSection>
+        <DescriptiveMetadataSection_fichiers remplir="true">
+            <!-- Métadonnées : ajout du titre depuis le refNum s'il n'est
+            pas présent dans la table. -->
+            <metadata ordre="table sinon refnum" />
+            <!-- Autres possibilités. -->
+            <!--
+            <metadata ordre="refnum et table" />
+            <metadata ordre="refnum seulement" />
+            <metadata ordre="table seulement" />
+             -->
+            <!-- Le contenu du titre peut être l'orderLabel ou le label de
+            la Structural Map. La BnF utilise l'"orderLabel" comme titre et
+            le "label" comme description. L'option est prise en compte
+            seulement si le refnum est utilisé (option "metadata/@ordre"). -->
+            <titre>
+                <copie valeur="orderLabel" />
+            </titre>
+            <description>
+                <copie valeur="label" />
+            </description>
+        </DescriptiveMetadataSection_fichiers>
+        <AdministrativeMetadataSection remplir="true">
+            <!-- Ajoute les événements Spar : création du paquet, info sur chaque
+            groupe, numéros ark, contrôle final. -->
+            <spar fin="8" remplir="true" />
+            <techMD remplir="true">
+                <meta remplir="true" />
+                <info remplir="true" />
+            </techMD>
+            <!-- Non géré actuellement. -->
+            <rightsMD remplir="false" />
+            <!-- Rarement utilisé dans les exemples disponibles.
+            Dans le refNum, il est seulement uUtilisé pour indiquer le support, la
+            plupart du temps unique, et l'éventuel identifiant de la source.
+            Remplir cet élément est plus compliqué lorsqu'il y a plusieurs supports,
+            puisqu'il faut gérer les liens.
+            - soit AMD.1 : support A & support B & identifiant
+            - soit AMD.1 : support A / AMD.2 : identifiant / AMD3 : support B
+            - soit AMD.1 : support A & identifiant / AMD.2 : support B & identifiant
+            Actuellement, seule la première structure est prise en compte.
+            La situation est la même pour le traitement "Manuel" ou "Auto" ou
+            "Complexe".
+            -->
+            <sourceMD remplir="true">
+            </sourceMD>
+            <digiprovMD remplir="true">
+                <eventIdentifierFormat nom="identifiant index" utiliser="true" separateur=":amd." />
+                <eventIdentifierFormat nom="uuid" utiliser="false" />
+                <valide remplir="true" />
+            </digiprovMD>
+        </AdministrativeMetadataSection>
+        <FileSection remplir="true" />
+        <StructuralMap remplir="true">
+            <!-- Si le nom est vide, le paramètre par défaut sera utilisé. -->
+            <structure_types nom="" />
+            <orderLabel remplir="true">
+                <!-- Page paginée : 'numéro" ou "nom" (le préfixe est déterminé
+                selon le type de pagination). -->
+                <titreFichier>numéro</titreFichier>
+                <!-- Page non paginée : "vide", "fixe", "ordre", "numéro NP", "numéro déduit", "nom". -->
+                <titreFichierNP>numéro déduit</titreFichierNP>
+                <!-- Utilisés en fonction du choix "titreFichierNP". -->
+                <titreFichierNPTexte>NP [</titreFichierNPTexte>
+                <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+            </orderLabel>
+            <!-- Pour mémoire, doit être différent du "orderLabel". -->
+            <label remplir="true">
+                <titreFichier>nom</titreFichier>
+                <titreFichierNP>nom</titreFichierNP>
+                <titreFichierNPTexte>NP [</titreFichierNPTexte>
+                <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+            </label>
+        </StructuralMap>
+        <!-- Non géré et inutile pour le refNum. -->
+        <StructuralLinks remplir="false" />
+        <!-- Non géré et inutile pour le refNum. -->
+        <Behavior remplir="false" />
+    </section>
+</profil>
+

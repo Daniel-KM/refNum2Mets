@@ -31,7 +31,7 @@ Elle permet de définir les numéros des identifiants des sections et sous-secti
 
     <!-- Paramètres -->
 
-    <!-- Choix du profil d'options. -->
+    <!-- Fichier de configuration. -->
     <xsl:param name="configuration">refNum2Mets_config.xml</xsl:param>
 
     <!-- Constantes. -->
@@ -39,8 +39,9 @@ Elle permet de définir les numéros des identifiants des sections et sous-secti
     <!-- Liste des paramètres du fichier de configuration. -->
     <xsl:variable name="parametres"
         select="document($configuration)/XMLlist"/>
+    <!-- Liste des paramètres du profil choisi. -->
     <xsl:variable name="profil"
-        select="$parametres/profil[@nom = ../formats/profil_mets[@utiliser = 'true'][1]/@nom]" />
+        select="document(r2m:cheminFichier($parametres/format/profil))/profil" />
 
     <!-- Quelques valeurs pour faciliter la numérotation des index. -->
     <!-- Le nombre de fichiers est celui des seuls masters et non des objets associés.

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Ce fichier de configuration permet de paramétrer la conversion des notices
+refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refNum2Mets.xsl".
+
+Format destiné à l'ingestion de données par un outil de diffusion de documents,
+par exemple dans Omeka. Les autres formats conviennent aussi, mais les données
+inutiles ne seront pas importées).
+
+En pratique : identique au format "Archive", sauf la section "administrative metadata" :
+- seulement les techmd utiles (infos sur les fichiers),
+- pas d'événement "digiprov".
+
+Le détail des paramètres se trouve dans le format "Archive".
+-->
+<profil nom="Diffusion">
+    <section>
+        <MetsHeader remplir="true" />
+        <DescriptiveMetadataSection remplir="true">
+            <descriptiveFormatWrapper>dc:dc</descriptiveFormatWrapper>
+            <metadata ordre="table sinon refnum" />
+            <tomaison>
+                <ajoutPremierTitre remplir="false" />
+                <ajoutAutreTitre remplir="true" />
+                <ajoutDescription remplir="false" />
+                <ajoutDescriptionSepare remplir="false" />
+                <ajoutDate remplir="true" />
+            </tomaison>
+        </DescriptiveMetadataSection>
+        <DescriptiveMetadataSection_fichiers remplir="true">
+            <metadata ordre="table sinon refnum" />
+            <titre>
+                <copie valeur="orderLabel" />
+            </titre>
+            <description>
+                <copie valeur="label" />
+            </description>
+        </DescriptiveMetadataSection_fichiers>
+        <AdministrativeMetadataSection remplir="true">
+            <spar fin="8" remplir="false" />
+            <techMD remplir="true">
+                <meta remplir="false" />
+                <info remplir="true" />
+            </techMD>
+            <rightsMD remplir="false" />
+            <sourceMD remplir="true">
+            </sourceMD>
+            <digiprovMD remplir="false">
+                <eventIdentifierFormat nom="identifiant index" utiliser="true" separateur=":amd." />
+                <eventIdentifierFormat nom="uuid" utiliser="false" />
+                <valide remplir="true" />
+            </digiprovMD>
+        </AdministrativeMetadataSection>
+        <FileSection remplir="true" />
+        <StructuralMap remplir="true">
+            <structure_types nom="" />
+            <orderLabel remplir="true">
+                <titreFichier>numéro</titreFichier>
+                <titreFichierNP>numéro déduit</titreFichierNP>
+                <titreFichierNPTexte>NP [</titreFichierNPTexte>
+                <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+            </orderLabel>
+            <label remplir="true">
+                <titreFichier>nom</titreFichier>
+                <titreFichierNP>nom</titreFichierNP>
+                <titreFichierNPTexte>NP [</titreFichierNPTexte>
+                <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+            </label>
+        </StructuralMap>
+        <StructuralLinks remplir="false" />
+        <Behavior remplir="false" />
+    </section>
+</profil>
+

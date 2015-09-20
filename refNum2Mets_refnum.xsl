@@ -31,7 +31,7 @@ Elle permet de normaliser certaines données du refNum.
 
     <!-- Paramètres -->
 
-    <!-- Choix du profil d'options. -->
+    <!-- Fichier de configuration. -->
     <xsl:param name="configuration">refNum2Mets_config.xml</xsl:param>
 
     <!-- Constantes. -->
@@ -42,8 +42,10 @@ Elle permet de normaliser certaines données du refNum.
     <!-- Liste des codes utilisés dans refNum. -->
     <xsl:variable name="codes"
         select="document($parametres/codes)/XMLlist"/>
+    <!-- Liste des paramètres du profil choisi. -->
     <xsl:variable name="profil"
-        select="$parametres/profil[@nom = ../formats/profil_mets[@utiliser = 'true'][1]/@nom]" />
+        select="document(r2m:cheminFichier($parametres/format/profil))/profil" />
+    <!-- Paramètres pour la construction des adresses. -->
     <xsl:variable name="adresse"
         select="$parametres/adresse[@nom = ../formats/adresse_fichier[@utiliser = 'true'][1]/@nom]" />
 

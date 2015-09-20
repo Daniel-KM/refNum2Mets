@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Ce format de profil contient toutes les options spécifiques à chaque section du
+Mets afin de les choisir simplement et clairement.
+
+Profil Spar de la BnF sur le modèle de http://bibnum.bnf.fr/mets/profile_SIP_global_20120822.xml
+
+Le détail des paramètres se trouve dans le format "Archive".
+-->
+<profil nom="Mets SIP BnF">
+    <namespace prefix="spar_dc">http://bibnum.bnf.fr/ns/spar_dc</namespace>
+    <profile>http://bibnum.bnf.fr/mets/profile_SIP_global_20120822.xml</profile>
+    <section>
+        <MetsHeader remplir="false" />
+        <DescriptiveMetadataSection remplir="true">
+            <descriptiveFormatWrapper>spar_dc:spar_dc</descriptiveFormatWrapper>
+            <metadata ordre="table sinon refnum" />
+            <tomaison>
+                <ajoutPremierTitre remplir="true" />
+                <ajoutAutreTitre remplir="false" />
+                <ajoutDescription remplir="false" />
+                <ajoutDescriptionSepare remplir="true" />
+                <ajoutDate remplir="false" />
+                <attributes nom="xsi:type">
+                    <attribute>spar_dc:sequentialDesignation1</attribute>
+                    <attribute>spar_dc:sequentialDesignation2</attribute>
+                    <attribute>spar_dc:sequentialDesignation3</attribute>
+                </attributes>
+            </tomaison>
+            <genreSelect>spar_dc</genreSelect>
+        </DescriptiveMetadataSection>
+        <DescriptiveMetadataSection_fichiers remplir="true">
+            <metadata ordre="table sinon refnum" />
+            <titre>
+                <copie valeur="orderLabel" />
+                <typePaginationSelect>spar_dc</typePaginationSelect>
+            </titre>
+            <description>
+                <copie valeur="label" />
+            </description>
+        </DescriptiveMetadataSection_fichiers>
+        <AdministrativeMetadataSection remplir="true">
+            <spar fin="8" remplir="true" />
+            <techMD remplir="true">
+                <meta remplir="true" />
+                <info remplir="true" />
+            </techMD>
+            <!-- Interdit.-->
+            <rightsMD remplir="false" />
+            <sourceMD remplir="true">
+                <codeBarreSelect>spar_dc:barCode</codeBarreSelect>
+            </sourceMD>
+            <!-- Un unique digiprovMD comprenant un premis:event de type 'packageCreation est requis.-->
+            <digiprovMD remplir="true">
+                <eventIdentifierFormat nom="uuid" utiliser="true" />
+                <valide remplir="true" />
+            </digiprovMD>
+        </AdministrativeMetadataSection>
+        <FileSection remplir="true" />
+        <StructuralMap remplir="true">
+            <structure_types nom="Mets SIP BnF" />
+            <orderLabel remplir="true">
+                <titreFichier>numéro</titreFichier>
+                <titreFichierNP>fixe</titreFichierNP>
+                <titreFichierNPTexte>NP</titreFichierNPTexte>
+                <titreFichierNPTexteAp></titreFichierNPTexteAp>
+            </orderLabel>
+            <label remplir="true">
+                <titreFichier>nom</titreFichier>
+                <titreFichierNP>nom</titreFichierNP>
+                <titreFichierNPTexte>NP [</titreFichierNPTexte>
+                <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+            </label>
+        </StructuralMap>
+        <StructuralLinks remplir="false" />
+        <Behavior remplir="false" />
+    </section>
+</profil>
+

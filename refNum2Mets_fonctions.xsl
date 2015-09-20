@@ -40,7 +40,7 @@ Elle contient des fonctions générales.
 
     <!-- Paramètres -->
 
-    <!-- Choix du profil d'options. -->
+    <!-- Fichier de configuration. -->
     <xsl:param name="configuration">refNum2Mets_config.xml</xsl:param>
 
     <!-- Constantes. -->
@@ -48,8 +48,9 @@ Elle contient des fonctions générales.
     <!-- Liste des paramètres du fichier de configuration. -->
     <xsl:variable name="parametres"
         select="document($configuration)/XMLlist"/>
+    <!-- Liste des paramètres du profil choisi. -->
     <xsl:variable name="profil"
-        select="$parametres/profil[@nom = ../formats/profil_mets[@utiliser = 'true'][1]/@nom]" />
+        select="document(r2m:cheminFichier($parametres/format/profil))/profil" />
 
     <!-- Fichiers additionnels : utilise ceux présents à côté du fichier refNum,
     sinon ceux du présent dossier. -->

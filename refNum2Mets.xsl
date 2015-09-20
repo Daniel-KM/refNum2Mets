@@ -143,140 +143,20 @@ Historique
     <xsl:variable name="dirname" as="xs:string" select="
             string-join(tokenize(document-uri(/), '/')[position() &lt; last()], '/')" />
 
-    <xsl:variable name="notices" as="xs:string">
-        <xsl:choose>
-            <xsl:when test="function-available('unparsed-text-available')">
-                <xsl:value-of select="
-                    if ($parametres/documents/metadata/liste/@chemin = 'xml')
-                        then if (unparsed-text-available(concat($dirname, '/', $parametres/documents/metadata/liste), 'UTF-8'))
-                            then concat($dirname, '/', $parametres/documents/metadata/liste)
-                            else if (unparsed-text-available(resolve-uri($parametres/documents/metadata/liste)))
-                                then resolve-uri($parametres/documents/metadata/liste)
-                                else ''
-                    else if (unparsed-text-available(resolve-uri($parametres/documents/metadata/liste)))
-                        then resolve-uri($parametres/documents/metadata/liste)
-                        else if (unparsed-text-available(concat($dirname, '/', $parametres/documents/metadata/liste), 'UTF-8'))
-                            then concat($dirname, '/', $parametres/documents/metadata/liste)
-                            else ''
-                    " />
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="
-                        if ($parametres/documents/metadata/liste/@chemin = 'xml')
-                        then concat($dirname, '/', $parametres/documents/metadata/liste)
-                        else resolve-uri($parametres/documents/metadata/liste)
-                        " />
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:variable>
+    <xsl:variable name="notices" as="xs:string"
+        select="r2m:cheminFichier($parametres/documents/metadata/liste)" />
 
-    <xsl:variable name="arks" as="xs:string">
-        <xsl:choose>
-            <xsl:when test="function-available('unparsed-text-available')">
-                <xsl:value-of select="
-                    if ($parametres/documents/ark/liste/@chemin = 'xml')
-                        then if (unparsed-text-available(concat($dirname, '/', $parametres/documents/ark/liste), 'UTF-8'))
-                            then concat($dirname, '/', $parametres/documents/ark/liste)
-                            else if (unparsed-text-available(resolve-uri($parametres/documents/ark/liste)))
-                                then resolve-uri($parametres/documents/ark/liste)
-                                else ''
-                    else if (unparsed-text-available(resolve-uri($parametres/documents/ark/liste)))
-                        then resolve-uri($parametres/documents/ark/liste)
-                        else if (unparsed-text-available(concat($dirname, '/', $parametres/documents/ark/liste), 'UTF-8'))
-                            then concat($dirname, '/', $parametres/documents/ark/liste)
-                            else ''
-                    " />
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="
-                        if ($parametres/documents/ark/liste/@chemin = 'xml')
-                        then concat($dirname, '/', $parametres/documents/ark/liste)
-                        else resolve-uri($parametres/documents/ark/liste)
-                        " />
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:variable>
+    <xsl:variable name="arks" as="xs:string"
+        select="r2m:cheminFichier($parametres/documents/ark/liste)" />
 
-    <xsl:variable name="fichier_checksums" as="xs:string">
-        <xsl:choose>
-            <xsl:when test="function-available('unparsed-text-available')">
-                <xsl:value-of select="
-                    if ($parametres/fichiers/checksums/liste/@chemin = 'xml')
-                        then if (unparsed-text-available(concat($dirname, '/', $parametres/fichiers/checksums/liste), 'UTF-8'))
-                            then concat($dirname, '/', $parametres/fichiers/checksums/liste)
-                            else if (unparsed-text-available(resolve-uri($parametres/fichiers/checksums/liste)))
-                                then resolve-uri($parametres/fichiers/checksums/liste)
-                                else ''
-                    else if (unparsed-text-available(resolve-uri($parametres/fichiers/checksums/liste)))
-                        then resolve-uri($parametres/fichiers/checksums/liste)
-                        else if (unparsed-text-available(concat($dirname, '/', $parametres/fichiers/checksums/liste), 'UTF-8'))
-                            then concat($dirname, '/', $parametres/fichiers/checksums/liste)
-                            else ''
-                    " />
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="
-                        if ($parametres/fichiers/checksums/liste/@chemin = 'xml')
-                        then concat($dirname, '/', $parametres/fichiers/checksums/liste)
-                        else resolve-uri($parametres/fichiers/checksums/liste)
-                        " />
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:variable>
+    <xsl:variable name="fichier_metadata" as="xs:string"
+        select="r2m:cheminFichier($parametres/fichiers/metadata/liste)" />
 
-    <xsl:variable name="fichier_tailles" as="xs:string">
-        <xsl:choose>
-            <xsl:when test="function-available('unparsed-text-available')">
-                <xsl:value-of select="
-                    if ($parametres/fichiers/tailles/liste/@chemin = 'xml')
-                        then if (unparsed-text-available(concat($dirname, '/', $parametres/fichiers/tailles/liste), 'UTF-8'))
-                            then concat($dirname, '/', $parametres/fichiers/tailles/liste)
-                            else if (unparsed-text-available(resolve-uri($parametres/fichiers/tailles/liste)))
-                                then resolve-uri($parametres/fichiers/tailles/liste)
-                                else ''
-                    else if (unparsed-text-available(resolve-uri($parametres/fichiers/tailles/liste)))
-                        then resolve-uri($parametres/fichiers/tailles/liste)
-                        else if (unparsed-text-available(concat($dirname, '/', $parametres/fichiers/tailles/liste), 'UTF-8'))
-                            then concat($dirname, '/', $parametres/fichiers/tailles/liste)
-                            else ''
-                    " />
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="
-                        if ($parametres/fichiers/tailles/liste/@chemin = 'xml')
-                        then concat($dirname, '/', $parametres/fichiers/tailles/liste)
-                        else resolve-uri($parametres/fichiers/tailles/liste)
-                        " />
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:variable>
+    <xsl:variable name="fichier_checksums" as="xs:string"
+        select="r2m:cheminFichier($parametres/fichiers/checksums/liste)" />
 
-    <xsl:variable name="fichier_metadata" as="xs:string">
-        <xsl:choose>
-            <xsl:when test="function-available('unparsed-text-available')">
-                <xsl:value-of select="
-                    if ($parametres/fichiers/metadata/liste/@chemin = 'xml')
-                        then if (unparsed-text-available(concat($dirname, '/', $parametres/fichiers/metadata/liste), 'UTF-8'))
-                            then concat($dirname, '/', $parametres/fichiers/metadata/liste)
-                            else if (unparsed-text-available(resolve-uri($parametres/fichiers/metadata/liste)))
-                                then resolve-uri($parametres/fichiers/metadata/liste)
-                                else ''
-                    else if (unparsed-text-available(resolve-uri($parametres/fichiers/metadata/liste)))
-                        then resolve-uri($parametres/fichiers/metadata/liste)
-                        else if (unparsed-text-available(concat($dirname, '/', $parametres/fichiers/metadata/liste), 'UTF-8'))
-                            then concat($dirname, '/', $parametres/fichiers/metadata/liste)
-                            else ''
-                    " />
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="
-                        if ($parametres/fichiers/metadata/liste/@chemin = 'xml')
-                        then concat($dirname, '/', $parametres/fichiers/metadata/liste)
-                        else resolve-uri($parametres/fichiers/metadata/liste)
-                        " />
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:variable>
+    <xsl:variable name="fichier_tailles" as="xs:string"
+        select="r2m:cheminFichier($parametres/fichiers/tailles/liste)" />
 
     <!-- Identifiant ark de la notice en cours, si possible. -->
     <xsl:variable name="arkId" as="xs:string">
@@ -3871,6 +3751,35 @@ Historique
         <xsl:variable name="chaine" select="concat('000000000', normalize-space(string($numero)))" />
 
         <xsl:value-of select="substring($chaine, string-length($chaine) - $longueur + 1)" />
+    </xsl:function>
+
+    <xsl:function name="r2m:cheminFichier" as="xs:string">
+        <xsl:param name="nomFichier" />
+
+        <xsl:choose>
+            <xsl:when test="function-available('unparsed-text-available')">
+                <xsl:value-of select="
+                    if ($nomFichier/@chemin = 'xml')
+                        then if (unparsed-text-available(concat($dirname, '/', $nomFichier), 'UTF-8'))
+                            then concat($dirname, '/', $nomFichier)
+                            else if (unparsed-text-available(resolve-uri($nomFichier)))
+                                then resolve-uri($nomFichier)
+                                else ''
+                    else if (unparsed-text-available(resolve-uri($nomFichier)))
+                        then resolve-uri($nomFichier)
+                        else if (unparsed-text-available(concat($dirname, '/', $nomFichier), 'UTF-8'))
+                            then concat($dirname, '/', $nomFichier)
+                            else ''
+                    " />
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="
+                        if ($nomFichier/@chemin = 'xml')
+                        then concat($dirname, '/', $nomFichier)
+                        else resolve-uri($nomFichier)
+                        " />
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:function>
 
 </xsl:stylesheet>

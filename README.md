@@ -53,6 +53,9 @@ tout autre tableur respectueux des standards, l'enregistrer au format "ods", et
 dézipper ce fichier. Un exemple est fourni. Le script utilise directement l'un
 ou l'autre format.
 
+Avec certains parseurs, les fichiers additionnels doivent être présents, même
+vides, pour éviter les erreurs.
+
 
 Avertissement
 -------------

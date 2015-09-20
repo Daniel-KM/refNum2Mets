@@ -22,8 +22,10 @@
 
 dossier=$1
 
-preparehash='true'
+prepareTailles='true'
+prepareHashs='true'
 reindente='true'
+supprimeFichiersIntermediaires='false'
 
 # Valeurs par défaut.
 if [ "$dossier" = '' ]
@@ -32,10 +34,10 @@ then
 fi
 
 # Si ods est présent, on sauve ses métadonnées en xml, sinon on prend le xml.
-filemetadata='fichiers_metadata.ods'
-filemetadataxml='fichiers_metadata.xml'
-filehashs='fichiers_hashs.txt'
-filesizes='fichiers_tailles.txt'
+fichiersMetadata='fichiers_metadata.ods'
+fichiersMetadataXml='fichiers_metadata.xml'
+fichiersHashs='fichiers_hashs.txt'
+fichiersTailles='fichiers_tailles.txt'
 
 arks='arks.txt'
 
@@ -77,37 +79,42 @@ do
     metspath="$dirname/$metsfilename"
 
     # Compte le nombre de fichiers pour info.
-    nombrefichiers=$(find $dirname -follow -type f | wc -l)
-    taillefichiers=$(du -sh | cut -f 1)
+    nombreFichiers=$(find $dirname -follow -type f | wc -l)
+    tailleFichiers=$(du -sh | cut -f 1)
 
-    echo $filename '=>' $metsfilename \($nombrefichiers fichiers, $taillefichiers\)
+    echo $filename '=>' $metsfilename \($nombreFichiers fichiers, $tailleFichiers\)
 
     # Extraction des métadonnées si besoin.
-    if [ -f "$filemetadata" ]
+    if [ -f "$fichiersMetadata" ]
     then
-        echo '  ' Utilisation des métadonnées de "$filemetadata" décompressées dans "$filemetadataxml".
-        unzip -p "$filemetadata" content.xml > "$filemetadataxml"
+        metadatapath="$dirname/$fichiersMetadataXml"
+        echo '  ' Utilisation des métadonnées de "$fichiersMetadata" décompressées dans "$metadatapath".
+        unzip -p "$fichiersMetadata" content.xml > "$metadatapath"
     else
-        if [ -f "$filemetadataxml" ]
+        if [ -f "$fichiersMetadataXml" ]
         then
-            echo '  ' Utilisation des métadonnées de "$filemetadataxml".
+            echo '  ' Utilisation des métadonnées de "$fichiersMetadataXml".
+            metadatapath="$dirname/$fichiersMetadataXml"
         else
             echo '  ' Pas de métadonnées pour les fichiers.
             metadatapath=""
         fi
     fi
 
-    # Préparation des taille des fichiers du dossier courant.
-    taillepath="$dirname/$filesizes"
-    find . -type f -print0 | xargs -0 stat --format '%n %s' | cut -sd / -f 2- | sort | awk '{print $2"  "$1}' > "$taillepath"
+    # Préparation des tailles des fichiers du dossier courant.
+    if [ "$prepareTailles" = 'true' ]
+    then
+        echo '  ' Calcul des tailles des fichiers du dossier...
+        taillespath="$dirname/$fichiersTailles"
+        find . -type f -print0 | xargs -0 stat --format '%n %s' | cut -sd / -f 2- | sort | awk '{print $2"  "$1}' > "$taillespath"
+    fi
 
     # Préparation des hashs des fichiers du dossier courant.
-    if [ "$preparehash" = 'true' ]
+    if [ "$prepareHashs" = 'true' ]
     then
         echo '  ' Calcul des hash sha1 des fichiers du dossier...
-
-        hashpath="$dirname/$filehashs"
-        find . -type f | cut -sd / -f 2- | sort | xargs sha1sum > "$hashpath"
+        hashspath="$dirname/$fichiersHashs"
+        find . -type f | cut -sd / -f 2- | sort | xargs sha1sum > "$hashspath"
     fi
 
     # Commande pour Debian 8.
@@ -118,6 +125,24 @@ do
     if [ "$reindente" = 'true' ]
     then
         xmllint --format --recover --output "$metspath" "$metspath"
+    fi
+
+    # Suppression éventuelle des fichiers intermédiaires.
+    if [ "$supprimeFichiersIntermediaires" = 'true' ]
+    then
+        echo '  ' Suppression des fichiers intermédaires créés par ce script.
+        if [ -f "$fichiersMetadata" ]
+        then
+            rm -f "$metadatapath"
+        fi
+        if [ "$prepareTailles" = 'true' ]
+        then
+            rm -f "$taillespath"
+        fi
+        if [ "$prepareHashs" = 'true' ]
+        then
+            rm -f "$hashspath"
+        fi
     fi
 
 done

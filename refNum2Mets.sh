@@ -41,8 +41,8 @@ fichiersMetadata='fichiers_metadata.ods'
 fichiersMetadataXml='fichiers_metadata.xml'
 fichiersHashs='fichiers_hashs.txt'
 fichiersTailles='fichiers_tailles.txt'
-
-arks='arks.txt'
+# Non utilisé ici.
+#fichierArks='documents_arks.txt'
 
 # Directory du script
 # Absolute path to this script, e.g. /home/user/bin/foo.sh

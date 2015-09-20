@@ -57,6 +57,17 @@ Avec certains parseurs, les fichiers additionnels doivent être présents, même
 vides, pour éviter les erreurs.
 
 
+Exemple
+-------
+
+Pour essayer l'exemple, lancer ces deux commandes dans un terminal :
+
+```
+cd metadata
+../refNum2Mets.sh
+```
+
+
 Avertissement
 -------------
 

@@ -1,0 +1,2 @@
+master/Exemple_001.jpg  14980
+ocr/Exemple_001.alto.xml  3137

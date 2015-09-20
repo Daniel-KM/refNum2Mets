@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><refNum xsi:schemaLocation="http://bibnum.bnf.fr/ns/refNum http://bibnum.bnf.fr/ns/refNum.xsd" xmlns="http://bibnum.bnf.fr/ns/refNum" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/TR/xlink">
+  <document identifiant="identifiant_exemple">
+    <bibliographie>
+      <genre>MONOGRAPHIE</genre>
+      <titre>Le Titre du document Exemple</titre>
+      <auteur>Le Créateur ; La Créatrice</auteur>
+      <editeur>Éditeur en refNum</editeur>
+      <dateEdition>2015-12-25</dateEdition>
+      <tomaison>
+        <type>Volume</type>
+        <valeur>1</valeur>
+      </tomaison>
+      <nombrePages>400</nombrePages>
+    </bibliographie>
+    <production>
+      <dateNumerisation>2015-09-21</dateNumerisation>
+      <nombreVueObjets>1</nombreVueObjets>
+      <nombreImages>1</nombreImages>
+      <identifiantSupport/>
+      <objetAssocie date="2015-09-21T00:00:00">ALTO</objetAssocie>
+    </production>
+    <structure>
+      <vueObjet typePagination="N" typePage="C" ordre="1" numeroPage="NP">
+        <image profondeur="24" dimension="640,480" resolution="0072,0072" typeFichier="JPG" nomImage="Exemple_001" supportOrigine="PAPIER FEU CO" cadrage="vueObjet" traitement="MANU"/>
+      </vueObjet>
+   </structure>
+  </document>
+</refNum>

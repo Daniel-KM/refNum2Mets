@@ -1,0 +1,2 @@
+master/Exemple_001.jpg  ef1136e7affea5b24c2c1beb2014dd602bb966e9
+ocr/Exemple_001.alto.xml  fd63069701b00a61180307f68cabbfbf334b6497

@@ -1974,9 +1974,11 @@ Historique
                         <xsl:variable name="amdIds">
                             <xsl:apply-templates select="." mode="amd_document" />
                         </xsl:variable>
-                        <xsl:attribute name="ADMID">
-                            <xsl:value-of select="normalize-space($amdIds)" />
-                        </xsl:attribute>
+                        <xsl:if test="$amdIds != ''">
+                            <xsl:attribute name="ADMID">
+                                <xsl:value-of select="normalize-space($amdIds)" />
+                            </xsl:attribute>
+                        </xsl:if>
                     </xsl:if>
 
                     <xsl:apply-templates select="refNum:document/refNum:structure/refNum:vueObjet" mode="StructuralMap" />
@@ -2034,6 +2036,7 @@ Historique
                 </xsl:attribute>
             </xsl:if>
             <xsl:if test="$profil/section/StructuralMap/label/@remplir = 'true'
+                    and $label != ''
                     and (
                         $profil/section/StructuralMap/label/@remplir != 'true'
                         or $label != $orderLabel
@@ -2056,12 +2059,14 @@ Historique
             </xsl:if>
             <xsl:if test="$profil/section/AdministrativeMetadataSection/@remplir = 'true'
                 and .//refNum:commentaire">
-                <xsl:attribute name="ADMID">
-                    <xsl:variable name="resultat">
-                        <xsl:apply-templates select="." mode="amd_objet" />
-                    </xsl:variable>
-                    <xsl:value-of select="normalize-space($resultat)" />
-                </xsl:attribute>
+                <xsl:variable name="resultat">
+                    <xsl:apply-templates select="." mode="amd_objet" />
+                </xsl:variable>
+                <xsl:if test="$resultat != ''">
+                    <xsl:attribute name="ADMID">
+                        <xsl:value-of select="normalize-space($resultat)" />
+                    </xsl:attribute>
+                </xsl:if>
             </xsl:if>
 
             <xsl:for-each select="refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio']">

@@ -180,7 +180,8 @@ Historique
             </xsl:otherwise>
         </xsl:choose>
     </xsl:variable>
-   <xsl:variable name="arks" as="xs:string">
+
+    <xsl:variable name="arks" as="xs:string">
         <xsl:choose>
             <xsl:when test="function-available('unparsed-text-available')">
                 <xsl:value-of select="
@@ -774,8 +775,8 @@ Historique
                             <xsl:with-param name="objetAssocie" select="." />
                         </xsl:apply-templates>
                     </xsl:for-each>
-                 </xsl:if>
-             </xsl:if>
+                </xsl:if>
+            </xsl:if>
 
             <!-- Infos finales Spar -->
             <xsl:if test="$profil/section/AdministrativeMetadataSection/spar/@remplir = 'true'">
@@ -1566,7 +1567,7 @@ Historique
                     </xsl:otherwise>
                 </xsl:choose>
             </premis:eventOutcome>
-           <xsl:if test="$parametres/section/AdministrativeMetadataSection/digiprovMD/ajouterDate
+            <xsl:if test="$parametres/section/AdministrativeMetadataSection/digiprovMD/ajouterDate
                     /*[name() = name(current())]/@remplir = 'true'">
                 <premis:eventOutcomeDetail>
                     <premis:eventOutcomeDetailNote>
@@ -1673,7 +1674,7 @@ Historique
             <mdWrap MDTYPE="PREMIS:EVENT" MIMETYPE="text/xml">
                 <xmlData>
                     <premis:event>
-                         <xsl:call-template name="premisEventIdentifier">
+                        <xsl:call-template name="premisEventIdentifier">
                             <xsl:with-param name="partie" select="'digiprovMD_valide'" />
                             <xsl:with-param name="numeroId" select="$numeroId" />
                         </xsl:call-template>
@@ -1954,7 +1955,7 @@ Historique
                     </premis:object>
                 </xmlData>
             </mdWrap>
-      </xsl:element>
+    </xsl:element>
     </xsl:template>
 
     <!-- Informations de fin de traitement Spar. -->
@@ -3228,7 +3229,7 @@ Historique
 
     </xsl:function>
 
-     <!-- Retourne le nom d'une page non paginée à partir de l'objet. -->
+    <!-- Retourne le nom d'une page non paginée à partir de l'objet. -->
     <xsl:function name="r2m:nomPageNonPaginee">
         <xsl:param name="objet" />
         <xsl:param name="format" />
@@ -3313,7 +3314,7 @@ Historique
                             r2m:conversionArabeVersRomain($suivante_numérotée/@numeroPage - $suivante_numérotée/@ordre + $objet/@ordre),
                             true(), $format, 'Page ', ' (non paginée)')" />
                     </xsl:when>
-                     <!-- Couvertures et pages de garde (sauf lot). -->
+                    <!-- Couvertures et pages de garde (sauf lot). -->
                     <xsl:otherwise>
                         <xsl:choose>
                             <!-- Lot : pas de couverture. -->
@@ -3389,9 +3390,9 @@ Historique
             <!-- Pagination entre deux chiffres arabes, avec test de
             cohérence par comparaison de la précédente et de la suivante. -->
             <xsl:when test="($précédente_numérotée/@typePagination = 'A')
-                  and ($suivante_numérotée/@typePagination = 'A')
-                  and ($suivante_numérotée/@numeroPage - $suivante_numérotée/@ordre = $précédente_numérotée/@numeroPage - $précédente_numérotée/@ordre)
-                  ">
+                    and ($suivante_numérotée/@typePagination = 'A')
+                    and ($suivante_numérotée/@numeroPage - $suivante_numérotée/@ordre = $précédente_numérotée/@numeroPage - $précédente_numérotée/@ordre)
+                    ">
                     <xsl:value-of select="r2m:nomPageNonPagineeFormat(
                         $suivante_numérotée/@numeroPage - $suivante_numérotée/@ordre + $objet/@ordre,
                         true(), $format, 'Page ', ' (non paginée)')" />
@@ -3399,9 +3400,9 @@ Historique
             <!-- Pagination entre deux chiffres romains, avec test de
             cohérence par comparaison de la précédente et de la suivante.. -->
             <xsl:when test="($précédente_numérotée/@typePagination = 'R')
-                  and ($suivante_numérotée/@typePagination = 'R')
-                  and ($suivante_numérotée/@numeroPage - $suivante_numérotée/@ordre = $précédente_numérotée/@numeroPage - $précédente_numérotée/@ordre)
-                  ">
+                    and ($suivante_numérotée/@typePagination = 'R')
+                    and ($suivante_numérotée/@numeroPage - $suivante_numérotée/@ordre = $précédente_numérotée/@numeroPage - $précédente_numérotée/@ordre)
+                    ">
                     <xsl:value-of select="r2m:nomPageNonPagineeFormat(
                         r2m:conversionArabeVersRomain($suivante_numérotée/@numeroPage - $suivante_numérotée/@ordre + $objet/@ordre),
                         true(), $format, 'Page ', ' (non paginée)')" />

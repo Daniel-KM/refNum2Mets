@@ -79,7 +79,7 @@ TODO
 - Ajouter périodique
 
 Historique
-2015/09/21 Ajout des métadonnées descriptives des pages
+2015/09/21 Ajout des notices de documents et des métadonnées descriptives des pages
 2015/09/07 Corrections de détails et ajout d'un script pour traiter les dossiers
 2015/06/22 Version pour publication
 2015/03/16 Version initiale (Mines ParisTech)
@@ -142,6 +142,60 @@ Historique
     sinon ceux du présent dossier. -->
     <xsl:variable name="dirname" as="xs:string" select="
             string-join(tokenize(document-uri(/), '/')[position() &lt; last()], '/')" />
+
+    <xsl:variable name="notices" as="xs:string">
+        <xsl:choose>
+            <xsl:when test="function-available('unparsed-text-available')">
+                <xsl:value-of select="
+                    if ($parametres/documents/metadata/liste/@chemin = 'xml')
+                        then if (unparsed-text-available(concat($dirname, '/', $parametres/documents/metadata/liste), 'UTF-8'))
+                            then concat($dirname, '/', $parametres/documents/metadata/liste)
+                            else if (unparsed-text-available(resolve-uri($parametres/documents/metadata/liste)))
+                                then resolve-uri($parametres/documents/metadata/liste)
+                                else ''
+                    else if (unparsed-text-available(resolve-uri($parametres/documents/metadata/liste)))
+                        then resolve-uri($parametres/documents/metadata/liste)
+                        else if (unparsed-text-available(concat($dirname, '/', $parametres/documents/metadata/liste), 'UTF-8'))
+                            then concat($dirname, '/', $parametres/documents/metadata/liste)
+                            else ''
+                    " />
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="
+                        if ($parametres/documents/metadata/liste/@chemin = 'xml')
+                        then concat($dirname, '/', $parametres/documents/metadata/liste)
+                        else resolve-uri($parametres/documents/metadata/liste)
+                        " />
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="arks" as="xs:string">
+        <xsl:choose>
+            <xsl:when test="function-available('unparsed-text-available')">
+                <xsl:value-of select="
+                    if ($parametres/documents/ark/liste/@chemin = 'xml')
+                        then if (unparsed-text-available(concat($dirname, '/', $parametres/documents/ark/liste), 'UTF-8'))
+                            then concat($dirname, '/', $parametres/documents/ark/liste)
+                            else if (unparsed-text-available(resolve-uri($parametres/documents/ark/liste)))
+                                then resolve-uri($parametres/documents/ark/liste)
+                                else ''
+                    else if (unparsed-text-available(resolve-uri($parametres/documents/ark/liste)))
+                        then resolve-uri($parametres/documents/ark/liste)
+                        else if (unparsed-text-available(concat($dirname, '/', $parametres/documents/ark/liste), 'UTF-8'))
+                            then concat($dirname, '/', $parametres/documents/ark/liste)
+                            else ''
+                    " />
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="
+                        if ($parametres/documents/ark/liste/@chemin = 'xml')
+                        then concat($dirname, '/', $parametres/documents/ark/liste)
+                        else resolve-uri($parametres/documents/ark/liste)
+                        " />
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
 
     <xsl:variable name="fichier_checksums" as="xs:string">
         <xsl:choose>
@@ -219,33 +273,6 @@ Historique
                         if ($parametres/fichiers/metadata/liste/@chemin = 'xml')
                         then concat($dirname, '/', $parametres/fichiers/metadata/liste)
                         else resolve-uri($parametres/fichiers/metadata/liste)
-                        " />
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:variable>
-
-    <xsl:variable name="arks" as="xs:string">
-        <xsl:choose>
-            <xsl:when test="function-available('unparsed-text-available')">
-                <xsl:value-of select="
-                    if ($parametres/ark/liste/@chemin = 'xml')
-                        then if (unparsed-text-available(concat($dirname, '/', $parametres/ark/liste), 'UTF-8'))
-                            then concat($dirname, '/', $parametres/ark/liste)
-                            else if (unparsed-text-available(resolve-uri($parametres/ark/liste)))
-                                then resolve-uri($parametres/ark/liste)
-                                else ''
-                    else if (unparsed-text-available(resolve-uri($parametres/ark/liste)))
-                        then resolve-uri($parametres/ark/liste)
-                        else if (unparsed-text-available(concat($dirname, '/', $parametres/ark/liste), 'UTF-8'))
-                            then concat($dirname, '/', $parametres/ark/liste)
-                            else ''
-                    " />
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="
-                        if ($parametres/ark/liste/@chemin = 'xml')
-                        then concat($dirname, '/', $parametres/ark/liste)
-                        else resolve-uri($parametres/ark/liste)
                         " />
             </xsl:otherwise>
         </xsl:choose>
@@ -466,255 +493,275 @@ Historique
                 <xsl:attribute name="LABEL">Notice du document</xsl:attribute>
                 <xsl:element name="xmlData">
                     <xsl:element name="{$profil/section/DescriptiveMetadataSection/descriptiveFormatWrapper}">
-                        <!-- Ajout de chaque valeur selon l'ordre du Dublin Core. -->
 
-                        <!-- dc:title -->
-                        <!-- Plusieurs titres peuvent être séparés par des points-virgules. -->
-                        <xsl:for-each select="tokenize(normalize-space(refNum:document/refNum:bibliographie/refNum:titre), ';')">
-                            <dc:title>
-                                <xsl:value-of select="normalize-space(.)" />
-                                <xsl:if test="position() = 1
-                                    and $tomaisonTitle != ''
-                                    and $profil/section/DescriptiveMetadataSection/tomaison/ajoutPremierTitre/@remplir = 'true'">
-                                    <xsl:text> (</xsl:text>
-                                    <xsl:value-of select="$tomaisonTitle" />
-                                    <xsl:text>)</xsl:text>
-                                </xsl:if>
-                            </dc:title>
-                        </xsl:for-each>
-                        <xsl:if test="$tomaisonTitle != '' and $profil/section/DescriptiveMetadataSection/tomaison/ajoutAutreTitre/@remplir = 'true'">
-                            <dc:title>
-                                <xsl:value-of select="$tomaisonTitle" />
-                            </dc:title>
-                        </xsl:if>
-                        <xsl:call-template name="ajout_metadonnees">
-                            <xsl:with-param name="element" select="'dc:title'" />
-                        </xsl:call-template>
-
-                        <!-- dc:creator -->
-                        <!-- Plusieurs auteurs peuvent être séparés par des points-virgules. -->
-                        <xsl:for-each select="tokenize(normalize-space(refNum:document/refNum:bibliographie/refNum:auteur), ';')[normalize-space(.) != '']">
-                            <dc:creator>
-                                <xsl:value-of select="normalize-space(.)" />
-                            </dc:creator>
-                        </xsl:for-each>
-                        <xsl:call-template name="ajout_metadonnees">
-                            <xsl:with-param name="element" select="'dc:creator'" />
-                        </xsl:call-template>
-
-                        <!-- dc:subject -->
-                        <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'CADRECLASSEMENTDEWEY'][normalize-space(.) != '']">
-                            <dc:subject>
-                                <xsl:value-of select="normalize-space(.)" />
-                            </dc:subject>
-                        </xsl:for-each>
-                        <xsl:call-template name="ajout_metadonnees">
-                            <xsl:with-param name="element" select="'dc:subject'" />
-                        </xsl:call-template>
-
-                        <!-- dc:description -->
-                        <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:description[normalize-space(.) != '']">
-                            <dc:description>
-                                <xsl:value-of select="normalize-space(.)" />
-                            </dc:description>
-                        </xsl:for-each>
-                        <xsl:if test="$tomaisonTitle != ''">
-                            <xsl:if test="$profil/section/DescriptiveMetadataSection/tomaison/ajoutDescription/@remplir = 'true'">
-                                <dc:description>
-                                    <xsl:value-of select="$tomaisonTitle" />
-                                </dc:description>
+                        <!-- Préparation de la notice du tableur pour le document. -->
+                        <xsl:variable name="notice">
+                            <xsl:if test="$profil/section/DescriptiveMetadataSection/metadata/@ordre != 'refnum' and $notices">
+                                <xsl:sequence select="r2m:trouveNotice(refNum:document/@identifiant)" />
                             </xsl:if>
-                            <xsl:if test="$profil/section/DescriptiveMetadataSection/tomaison/ajoutDescriptionSepare/@remplir = 'true'">
-                                <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:tomaison">
-                                    <xsl:element name="dc:description">
-                                        <xsl:if test="$profil/section/DescriptiveMetadataSection/tomaison/attributes">
-                                            <xsl:attribute name="{$profil/section/DescriptiveMetadataSection/tomaison/attributes/@nom}">
-                                                <xsl:choose>
-                                                    <xsl:when test="count($profil/section/DescriptiveMetadataSection/tomaison/attributes/attribute) > 1">
-                                                        <xsl:variable name="position" select="position()" />
-                                                        <xsl:value-of select="$profil/section/DescriptiveMetadataSection/tomaison/attributes/attribute
-                                                        [position() = $position]" />
-                                                    </xsl:when>
-                                                    <xsl:otherwise>
-                                                        <xsl:value-of select="$profil/section/DescriptiveMetadataSection/tomaison/attributes/attribute" />
-                                                    </xsl:otherwise>
-                                                </xsl:choose>
-                                            </xsl:attribute>
-                                        </xsl:if>
-                                        <xsl:apply-templates select="." />
-                                    </xsl:element>
-                                </xsl:for-each>
-                            </xsl:if>
-                        </xsl:if>
-                        <xsl:call-template name="ajout_metadonnees">
-                            <xsl:with-param name="element" select="'dc:description'" />
-                        </xsl:call-template>
+                        </xsl:variable>
 
-                        <!-- dc:publisher -->
-                        <xsl:if test="normalize-space(refNum:document/refNum:bibliographie/refNum:editeur)">
-                            <dc:publisher>
-                                <xsl:value-of select="normalize-space(refNum:document/refNum:bibliographie/refNum:editeur)" />
-                            </dc:publisher>
-                        </xsl:if>
-                        <xsl:call-template name="ajout_metadonnees">
-                            <xsl:with-param name="element" select="'dc:publisher'" />
-                        </xsl:call-template>
-
-                        <!-- dc:contributor. -->
-                        <xsl:call-template name="ajout_metadonnees">
-                            <xsl:with-param name="element" select="'dc:contributor'" />
-                        </xsl:call-template>
-
-                        <!-- dc:date (dcterms:issued) -->
-                        <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:dateEdition[normalize-space(.) != '']">
-                            <dc:date>
-                                <xsl:value-of select="normalize-space(.)" />
-                            </dc:date>
-                        </xsl:for-each>
-                        <xsl:if test="$tomaisonDate != '' and $profil/section/DescriptiveMetadataSection/tomaison/ajoutDate/@remplir = 'true'">
-                            <dc:date>
-                                <xsl:value-of select="$tomaisonDate" />
-                            </dc:date>
-                        </xsl:if>
-                        <xsl:call-template name="ajout_metadonnees">
-                            <xsl:with-param name="element" select="'dc:date'" />
-                        </xsl:call-template>
-
-                        <!-- dc:type -->
-                        <!-- Utilisation de l'un des types standard, outre le type refNum. -->
-                        <xsl:variable name="genre" select="normalize-space(refNum:document/refNum:bibliographie/refNum:genre)" />
                         <xsl:choose>
-                            <xsl:when test="$codes/genre/entry[@code = upper-case($genre)]">
-                                <dc:type>
-                                    <xsl:value-of select="$codes/genre/entry[@code = upper-case($genre)]/@type" />
-                                </dc:type>
-                                <dc:type>
-                                    <xsl:choose>
-                                        <xsl:when test="$profil/section/DescriptiveMetadataSection/genreSelect != ''">
-                                            <xsl:value-of select="$codes/genre/entry[@code = upper-case($genre)]
-                                                /@*[name() = $profil/section/DescriptiveMetadataSection/genreSelect]" />
-                                        </xsl:when>
-                                        <xsl:otherwise>
-                                            <xsl:value-of select="$codes/genre/entry[@code = upper-case($genre)]" />
-                                        </xsl:otherwise>
-                                    </xsl:choose>
-                                </dc:type>
+                            <!-- Ajout des métadonnées de la table. -->
+                            <xsl:when test="$profil/section/DescriptiveMetadataSection/metadata/@ordre = 'table'
+                                    or ($profil/section/DescriptiveMetadataSection/metadata/@ordre = 'table sinon refnum'
+                                        and $notices != '')
+                                    ">
+                                <xsl:sequence select="$notice" />
                             </xsl:when>
-                            <!-- Variantes du standard. -->
+
+                            <!-- Ajout de chaque valeur selon l'ordre du Dublin Core à partir du refnum. -->
                             <xsl:otherwise>
-                                <xsl:if test="$genre != ''">
-                                    <dc:type>
-                                        <xsl:value-of select="$genre" />
-                                    </dc:type>
+                                <!-- dc:title -->
+                                <!-- Plusieurs titres peuvent être séparés par des points-virgules. -->
+                                <xsl:for-each select="tokenize(normalize-space(refNum:document/refNum:bibliographie/refNum:titre), ';')">
+                                    <dc:title>
+                                        <xsl:value-of select="normalize-space(.)" />
+                                        <xsl:if test="position() = 1
+                                            and $tomaisonTitle != ''
+                                            and $profil/section/DescriptiveMetadataSection/tomaison/ajoutPremierTitre/@remplir = 'true'">
+                                            <xsl:text> (</xsl:text>
+                                            <xsl:value-of select="$tomaisonTitle" />
+                                            <xsl:text>)</xsl:text>
+                                        </xsl:if>
+                                    </dc:title>
+                                </xsl:for-each>
+                                <xsl:if test="$tomaisonTitle != '' and $profil/section/DescriptiveMetadataSection/tomaison/ajoutAutreTitre/@remplir = 'true'">
+                                    <dc:title>
+                                        <xsl:value-of select="$tomaisonTitle" />
+                                    </dc:title>
                                 </xsl:if>
                                 <xsl:call-template name="ajout_metadonnees">
-                                    <xsl:with-param name="element" select="'dc:type'" />
+                                    <xsl:with-param name="element" select="'dc:title'" />
+                                </xsl:call-template>
+
+                                <!-- dc:creator -->
+                                <!-- Plusieurs auteurs peuvent être séparés par des points-virgules. -->
+                                <xsl:for-each select="tokenize(normalize-space(refNum:document/refNum:bibliographie/refNum:auteur), ';')[normalize-space(.) != '']">
+                                    <dc:creator>
+                                        <xsl:value-of select="normalize-space(.)" />
+                                    </dc:creator>
+                                </xsl:for-each>
+                                <xsl:call-template name="ajout_metadonnees">
+                                    <xsl:with-param name="element" select="'dc:creator'" />
+                                </xsl:call-template>
+
+                                <!-- dc:subject -->
+                                <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'CADRECLASSEMENTDEWEY'][normalize-space(.) != '']">
+                                    <dc:subject>
+                                        <xsl:value-of select="normalize-space(.)" />
+                                    </dc:subject>
+                                </xsl:for-each>
+                                <xsl:call-template name="ajout_metadonnees">
+                                    <xsl:with-param name="element" select="'dc:subject'" />
+                                </xsl:call-template>
+
+                                <!-- dc:description -->
+                                <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:description[normalize-space(.) != '']">
+                                    <dc:description>
+                                        <xsl:value-of select="normalize-space(.)" />
+                                    </dc:description>
+                                </xsl:for-each>
+                                <xsl:if test="$tomaisonTitle != ''">
+                                    <xsl:if test="$profil/section/DescriptiveMetadataSection/tomaison/ajoutDescription/@remplir = 'true'">
+                                        <dc:description>
+                                            <xsl:value-of select="$tomaisonTitle" />
+                                        </dc:description>
+                                    </xsl:if>
+                                    <xsl:if test="$profil/section/DescriptiveMetadataSection/tomaison/ajoutDescriptionSepare/@remplir = 'true'">
+                                        <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:tomaison">
+                                            <xsl:element name="dc:description">
+                                                <xsl:if test="$profil/section/DescriptiveMetadataSection/tomaison/attributes">
+                                                    <xsl:attribute name="{$profil/section/DescriptiveMetadataSection/tomaison/attributes/@nom}">
+                                                        <xsl:choose>
+                                                            <xsl:when test="count($profil/section/DescriptiveMetadataSection/tomaison/attributes/attribute) > 1">
+                                                                <xsl:variable name="position" select="position()" />
+                                                                <xsl:value-of select="$profil/section/DescriptiveMetadataSection/tomaison/attributes/attribute
+                                                                [position() = $position]" />
+                                                            </xsl:when>
+                                                            <xsl:otherwise>
+                                                                <xsl:value-of select="$profil/section/DescriptiveMetadataSection/tomaison/attributes/attribute" />
+                                                            </xsl:otherwise>
+                                                        </xsl:choose>
+                                                    </xsl:attribute>
+                                                </xsl:if>
+                                                <xsl:apply-templates select="." />
+                                            </xsl:element>
+                                        </xsl:for-each>
+                                    </xsl:if>
+                                </xsl:if>
+                                <xsl:call-template name="ajout_metadonnees">
+                                    <xsl:with-param name="element" select="'dc:description'" />
+                                </xsl:call-template>
+
+                                <!-- dc:publisher -->
+                                <xsl:if test="normalize-space(refNum:document/refNum:bibliographie/refNum:editeur)">
+                                    <dc:publisher>
+                                        <xsl:value-of select="normalize-space(refNum:document/refNum:bibliographie/refNum:editeur)" />
+                                    </dc:publisher>
+                                </xsl:if>
+                                <xsl:call-template name="ajout_metadonnees">
+                                    <xsl:with-param name="element" select="'dc:publisher'" />
+                                </xsl:call-template>
+
+                                <!-- dc:contributor. -->
+                                <xsl:call-template name="ajout_metadonnees">
+                                    <xsl:with-param name="element" select="'dc:contributor'" />
+                                </xsl:call-template>
+
+                                <!-- dc:date (dcterms:issued) -->
+                                <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:dateEdition[normalize-space(.) != '']">
+                                    <dc:date>
+                                        <xsl:value-of select="normalize-space(.)" />
+                                    </dc:date>
+                                </xsl:for-each>
+                                <xsl:if test="$tomaisonDate != '' and $profil/section/DescriptiveMetadataSection/tomaison/ajoutDate/@remplir = 'true'">
+                                    <dc:date>
+                                        <xsl:value-of select="$tomaisonDate" />
+                                    </dc:date>
+                                </xsl:if>
+                                <xsl:call-template name="ajout_metadonnees">
+                                    <xsl:with-param name="element" select="'dc:date'" />
+                                </xsl:call-template>
+
+                                <!-- dc:type -->
+                                <!-- Utilisation de l'un des types standard, outre le type refNum. -->
+                                <xsl:variable name="genre" select="normalize-space(refNum:document/refNum:bibliographie/refNum:genre)" />
+                                <xsl:choose>
+                                    <xsl:when test="$codes/genre/entry[@code = upper-case($genre)]">
+                                        <dc:type>
+                                            <xsl:value-of select="$codes/genre/entry[@code = upper-case($genre)]/@type" />
+                                        </dc:type>
+                                        <dc:type>
+                                            <xsl:choose>
+                                                <xsl:when test="$profil/section/DescriptiveMetadataSection/genreSelect != ''">
+                                                    <xsl:value-of select="$codes/genre/entry[@code = upper-case($genre)]
+                                                        /@*[name() = $profil/section/DescriptiveMetadataSection/genreSelect]" />
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                    <xsl:value-of select="$codes/genre/entry[@code = upper-case($genre)]" />
+                                                </xsl:otherwise>
+                                            </xsl:choose>
+                                        </dc:type>
+                                    </xsl:when>
+                                    <!-- Variantes du standard. -->
+                                    <xsl:otherwise>
+                                        <xsl:if test="$genre != ''">
+                                            <dc:type>
+                                                <xsl:value-of select="$genre" />
+                                            </dc:type>
+                                        </xsl:if>
+                                        <xsl:call-template name="ajout_metadonnees">
+                                            <xsl:with-param name="element" select="'dc:type'" />
+                                        </xsl:call-template>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+
+                                <!-- dc:format -->
+                                <xsl:variable name="nombrePages" select="normalize-space(refNum:document/refNum:bibliographie/refNum:nombrePages)" />
+                                <xsl:if test="$nombrePages != '' and lower-case($nombrePages) != 'sans objet'">
+                                    <dc:format>
+                                        <xsl:value-of select="$nombrePages" />
+                                        <xsl:text> pages</xsl:text>
+                                    </dc:format>
+                                </xsl:if>
+                                <xsl:call-template name="ajout_metadonnees">
+                                    <xsl:with-param name="element" select="'dc:format'" />
+                                </xsl:call-template>
+
+                                <!-- dc:identifier -->
+                                <xsl:if test="normalize-space(refNum:document/@identifiant) != ''">
+                                    <dc:identifier>
+                                        <xsl:value-of select="normalize-space(refNum:document/@identifiant)" />
+                                    </dc:identifier>
+                                </xsl:if>
+                                <!-- TODO En section descriptive ou administrative ? -->
+                                <xsl:if test="normalize-space(refNum:document/@numper) != ''">
+                                    <dc:identifier>
+                                        <xsl:text>Numper : </xsl:text>
+                                        <xsl:value-of select="normalize-space(refNum:document/@numper)" />
+                                    </dc:identifier>
+                                </xsl:if>
+                                <!-- TODO En section descriptive ou administrative ? -->
+                                <xsl:if test="normalize-space(refNum:document/@identifiantAutreVersion) != ''">
+                                    <dc:identifier>
+                                        <xsl:text>Identifiant autre version : </xsl:text>
+                                        <xsl:value-of select="normalize-space(refNum:document/@identifiantAutreVersion)" />
+                                    </dc:identifier>
+                                </xsl:if>
+                                <!-- TODO En section descriptive ou administrative ? -->
+                                <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'IDDOCUMENT'][normalize-space(.) != '']">
+                                    <dc:identifier>
+                                        <xsl:text>ID document : </xsl:text>
+                                        <xsl:value-of select="normalize-space(.)" />
+                                    </dc:identifier>
+                                </xsl:for-each>
+                                <xsl:call-template name="ajout_metadonnees">
+                                    <xsl:with-param name="element" select="'dc:identifier'" />
+                                </xsl:call-template>
+
+                                <!-- dc:source -->
+                                <!-- Voir http://dublincore.org/documents/usageguide/elements.shtml#source -->
+                                <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'COTEORIGINAL'][normalize-space(.) != '']">
+                                    <dc:source>
+                                        <xsl:text>Cote original : </xsl:text>
+                                        <xsl:value-of select="normalize-space(.)" />
+                                    </dc:source>
+                                </xsl:for-each>
+                                <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'COTEOBJETREPRODUIT'][normalize-space(.) != '']">
+                                    <dc:source>
+                                        <xsl:text>Cote objet reproduit : </xsl:text>
+                                        <xsl:value-of select="normalize-space(.)" />
+                                    </dc:source>
+                                </xsl:for-each>
+                                <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'SOURCE'][normalize-space(.) != '']">
+                                    <dc:source>
+                                        <xsl:value-of select="normalize-space(.)" />
+                                    </dc:source>
+                                </xsl:for-each>
+                                <xsl:call-template name="ajout_metadonnees">
+                                    <xsl:with-param name="element" select="'dc:source'" />
+                                </xsl:call-template>
+
+                                <!-- dcterms:provenance -->
+                                <xsl:call-template name="ajout_metadonnees">
+                                    <xsl:with-param name="element" select="'dcterms:provenance'" />
+                                </xsl:call-template>
+
+                                <!-- dc:language -->
+                                <xsl:call-template name="ajout_metadonnees">
+                                    <xsl:with-param name="element" select="'dc:language'" />
+                                </xsl:call-template>
+
+                                <!-- dc:relation -->
+                                <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'NOTICEBIBLIOGRAPHIQUE'][normalize-space(.) != '']">
+                                    <dc:relation>
+                                        <xsl:value-of select="normalize-space(.)" />
+                                    </dc:relation>
+                                </xsl:for-each>
+                                <!-- TODO En section descriptive ou administrative ? -->
+                                <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'CODEBARREBNF'][normalize-space(.) != '']">
+                                    <dc:relation>
+                                        <xsl:text>Code-barre BnF : </xsl:text>
+                                        <xsl:value-of select="normalize-space(.)" />
+                                    </dc:relation>
+                                </xsl:for-each>
+                                <xsl:call-template name="ajout_metadonnees">
+                                    <xsl:with-param name="element" select="'dc:relation'" />
+                                </xsl:call-template>
+
+                                <!-- dc:coverage -->
+                                <xsl:call-template name="ajout_metadonnees">
+                                    <xsl:with-param name="element" select="'dc:coverage'" />
+                                </xsl:call-template>
+
+                                <!-- dc:rights -->
+                                <xsl:call-template name="ajout_metadonnees">
+                                    <xsl:with-param name="element" select="'dc:rights'" />
                                 </xsl:call-template>
                             </xsl:otherwise>
                         </xsl:choose>
 
-                        <!-- dc:format -->
-                        <xsl:variable name="nombrePages" select="normalize-space(refNum:document/refNum:bibliographie/refNum:nombrePages)" />
-                        <xsl:if test="$nombrePages != '' and lower-case($nombrePages) != 'sans objet'">
-                            <dc:format>
-                                <xsl:value-of select="$nombrePages" />
-                                <xsl:text> pages</xsl:text>
-                            </dc:format>
-                        </xsl:if>
-                        <xsl:call-template name="ajout_metadonnees">
-                            <xsl:with-param name="element" select="'dc:format'" />
-                        </xsl:call-template>
-
-                        <!-- dc:identifier -->
-                        <xsl:if test="normalize-space(refNum:document/@identifiant) != ''">
-                            <dc:identifier>
-                                <xsl:value-of select="normalize-space(refNum:document/@identifiant)" />
-                            </dc:identifier>
-                        </xsl:if>
-                        <!-- TODO En section descriptive ou administrative ? -->
-                        <xsl:if test="normalize-space(refNum:document/@numper) != ''">
-                            <dc:identifier>
-                                <xsl:text>Numper : </xsl:text>
-                                <xsl:value-of select="normalize-space(refNum:document/@numper)" />
-                            </dc:identifier>
-                        </xsl:if>
-                        <!-- TODO En section descriptive ou administrative ? -->
-                        <xsl:if test="normalize-space(refNum:document/@identifiantAutreVersion) != ''">
-                            <dc:identifier>
-                                <xsl:text>Identifiant autre version : </xsl:text>
-                                <xsl:value-of select="normalize-space(refNum:document/@identifiantAutreVersion)" />
-                            </dc:identifier>
-                        </xsl:if>
-                        <!-- TODO En section descriptive ou administrative ? -->
-                        <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'IDDOCUMENT'][normalize-space(.) != '']">
-                            <dc:identifier>
-                                <xsl:text>ID document : </xsl:text>
-                                <xsl:value-of select="normalize-space(.)" />
-                            </dc:identifier>
-                        </xsl:for-each>
-                        <xsl:call-template name="ajout_metadonnees">
-                            <xsl:with-param name="element" select="'dc:identifier'" />
-                        </xsl:call-template>
-
-                        <!-- dc:source -->
-                        <!-- Voir http://dublincore.org/documents/usageguide/elements.shtml#source -->
-                        <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'COTEORIGINAL'][normalize-space(.) != '']">
-                            <dc:source>
-                                <xsl:text>Cote original : </xsl:text>
-                                <xsl:value-of select="normalize-space(.)" />
-                            </dc:source>
-                        </xsl:for-each>
-                        <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'COTEOBJETREPRODUIT'][normalize-space(.) != '']">
-                            <dc:source>
-                                <xsl:text>Cote objet reproduit : </xsl:text>
-                                <xsl:value-of select="normalize-space(.)" />
-                            </dc:source>
-                        </xsl:for-each>
-                        <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'SOURCE'][normalize-space(.) != '']">
-                            <dc:source>
-                                <xsl:value-of select="normalize-space(.)" />
-                            </dc:source>
-                        </xsl:for-each>
-                        <xsl:call-template name="ajout_metadonnees">
-                            <xsl:with-param name="element" select="'dc:source'" />
-                        </xsl:call-template>
-
-                        <!-- dcterms:provenance -->
-                        <xsl:call-template name="ajout_metadonnees">
-                            <xsl:with-param name="element" select="'dcterms:provenance'" />
-                        </xsl:call-template>
-
-                        <!-- dc:language -->
-                        <xsl:call-template name="ajout_metadonnees">
-                            <xsl:with-param name="element" select="'dc:language'" />
-                        </xsl:call-template>
-
-                        <!-- dc:relation -->
-                        <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'NOTICEBIBLIOGRAPHIQUE'][normalize-space(.) != '']">
-                            <dc:relation>
-                                <xsl:value-of select="normalize-space(.)" />
-                            </dc:relation>
-                        </xsl:for-each>
-                        <!-- TODO En section descriptive ou administrative ? -->
-                        <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'CODEBARREBNF'][normalize-space(.) != '']">
-                            <dc:relation>
-                                <xsl:text>Code-barre BnF : </xsl:text>
-                                <xsl:value-of select="normalize-space(.)" />
-                            </dc:relation>
-                        </xsl:for-each>
-                        <xsl:call-template name="ajout_metadonnees">
-                            <xsl:with-param name="element" select="'dc:relation'" />
-                        </xsl:call-template>
-
-                        <!-- dc:coverage -->
-                        <xsl:call-template name="ajout_metadonnees">
-                            <xsl:with-param name="element" select="'dc:coverage'" />
-                        </xsl:call-template>
-
-                        <!-- dc:rights -->
-                        <xsl:call-template name="ajout_metadonnees">
-                            <xsl:with-param name="element" select="'dc:rights'" />
-                        </xsl:call-template>
                     </xsl:element>
                 </xsl:element>
             </xsl:element>
@@ -3040,15 +3087,32 @@ Historique
         <xsl:value-of select="string($resultat)" />
     </xsl:function>
 
+    <!-- Récupère la notice d'un document. -->
+    <xsl:function name="r2m:trouveNotice">
+        <!-- Identifiant du document refnum -->
+        <xsl:param name="identifiant" />
+
+        <xsl:sequence select="r2m:extraitCellules($notices, $identifiant)" />
+    </xsl:function>
+
     <!-- Récupère les métadonnées d'un fichier. -->
     <xsl:function name="r2m:trouveMetadata">
         <!-- Nom du fichier -->
         <xsl:param name="fichier" />
 
+        <xsl:sequence select="r2m:extraitCellules($fichier_metadata, $fichier)" />
+    </xsl:function>
+
+    <!-- Récupère une ligne de cellules d'un tableur OpenDocument. -->
+    <!-- L'identifiant doit être dans la première colonne. -->
+    <xsl:function name="r2m:extraitCellules">
+        <xsl:param name="tableur" as="xs:string" />
+        <xsl:param name="identifiant" as="xs:string" />
+
         <!-- TODO Optimiser si besoin. -->
-        <xsl:variable name="row" select="document($fichier_metadata)
+        <xsl:variable name="row" select="document($tableur)
                 /office:document-content/office:body/office:spreadsheet/table:table[1]
-                /table:table-row[table:table-cell[1]/text:p = $fichier]" />
+                /table:table-row[table:table-cell[1]/text:p = $identifiant]" />
 
         <xsl:if test="not(empty($row))">
             <!-- D'abord, reconstruire la liste des cellules pour gérer les cellules
@@ -3071,9 +3135,9 @@ Historique
 
             <!-- Ensuite, lier les cellules au nom des colonnes (qui doivent être du Dublin Core). -->
             <xsl:variable name="result">
-                <xsl:for-each select="document($fichier_metadata)
-                        /office:document-content/office:body/office:spreadsheet
-                        /table:table[1]/table:table-row[1]/table:table-cell
+                <xsl:for-each select="document($tableur)
+                        /office:document-content/office:body/office:spreadsheet/table:table[1]
+                        /table:table-row[1]/table:table-cell
                         ">
                     <!-- La première cellule est le nom du fichier, inutile désormais. -->
                     <xsl:if test="position() != 1" >

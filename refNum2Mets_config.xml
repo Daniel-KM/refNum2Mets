@@ -19,10 +19,27 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
     etc., afin de les traduire en langue compréhensible. -->
     <codes>refNum2Mets_codes.xml</codes>
 
-    <fichiers>
-        <!-- Mets permet d'ajouter des métadonnées au niveau de chaque fichier. -->
+    <documents>
+        <!-- Notices en Dublin Core, plus complète que celle du refnum. -->
         <!-- Les données sont au format Open Document Spreadsheet : c'est le
         fichier principal et décompressé d'un tableur LibreOffice ou autre. -->
+        <!-- L'identifiant doit être dans la première colonne. -->
+        <metadata>
+            <liste chemin="xml">documents_metadata.xml</liste>
+        </metadata>
+
+        <!-- L'identifiant ark est unique, court, opaque et pérenne et permet
+        d'identifier l'institution qui dispose des documents -->
+        <ark>
+            <liste chemin="xsl">documents_arks.txt</liste>
+        </ark>
+    </documents>
+
+    <fichiers>
+        <!-- Mets permet d'ajouter des métadonnées au niveau de chaque fichier. -->
+        <!-- Peut être le même fichier que pour les notices des documents (le
+        nom de la colonne de l'identifiant ou du nom de fichier n'est pas pris
+        en compte, mais il faut que ce soit la première colonne). -->
         <metadata>
             <liste chemin="xml">fichiers_metadata.xml</liste>
         </metadata>
@@ -46,10 +63,7 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
     INIFORMATIONS DIVERSES
     =============================================================== -->
 
-    <!-- L'identifiant ark est unique, court, opaque et pérenne et permet
-    d'identifier l'insititution qui dispose des documents -->
     <ark>
-        <liste chemin="xsl">arks.txt</liste>
         <!-- Numéro d'autorité nommante attribué gratuitement par la
         California Digital Library. La BnF est le 12148, 12345 indique un exemple. -->
         <institution>12345</institution>
@@ -160,11 +174,13 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
         </MetsHeader>
 
         <!-- Les valeurs par défaut sont toujours ajoutées, sauf pour defautType,
-        ajouté seulement si aucune n'est trouvé via les informations du fichier refNum source. -->
+        ajouté seulement si aucune n'est trouvé via les informations du fichier refNum source.
+        Ne sont pas prises en compte si les notices sont dans une table.
+        -->
         <DescriptiveMetadataSection>
             <elementsCommuns>
-              <!-- Type par défaut (dcmi vocabulary pour dc:type), utilisé pour le genre
-              "Multimédia" ou en son absence. -->
+            <!-- Type par défaut (dcmi vocabulary pour dc:type), utilisé pour le genre
+            "Multimédia" ou en son absence. -->
                 <dc>
                     <type>Moving Image</type>
                     <source></source>
@@ -271,7 +287,9 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
             <MetsHeader remplir="true" />
             <DescriptiveMetadataSection remplir="true">
                 <descriptiveFormatWrapper>dc:dc</descriptiveFormatWrapper>
-                <!-- Conversion de la tomaison en Dublin Core -->
+                <!-- Notices : soit la "table", soit le "refnum", soit "table sinon refnum". -->
+                <metadata ordre="table sinon refnum" />
+                <!-- Conversion de la tomaison en Dublin Core pour le refnum. -->
                 <tomaison>
                     <ajoutPremierTitre remplir="false" />
                     <ajoutAutreTitre remplir="true" />
@@ -362,6 +380,7 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
             <MetsHeader remplir="true" />
             <DescriptiveMetadataSection remplir="true">
                 <descriptiveFormatWrapper>dc:dc</descriptiveFormatWrapper>
+                <metadata ordre="table sinon refnum" />
                 <tomaison>
                     <ajoutPremierTitre remplir="false" />
                     <ajoutAutreTitre remplir="true" />
@@ -421,6 +440,7 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
             <MetsHeader remplir="true" />
             <DescriptiveMetadataSection remplir="true">
                 <descriptiveFormatWrapper>dc:dc</descriptiveFormatWrapper>
+                <metadata ordre="table sinon refnum" />
                 <tomaison>
                     <ajoutPremierTitre remplir="false" />
                     <ajoutAutreTitre remplir="true" />
@@ -482,6 +502,7 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
             <MetsHeader remplir="false" />
             <DescriptiveMetadataSection remplir="true">
                 <descriptiveFormatWrapper>spar_dc:spar_dc</descriptiveFormatWrapper>
+                <metadata ordre="table sinon refnum" />
                 <tomaison>
                     <ajoutPremierTitre remplir="true" />
                     <ajoutAutreTitre remplir="false" />
@@ -550,6 +571,7 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
             <MetsHeader remplir="false" />
             <DescriptiveMetadataSection remplir="true">
                 <descriptiveFormatWrapper>dc:dc</descriptiveFormatWrapper>
+                <metadata ordre="table sinon refnum" />
                 <tomaison>
                     <ajoutPremierTitre remplir="false" />
                     <ajoutAutreTitre remplir="true" />

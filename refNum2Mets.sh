@@ -2,6 +2,7 @@
 #
 # Convertit tous les fichiers refNum d'un dossier en Mets via xslt Saxon-HE.
 #
+# - Les métadonnées peuvent se trouver dans des tables ODS ou en xml.
 # - Les fichiers originaux sont conservés.
 # - Le hash de tous les fichiers est calculé, ce qui peut être long.
 # - Les noms de fichiers ne doivent pas contenir d'espace (problème dans
@@ -34,6 +35,8 @@ then
 fi
 
 # Si ods est présent, on sauve ses métadonnées en xml, sinon on prend le xml.
+documentsMetadata='documents_metadata.ods'
+documentsMetadataXml='documents_metadata.xml'
 fichiersMetadata='fichiers_metadata.ods'
 fichiersMetadataXml='fichiers_metadata.xml'
 fichiersHashs='fichiers_hashs.txt'
@@ -84,7 +87,24 @@ do
 
     echo $filename '=>' $metsfilename \($nombreFichiers fichiers, $tailleFichiers\)
 
-    # Extraction des métadonnées si besoin.
+    # Extraction des notices des documents si besoin.
+    if [ -f "$documentsMetadata" ]
+    then
+        noticespath="$dirname/$documentsMetadataXml"
+        echo '  ' Utilisation des notices de "$documentsMetadata" décompressées dans "$noticespath".
+        unzip -p "$documentsMetadata" content.xml > "$noticespath"
+    else
+        if [ -f "$documentsMetadataXml" ]
+        then
+            echo '  ' Utilisation des notices de "$documentsMetadataXml".
+            noticespath="$dirname/$documentsMetadataXml"
+        else
+            echo '  ' Pas de notices pour les documents.
+            noticespath=""
+        fi
+    fi
+
+    # Extraction des métadonnées des fichiers si besoin.
     if [ -f "$fichiersMetadata" ]
     then
         metadatapath="$dirname/$fichiersMetadataXml"
@@ -131,6 +151,10 @@ do
     if [ "$supprimeFichiersIntermediaires" = 'true' ]
     then
         echo '  ' Suppression des fichiers intermédaires créés par ce script.
+        if [ -f "$documentsMetadata" ]
+        then
+            rm -f "$noticespath"
+        fi
         if [ -f "$fichiersMetadata" ]
         then
             rm -f "$metadatapath"

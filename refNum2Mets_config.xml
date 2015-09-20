@@ -305,23 +305,25 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
                 </tomaison>
             </DescriptiveMetadataSection>
             <DescriptiveMetadataSection_fichiers remplir="true">
+                <!-- Métadonnées : ajout du titre depuis le refNum s'il n'est
+                pas présent dans la table. -->
+                <metadata ordre="table sinon refnum" />
+                <!-- Autres possibilités. -->
+                <!--
+                <metadata ordre="refnum et table" />
+                <metadata ordre="refnum seulement" />
+                <metadata ordre="table seulement" />
+                 -->
+                <!-- Le contenu du titre peut être l'orderLabel ou le label de
+                la Structural Map. La BnF utilise l'"orderLabel" comme titre et
+                le "label" comme description. L'option est prise en compte
+                seulement si le refnum est utilisé (option "metadata/@ordre"). -->
                 <titre>
-                    <!-- Métadonnées : ajout du titre depuis la table, sinon refNum. -->
-                    <metadata ordre="table sinon refnum" />
-                    <!-- Autres possibilités. -->
-                    <!--
-                    <metadata ordre="table et refnum" />
-                    <metadata ordre="table seulement" />
-                     -->
-                    <!-- Page paginée : 'numéro" ou "nom" (le préfixe est déterminé
-                    selon le type de pagination). -->
-                    <titreFichier>nom</titreFichier>
-                    <!-- Page non paginée : "vide", "fixe", "ordre", "numéro NP", "numéro déduit", "nom". -->
-                    <titreFichierNP>nom</titreFichierNP>
-                    <!-- Utilisés en fonction du choix "titreFichierNP". -->
-                    <titreFichierNPTexte>NP [</titreFichierNPTexte>
-                    <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+                    <copie valeur="orderLabel" />
                 </titre>
+                <description>
+                    <copie valeur="label" />
+                </description>
             </DescriptiveMetadataSection_fichiers>
             <AdministrativeMetadataSection remplir="true">
                 <!-- Ajoute les événements Spar : création du paquet, info sur chaque
@@ -358,8 +360,12 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
                 <!-- Si le nom est vide, le paramètre par défaut sera utilisé. -->
                 <structure_types nom="" />
                 <orderLabel remplir="true">
+                    <!-- Page paginée : 'numéro" ou "nom" (le préfixe est déterminé
+                    selon le type de pagination). -->
                     <titreFichier>numéro</titreFichier>
+                    <!-- Page non paginée : "vide", "fixe", "ordre", "numéro NP", "numéro déduit", "nom". -->
                     <titreFichierNP>numéro déduit</titreFichierNP>
+                    <!-- Utilisés en fonction du choix "titreFichierNP". -->
                     <titreFichierNPTexte>NP [</titreFichierNPTexte>
                     <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
                 </orderLabel>
@@ -396,13 +402,13 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
                 </tomaison>
             </DescriptiveMetadataSection>
             <DescriptiveMetadataSection_fichiers remplir="true">
+                <metadata ordre="table sinon refnum" />
                 <titre>
-                    <metadata ordre="table sinon refnum" />
-                    <titreFichier>nom</titreFichier>
-                    <titreFichierNP>nom</titreFichierNP>
-                    <titreFichierNPTexte>NP [</titreFichierNPTexte>
-                    <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+                    <copie valeur="orderLabel" />
                 </titre>
+                <description>
+                    <copie valeur="label" />
+                </description>
             </DescriptiveMetadataSection_fichiers>
             <AdministrativeMetadataSection remplir="true">
                 <spar fin="8" remplir="false" />
@@ -456,13 +462,13 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
                 </tomaison>
             </DescriptiveMetadataSection>
             <DescriptiveMetadataSection_fichiers remplir="true">
+                <metadata ordre="table sinon refnum" />
                 <titre>
-                    <metadata ordre="table sinon refnum" />
-                    <titreFichier>nom</titreFichier>
-                    <titreFichierNP>nom</titreFichierNP>
-                    <titreFichierNPTexte>NP [</titreFichierNPTexte>
-                    <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+                    <copie valeur="orderLabel" />
                 </titre>
+                <description>
+                    <copie valeur="label" />
+                </description>
             </DescriptiveMetadataSection_fichiers>
             <AdministrativeMetadataSection remplir="false">
                 <spar fin="8" remplir="true" />
@@ -524,14 +530,14 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
                 <genreSelect>spar_dc</genreSelect>
             </DescriptiveMetadataSection>
             <DescriptiveMetadataSection_fichiers remplir="true">
+                <metadata ordre="table sinon refnum" />
                 <titre>
-                    <metadata ordre="table sinon refnum" />
-                    <titreFichier>numéro</titreFichier>
-                    <titreFichierNP>numéro déduit</titreFichierNP>
-                    <titreFichierNPTexte>NP [</titreFichierNPTexte>
-                    <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+                    <copie valeur="orderLabel" />
+                    <typePaginationSelect>spar_dc</typePaginationSelect>
                 </titre>
-                <typePaginationSelect>spar_dc</typePaginationSelect>
+                <description>
+                    <copie valeur="label" />
+                </description>
             </DescriptiveMetadataSection_fichiers>
             <AdministrativeMetadataSection remplir="true">
                 <spar fin="8" remplir="true" />
@@ -587,13 +593,13 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
                 </tomaison>
             </DescriptiveMetadataSection>
             <DescriptiveMetadataSection_fichiers remplir="true">
+                <metadata ordre="table sinon refnum" />
                 <titre>
-                    <metadata ordre="table sinon refnum" />
-                    <titreFichier>nom</titreFichier>
-                    <titreFichierNP>nom</titreFichierNP>
-                    <titreFichierNPTexte>NP [</titreFichierNPTexte>
-                    <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+                    <copie valeur="orderLabel" />
                 </titre>
+                <description>
+                    <copie valeur="label" />
+                </description>
             </DescriptiveMetadataSection_fichiers>
             <AdministrativeMetadataSection remplir="true">
                 <spar fin="8" remplir="true" />

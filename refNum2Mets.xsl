@@ -639,48 +639,103 @@ Historique
                             <xsl:sequence select="r2m:trouveMetadata($href)" />
                         </xsl:variable>
 
+                        <!-- Détermination des titres et description depuis le refNum. -->
+                        <!-- Les autres métadonnées utiles se trouvent au niveau
+                        du document et le lien est fait au niveau de "fileSec". -->
+                        <!-- TODO Texte et Audio -->
+
                         <!-- Préparation du titre depuis le refnum. -->
                         <xsl:variable name="refnum_titre">
-                            <!-- TODO Texte et Audio -->
-                            <!-- Seul le titre est utile, le reste est au niveau du document et
-                            le lien est fait au niveau de "fileSec". -->
-                            <xsl:element name="dc:title">
-                                <xsl:variable name="typePaginationSelect"
-                                select="$profil/section/DescriptiveMetadataSection_fichiers/typePaginationSelect" />
-                                <xsl:if test="$typePaginationSelect">
-                                    <xsl:if test="$codes/typePagination/entry[@code = current()/../@typePagination]/@*[name() = $typePaginationSelect]">
-                                        <xsl:attribute name="xsi:type">
-                                            <xsl:value-of select="$typePaginationSelect" />
-                                            <xsl:text>:</xsl:text>
-                                            <xsl:value-of select="$codes/typePagination/entry[@code = current()/../@typePagination]/@*[name() = $typePaginationSelect]" />
-                                        </xsl:attribute>
+                            <xsl:choose>
+                                <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
+                                        /titre/copie/@valeur = 'orderLabel'">
+                                    <xsl:variable name="valeur_titre"
+                                    select="r2m:nomImage(., $profil/section/StructuralMap/orderLabel)" />
+                                    <xsl:if test="$valeur_titre != ''">
+                                        <xsl:element name="dc:title">
+                                            <!-- Spécificité BnF. -->
+                                            <xsl:variable name="typePaginationSelect"
+                                            select="$profil/section/DescriptiveMetadataSection_fichiers/titre/typePaginationSelect" />
+                                            <xsl:if test="$typePaginationSelect">
+                                                <xsl:if test="$codes/typePagination/entry[@code = current()/../@typePagination]/@*[name() = $typePaginationSelect]">
+                                                    <xsl:attribute name="xsi:type">
+                                                        <xsl:value-of select="$typePaginationSelect" />
+                                                        <xsl:text>:</xsl:text>
+                                                        <xsl:value-of select="$codes/typePagination/entry[@code = current()/../@typePagination]/@*[name() = $typePaginationSelect]" />
+                                                    </xsl:attribute>
+                                                </xsl:if>
+                                            </xsl:if>
+                                            <xsl:value-of select="$valeur_titre" />
+                                        </xsl:element>
                                     </xsl:if>
-                                </xsl:if>
-                                <xsl:value-of select="r2m:nomImage(., $profil/section/DescriptiveMetadataSection_fichiers/titre)" />
-                            </xsl:element>
+                                </xsl:when>
+                                <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
+                                        /title/copie/@valeur = 'label'">
+                                    <xsl:variable name="valeur_titre"
+                                    select="r2m:nomImage(., $profil/section/StructuralMap/label)" />
+                                    <xsl:if test="$valeur_titre != ''">
+                                        <xsl:element name="dc:title">
+                                            <xsl:value-of select="$valeur_titre" />
+                                        </xsl:element>
+                                    </xsl:if>
+                                </xsl:when>
+                            </xsl:choose>
                         </xsl:variable>
 
-                        <!-- Ajout des métadonnées de la table. -->
-                        <xsl:sequence select="$metadata" />
+                        <!-- Préparation de la description depuis le refnum. -->
+                        <xsl:variable name="refnum_description">
+                            <xsl:variable name="valeur_description" select="
+                            r2m:nomImage(., $profil/section/StructuralMap
+                                /*[local-name() = $profil/section/DescriptiveMetadataSection_fichiers
+                                    /description/copie/@valeur
+                                ])" />
+                            <xsl:if test="$valeur_description != ''
+                                and $valeur_description != $refnum_titre/dc:title/text()">
+                                <xsl:element name="dc:description">
+                                    <xsl:value-of select="$valeur_description" />
+                                </xsl:element>
+                            </xsl:if>
+                        </xsl:variable>
 
-                        <!-- Ajout éventuel du titre refnum. -->
+                        <!-- Ajout du refnum (titre et description) et de la table selon l'option. -->
                         <xsl:choose>
-                            <!-- Ajout systématique du titre refnum. -->
-                            <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers/titre
-                                    /metadata/@ordre = 'table et refnum'">
-                                <xsl:sequence select="$refnum_titre" />
-                            </xsl:when>
-                            <!-- Pas de titre refnum -->
-                            <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers/titre
+                            <!-- Table seule. -->
+                            <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
                                     /metadata/@ordre = 'table seulement'">
+                                <xsl:sequence select="$metadata" />
                             </xsl:when>
-                            <!-- On ajoute le titre refnum seulement s'il n'est pas défini dans
-                            la table des métadonnées. -->
-                            <xsl:when test="empty($metadata/dc:title)">
+
+                            <!-- Refnum seul. -->
+                            <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
+                                    /metadata/@ordre = 'refnum seulement'">
                                 <xsl:sequence select="$refnum_titre" />
+                                <xsl:sequence select="$refnum_description" />
+                            </xsl:when>
+
+                            <!-- Ajout systématique du refnum (titre et description), sauf doublon. -->
+                            <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
+                                    /metadata/@ordre = 'refnum et table'">
+                                <xsl:if test="not($metadata/dc:title = $refnum_titre)">
+                                    <xsl:sequence select="$refnum_titre" />
+                                </xsl:if>
+                                <xsl:if test="not($metadata/dc:description = $refnum_description)">
+                                    <xsl:sequence select="$refnum_description" />
+                                </xsl:if>
+                                <xsl:sequence select="$metadata" />
+                            </xsl:when>
+
+                            <!-- Ajout du refnum (titre et description) si non défini dans la table. -->
+                            <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
+                                    /metadata/@ordre = 'table sinon refnum'">
+                                <xsl:if test="not($metadata/dc:title)">
+                                    <xsl:sequence select="$refnum_titre" />
+                                </xsl:if>
+                                <xsl:if test="not($metadata/dc:description)">
+                                    <xsl:sequence select="$refnum_description" />
+                                </xsl:if>
+                                <xsl:sequence select="$metadata" />
                             </xsl:when>
                         </xsl:choose>
-
                     </xsl:element>
                 </xsl:element>
             </xsl:element>
@@ -2471,16 +2526,27 @@ Historique
             <xsl:attribute name="ORDER">
                 <xsl:value-of select="@ordre" />
             </xsl:attribute>
+
+            <xsl:variable name="orderLabel"
+                select="r2m:nomImage(., $profil/section/StructuralMap/orderLabel)" />
+            <xsl:variable name="label"
+                select="r2m:nomImage(., $profil/section/StructuralMap/label)" />
+
             <xsl:if test="$profil/section/StructuralMap/orderLabel/@remplir = 'true'">
                 <xsl:attribute name="ORDERLABEL">
-                    <xsl:value-of select="r2m:nomImage(., $profil/section/StructuralMap/orderLabel)" />
+                    <xsl:value-of select="$orderLabel" />
                 </xsl:attribute>
             </xsl:if>
-            <xsl:if test="$profil/section/StructuralMap/label/@remplir = 'true'">
+            <xsl:if test="$profil/section/StructuralMap/label/@remplir = 'true'
+                    and (
+                        $profil/section/StructuralMap/label/@remplir != 'true'
+                        or $label != $orderLabel
+                    )">
                 <xsl:attribute name="LABEL">
-                    <xsl:value-of select="r2m:nomImage(., $profil/section/StructuralMap/label)" />
+                    <xsl:value-of select="$label" />
                 </xsl:attribute>
             </xsl:if>
+
             <xsl:attribute name="ID">
                 <xsl:text>DIV.</xsl:text>
                 <!-- Plus 2, car il y a le set et le group. -->

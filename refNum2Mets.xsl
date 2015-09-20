@@ -96,8 +96,10 @@ Historique
     xmlns:r2m="refNum2Mets"
     xmlns:refNum="http://bibnum.bnf.fr/ns/refNum"
     xmlns:detailsOperation="http://bibnum.bnf.fr/ns/detailsOperation"
+
     xmlns:spar_dc="http://bibnum.bnf.fr/ns/spar_dc"
     xmlns:alto="http://bibnum.bnf.fr/ns/alto_prod"
+
     xmlns="http://www.loc.gov/METS/"
     xmlns:mets="http://www.loc.gov/METS/"
     xmlns:premis="info:lc/xmlns/premis-v2"
@@ -107,7 +109,13 @@ Historique
     xmlns:dcterms="http://purl.org/dc/terms/"
     xmlns:niso="http://www.niso.org/Z39-87-2006.pdf"
     xmlns:textmd="info:lc/xmlns/textMD-v3"
-    exclude-result-prefixes="xsl fn xs r2m refNum detailsOperation spar_dc alto mets textmd">
+
+    exclude-result-prefixes="
+        xsl fn xs r2m refNum detailsOperation
+        spar_dc alto
+        mets textmd
+        ">
+
     <xsl:output method="xml" indent="yes" encoding="UTF-8"/>
 
     <xsl:strip-space elements="*"/>
@@ -128,54 +136,56 @@ Historique
     sinon ceux du présent dossier. -->
     <xsl:variable name="dirname" as="xs:string" select="
             string-join(tokenize(document-uri(/), '/')[position() &lt; last()], '/')" />
-    <xsl:variable name="checksums" as="xs:string">
+
+    <xsl:variable name="fichier_checksums" as="xs:string">
         <xsl:choose>
             <xsl:when test="function-available('unparsed-text-available')">
                 <xsl:value-of select="
-                    if ($parametres/checksum/liste/@chemin = 'xml')
-                        then if (unparsed-text-available(concat($dirname, '/', $parametres/checksum/liste), 'UTF-8'))
-                            then concat($dirname, '/', $parametres/checksum/liste)
-                            else if (unparsed-text-available(resolve-uri($parametres/checksum/liste)))
-                                then resolve-uri($parametres/checksum/liste)
+                    if ($parametres/fichiers/checksums/liste/@chemin = 'xml')
+                        then if (unparsed-text-available(concat($dirname, '/', $parametres/fichiers/checksums/liste), 'UTF-8'))
+                            then concat($dirname, '/', $parametres/fichiers/checksums/liste)
+                            else if (unparsed-text-available(resolve-uri($parametres/fichiers/checksums/liste)))
+                                then resolve-uri($parametres/fichiers/checksums/liste)
                                 else ''
-                    else if (unparsed-text-available(resolve-uri($parametres/checksum/liste)))
-                        then resolve-uri($parametres/checksum/liste)
-                        else if (unparsed-text-available(concat($dirname, '/', $parametres/checksum/liste), 'UTF-8'))
-                            then concat($dirname, '/', $parametres/checksum/liste)
+                    else if (unparsed-text-available(resolve-uri($parametres/fichiers/checksums/liste)))
+                        then resolve-uri($parametres/fichiers/checksums/liste)
+                        else if (unparsed-text-available(concat($dirname, '/', $parametres/fichiers/checksums/liste), 'UTF-8'))
+                            then concat($dirname, '/', $parametres/fichiers/checksums/liste)
                             else ''
                     " />
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="
-                        if ($parametres/checksum/liste/@chemin = 'xml')
-                        then concat($dirname, '/', $parametres/checksum/liste)
-                        else resolve-uri($parametres/checksum/liste)
+                        if ($parametres/fichiers/checksums/liste/@chemin = 'xml')
+                        then concat($dirname, '/', $parametres/fichiers/checksums/liste)
+                        else resolve-uri($parametres/fichiers/checksums/liste)
                         " />
             </xsl:otherwise>
         </xsl:choose>
     </xsl:variable>
-    <xsl:variable name="filesizes" as="xs:string">
-         <xsl:choose>
+
+    <xsl:variable name="fichier_tailles" as="xs:string">
+        <xsl:choose>
             <xsl:when test="function-available('unparsed-text-available')">
                 <xsl:value-of select="
-                    if ($parametres/filesize/liste/@chemin = 'xml')
-                        then if (unparsed-text-available(concat($dirname, '/', $parametres/filesize/liste), 'UTF-8'))
-                            then concat($dirname, '/', $parametres/filesize/liste)
-                            else if (unparsed-text-available(resolve-uri($parametres/filesize/liste)))
-                                then resolve-uri($parametres/filesize/liste)
+                    if ($parametres/fichiers/tailles/liste/@chemin = 'xml')
+                        then if (unparsed-text-available(concat($dirname, '/', $parametres/fichiers/tailles/liste), 'UTF-8'))
+                            then concat($dirname, '/', $parametres/fichiers/tailles/liste)
+                            else if (unparsed-text-available(resolve-uri($parametres/fichiers/tailles/liste)))
+                                then resolve-uri($parametres/fichiers/tailles/liste)
                                 else ''
-                    else if (unparsed-text-available(resolve-uri($parametres/filesize/liste)))
-                        then resolve-uri($parametres/filesize/liste)
-                        else if (unparsed-text-available(concat($dirname, '/', $parametres/filesize/liste), 'UTF-8'))
-                            then concat($dirname, '/', $parametres/filesize/liste)
+                    else if (unparsed-text-available(resolve-uri($parametres/fichiers/tailles/liste)))
+                        then resolve-uri($parametres/fichiers/tailles/liste)
+                        else if (unparsed-text-available(concat($dirname, '/', $parametres/fichiers/tailles/liste), 'UTF-8'))
+                            then concat($dirname, '/', $parametres/fichiers/tailles/liste)
                             else ''
                     " />
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="
-                        if ($parametres/filesize/liste/@chemin = 'xml')
-                        then concat($dirname, '/', $parametres/filesize/liste)
-                        else resolve-uri($parametres/filesize/liste)
+                        if ($parametres/fichiers/tailles/liste/@chemin = 'xml')
+                        then concat($dirname, '/', $parametres/fichiers/tailles/liste)
+                        else resolve-uri($parametres/fichiers/tailles/liste)
                         " />
             </xsl:otherwise>
         </xsl:choose>
@@ -2300,11 +2310,11 @@ Historique
                 </xsl:attribute>
             </xsl:if>
 
-            <xsl:if test="$parametres/checksum/type">
+            <xsl:if test="$parametres/fichiers/checksums/type">
                 <xsl:variable name="checksumFichier" select="r2m:trouveChecksum($href)" />
                 <xsl:if test="$checksumFichier != ''">
                     <xsl:attribute name="CHECKSUMTYPE">
-                        <xsl:value-of select="$parametres/checksum/type" />
+                        <xsl:value-of select="$parametres/fichiers/checksums/type" />
                     </xsl:attribute>
                     <xsl:attribute name="CHECKSUM">
                         <xsl:value-of select="$checksumFichier" />
@@ -2312,7 +2322,7 @@ Historique
                 </xsl:if>
             </xsl:if>
 
-            <xsl:if test="$filesizes">
+            <xsl:if test="$fichier_tailles">
                 <xsl:variable name="tailleFichier" select="r2m:trouveTaille($href)" />
                 <xsl:if test="$tailleFichier != ''">
                     <xsl:attribute name="SIZE">
@@ -2938,7 +2948,7 @@ Historique
 
         <!-- TODO Optimiser si besoin. -->
         <xsl:variable name="resultat">
-            <xsl:for-each select="tokenize(unparsed-text($checksums, 'UTF-8'), '\r?\n')">
+            <xsl:for-each select="tokenize(unparsed-text($fichier_checksums, 'UTF-8'), '\r?\n')">
                 <xsl:if test="normalize-space(substring-after(., ' ')) = $fichier">
                     <xsl:value-of select="normalize-space(substring-before(., ' '))" />
                 </xsl:if>
@@ -2954,7 +2964,7 @@ Historique
 
         <!-- TODO Optimiser si besoin. -->
         <xsl:variable name="resultat">
-            <xsl:for-each select="tokenize(unparsed-text($filesizes, 'UTF-8'), '\r?\n')">
+            <xsl:for-each select="tokenize(unparsed-text($fichier_tailles, 'UTF-8'), '\r?\n')">
                 <xsl:if test="normalize-space(substring-after(., ' ')) = $fichier">
                     <xsl:value-of select="normalize-space(substring-before(., ' '))" />
                 </xsl:if>

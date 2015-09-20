@@ -31,7 +31,7 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
         <!-- L'identifiant ark est unique, court, opaque et pérenne et permet
         d'identifier l'institution qui dispose des documents -->
         <ark>
-            <liste chemin="xsl">documents_arks.txt</liste>
+            <liste chemin="xml">documents_arks.txt</liste>
         </ark>
     </documents>
 

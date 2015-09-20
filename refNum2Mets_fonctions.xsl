@@ -130,16 +130,38 @@ Elle contient des fonctions générales.
         </xsl:choose>
     </xsl:function>
 
-    <!-- Extrait une valeur d'un fichier (la valeur est en première colonne, la clé ensuite). -->
+    <!-- Extrait une valeur d'un fichier (la valeur est en dernière colonne, après la clé). -->
     <xsl:function name="r2m:extraitValeur" as="xs:string?">
         <xsl:param name="fichier" />
         <xsl:param name="nom" />
 
+        <xsl:variable name="separe" select="' '" />
+
         <!-- TODO Optimiser si besoin. -->
         <xsl:variable name="resultat">
             <xsl:for-each select="tokenize(unparsed-text($fichier, 'UTF-8'), '\r?\n')">
-                <xsl:if test="normalize-space(substring-after(., ' ')) = $nom">
-                    <xsl:value-of select="normalize-space(substring-before(., ' '))" />
+                <xsl:variable name="cle" select="string-join(tokenize(., $separe)[position() lt last()], $separe)" />
+                <!-- Nettoie la clé (trim). -->
+                <xsl:if test="replace($cle, '^\s*(.+?)\s*$', '$1') = $nom">
+                    <xsl:value-of select="normalize-space(tokenize(., $separe)[last()])" />
+                </xsl:if>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:value-of select="string($resultat)" />
+    </xsl:function>
+
+    <!-- Extrait une valeur d'un fichier (la valeur est en première colonne, la clé ensuite). -->
+    <xsl:function name="r2m:extraitValeurInverse" as="xs:string?">
+        <xsl:param name="fichier" />
+        <xsl:param name="nom" />
+
+        <xsl:variable name="separe" select="' '" />
+
+        <!-- TODO Optimiser si besoin. -->
+        <xsl:variable name="resultat">
+            <xsl:for-each select="tokenize(unparsed-text($fichier, 'UTF-8'), '\r?\n')">
+                <xsl:if test="normalize-space(substring-after(., $separe)) = $nom">
+                    <xsl:value-of select="normalize-space(substring-before(., $separe))" />
                 </xsl:if>
             </xsl:for-each>
         </xsl:variable>

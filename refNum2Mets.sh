@@ -126,7 +126,7 @@ do
     then
         echo '  ' Calcul des tailles des fichiers du dossier...
         taillespath="$dirname/$fichiersTailles"
-        find . -type f -print0 | xargs -0 stat --format '%n %s' | cut -sd / -f 2- | sort | awk '{print $2"  "$1}' > "$taillespath"
+        find . -type f -print0 | xargs -0 stat --format '%n  %s' | cut -sd / -f 2- | sort > "$taillespath"
     fi
 
     # Préparation des hashs des fichiers du dossier courant.
@@ -134,7 +134,7 @@ do
     then
         echo '  ' Calcul des hash sha1 des fichiers du dossier...
         hashspath="$dirname/$fichiersHashs"
-        find . -type f | cut -sd / -f 2- | sort | xargs sha1sum > "$hashspath"
+        find . -type f | cut -sd / -f 2- | xargs sha1sum | awk '{print $2"  "$1}' | sort > "$hashspath"
     fi
 
     # Commande pour Debian 8.

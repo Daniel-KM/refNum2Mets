@@ -656,5 +656,64 @@ Elle permet de normaliser certaines données du refNum.
         </xsl:choose>
     </xsl:function>
 
+    <!-- Retourne l'orientation (sens de lecture) d'une image. -->
+    <xsl:function name="r2m:valeurOrientation">
+        <xsl:param name="objet" />
+
+        <xsl:variable name="orientation"
+            select="$codes/orientation/entry[@code = $objet/@orientation]/text()" />
+
+        <xsl:choose>
+            <!-- Pas de code. -->
+            <xsl:when test="empty($objet/@orientation) or $objet/@orientation = ''">
+                <xsl:text></xsl:text>
+            </xsl:when>
+            <!-- C'est un code. -->
+            <xsl:when test="$orientation != ''">
+                <xsl:value-of select="$orientation" />
+            </xsl:when>
+            <!-- C'est un nombre, ou non standard. -->
+            <xsl:otherwise>
+                <xsl:value-of select="$objet/@orientation" />
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
+
+    <!-- Retourne la position d'une image. -->
+    <xsl:function name="r2m:valeurPosition">
+        <xsl:param name="objet" />
+
+        <xsl:variable name="position"
+            select="$codes/positionPage/entry[@code = $objet/@positionPage]/text()" />
+
+        <xsl:choose>
+            <!-- Pas de code. -->
+            <xsl:when test="empty($objet/@positionPage) or $objet/@positionPage = ''">
+                <xsl:text></xsl:text>
+            </xsl:when>
+            <!-- C'est un code. -->
+            <xsl:when test="$position != ''">
+                <xsl:value-of select="$position" />
+            </xsl:when>
+            <!-- C'est quelque chose de non standard. -->
+            <xsl:otherwise>
+                <xsl:value-of select="$objet/@positionPage" />
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
+
+
+    <!-- Vérifie la conformité de la position d'une page à son ordre. -->
+    <!-- Fonctionne seulement pour Gauche / Droite. -->
+    <xsl:function name="r2m:estPositionNormale" as="xs:boolean">
+        <xsl:param name="position" />
+        <xsl:param name="ordre" />
+
+        <xsl:value-of select="
+                (($position = 'Left' or $position = 'L') and number($ordre) mod 2 = 0)
+                or (($position = 'Right' or $position = 'R') and number($ordre) mod 2 = 1)
+            " />
+    </xsl:function>
+
 </xsl:stylesheet>
 

@@ -29,8 +29,8 @@ de la BnF. -->
             <!-- Autres possibilités. -->
             <!--
             <metadata ordre="refnum et table" />
-            <metadata ordre="refnum seulement" />
-            <metadata ordre="table seulement" />
+            <metadata ordre="refnum" />
+            <metadata ordre="table" />
              -->
             <!-- Le contenu du titre peut être l'orderLabel ou le label de
             la Structural Map. La BnF utilise l'"orderLabel" comme titre et
@@ -45,6 +45,23 @@ de la BnF. -->
             <type>
                 <copie valeur="type" />
             </type>
+            <format>
+                <!-- L'orientation correspond au sens de lecture réel, donc au
+                nombre de degrés à tourner la vue par rapport au fichier,
+                généralement 0 (normal) ou 90 (par exemple une image de paysage).
+                -->
+                <copie valeur="orientation" normal="false" prefixe="Orientation: " suffixe="°" />
+                <!-- La position correspond généralement à la parité du numéro de
+                page, ou à l'ordre (un sur deux). Cette information sert donc
+                surtout en cas de page manquante, doublée ou numérotée de
+                manière non standard.
+                Peut être Left, Right, Top, Bottom, Horizontal (double pages),
+                Vertical (double pages), Single, Missing or Other.
+                Cette information ne se trouve généralement pas dans les standards,
+                mais est pratique pour afficher les documents incomplets.
+                -->
+                <copie valeur="position" normal="false" prefixe="Position: " suffixe="" />
+            </format>
         </DescriptiveMetadataSection_fichiers>
         <AdministrativeMetadataSection remplir="true">
             <!-- Ajoute les événements Spar : création du paquet, info sur chaque

@@ -687,20 +687,68 @@ Historique
                             </xsl:if>
                         </xsl:variable>
 
+                        <!-- Préparation du format / orientation depuis le refnum. -->
+                        <xsl:variable name="refnum_format_orientation">
+                            <xsl:variable name="valeur_format_orientation" select="
+                                if ($profil/section/DescriptiveMetadataSection_fichiers
+                                    /format/copie/@valeur = 'orientation')
+                                then r2m:valeurOrientation(..)
+                                else ''" />
+                            <xsl:if test="$valeur_format_orientation != ''
+                                    and ($valeur_format_orientation != '0'
+                                        or ($valeur_format_orientation = '0'
+                                            and $profil/section/DescriptiveMetadataSection_fichiers
+                                                /format/copie[@valeur = 'orientation']/@normal = 'true'
+                                    ))">
+                                <xsl:element name="dc:format">
+                                    <xsl:value-of select="$profil/section/DescriptiveMetadataSection_fichiers
+                                        /format/copie[@valeur = 'orientation']/@prefixe" />
+                                    <xsl:value-of select="$valeur_format_orientation" />
+                                    <xsl:value-of select="$profil/section/DescriptiveMetadataSection_fichiers
+                                        /format/copie[@valeur = 'orientation']/@suffixe" />
+                                </xsl:element>
+                            </xsl:if>
+                        </xsl:variable>
+
+                        <!-- Préparation du format / position depuis le refnum. -->
+                        <xsl:variable name="refnum_format_position">
+                            <xsl:variable name="valeur_format_position" select="
+                                if ($profil/section/DescriptiveMetadataSection_fichiers
+                                    /format/copie/@valeur = 'position')
+                                then r2m:valeurPosition(..)
+                                else ''" />
+                            <xsl:if test="$valeur_format_position != ''
+                                    and (not(r2m:estPositionNormale($valeur_format_position, ../@ordre))
+                                        or (r2m:estPositionNormale($valeur_format_position, ../@ordre)
+                                            and $profil/section/DescriptiveMetadataSection_fichiers
+                                                /format/copie[@valeur = 'position']/@normal = 'true'
+                                    ))">
+                                <xsl:element name="dc:format">
+                                    <xsl:value-of select="$profil/section/DescriptiveMetadataSection_fichiers
+                                        /format/copie[@valeur = 'position']/@prefixe" />
+                                    <xsl:value-of select="$valeur_format_position" />
+                                    <xsl:value-of select="$profil/section/DescriptiveMetadataSection_fichiers
+                                        /format/copie[@valeur = 'position']/@suffixe" />
+                                </xsl:element>
+                            </xsl:if>
+                        </xsl:variable>
+
                         <!-- Ajout des données refnum et de la table selon l'option. -->
                         <xsl:choose>
                             <!-- Table seule. -->
                             <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
-                                    /metadata/@ordre = 'table seulement'">
+                                    /metadata/@ordre = 'table'">
                                 <xsl:sequence select="$metadata" />
                             </xsl:when>
 
                             <!-- Refnum seul. -->
                             <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
-                                    /metadata/@ordre = 'refnum seulement'">
+                                    /metadata/@ordre = 'refnum'">
                                 <xsl:sequence select="$refnum_titre" />
                                 <xsl:sequence select="$refnum_description" />
                                 <xsl:sequence select="$refnum_type" />
+                                <xsl:sequence select="$refnum_format_orientation" />
+                                <xsl:sequence select="$refnum_format_position" />
                             </xsl:when>
 
                             <!-- Ajout systématique des données refnum, sauf doublon. -->
@@ -715,10 +763,16 @@ Historique
                                 <xsl:if test="not($metadata/dc:type = $refnum_type)">
                                     <xsl:sequence select="$refnum_type" />
                                 </xsl:if>
+                                <xsl:if test="not($metadata/dc:format = $refnum_format_orientation)">
+                                    <xsl:sequence select="$refnum_format_orientation" />
+                                </xsl:if>
+                                <xsl:if test="not($metadata/dc:format = $refnum_format_position)">
+                                    <xsl:sequence select="$refnum_format_position" />
+                                </xsl:if>
                                 <xsl:sequence select="$metadata" />
                             </xsl:when>
 
-                            <!-- Ajout des données refnum si non défini dans la table. -->
+                            <!-- Ajout des données refnum si non définis dans la table. -->
                             <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
                                     /metadata/@ordre = 'table sinon refnum'">
                                 <xsl:if test="not($metadata/dc:title)">
@@ -729,6 +783,10 @@ Historique
                                 </xsl:if>
                                 <xsl:if test="not($metadata/dc:type)">
                                     <xsl:sequence select="$refnum_type" />
+                                </xsl:if>
+                                <xsl:if test="not($metadata/dc:format)">
+                                    <xsl:sequence select="$refnum_format_orientation" />
+                                    <xsl:sequence select="$refnum_format_position" />
                                 </xsl:if>
                                 <xsl:sequence select="$metadata" />
                             </xsl:when>

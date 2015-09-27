@@ -163,6 +163,29 @@ Historique :
         <entry code="PV NB POS">Plaque de verre noir et blanc positif</entry>
     </supportOrigine>
 
+    <!-- Attribut spécifique aux Mines : orientation du sens de lecture par
+    rapport au fichier. -->
+    <orientation>
+        <entry code="N">0</entry>
+        <entry code="P">90</entry>
+        <entry code="R">180</entry>
+        <entry code="I">270</entry>
+    </orientation>
+
+    <!-- Attribut spécifique aux Mines : position de la page, utile pour
+    l'affichage dans les cas spéciaux. -->
+    <positionPage>
+        <entry code="G" abreviation="L">Left</entry>
+        <entry code="D" abreviation="R">Right</entry>
+        <entry code="S" abreviation="T">Top</entry>
+        <entry code="I" abreviation="B">Bottom</entry>
+        <entry code="H" abreviation="H">Horizontal</entry>
+        <entry code="V" abreviation="V">Vertical</entry>
+        <entry code="U" abreviation="S">Single</entry>
+        <entry code="B" abreviation="M">Missing</entry>
+        <entry code="X" abreviation="X">Other</entry>
+    </positionPage>
+
     <traitement>
         <entry code="type" premis="treatmentType" note="non vérifié"/>
         <entry code="ordre" premis="treatmentOrder" />

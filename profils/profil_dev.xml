@@ -32,6 +32,10 @@ Le détail des paramètres se trouve dans le format "Archive".
             <type>
                 <copie valeur="type" />
             </type>
+            <format>
+                <copie valeur="orientation" normal="false" prefixe="Orientation: " suffixe="°" />
+                <copie valeur="position" normal="false" prefixe="Position: " suffixe="" />
+            </format>
         </DescriptiveMetadataSection_fichiers>
         <AdministrativeMetadataSection remplir="true">
             <spar fin="8" remplir="true" />

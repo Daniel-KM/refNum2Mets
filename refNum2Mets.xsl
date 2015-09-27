@@ -670,7 +670,24 @@ Historique
                             </xsl:if>
                         </xsl:variable>
 
-                        <!-- Ajout du refnum (titre et description) et de la table selon l'option. -->
+                        <!-- Préparation du type depuis le refnum. -->
+                        <xsl:variable name="refnum_type">
+                            <xsl:variable name="valeur_type" select="
+                                if ($profil/section/DescriptiveMetadataSection_fichiers
+                                    /type/copie/@valeur = 'type')
+                                then $parametres/structure_types[@nom = $structure_types]/niveau_objet/text()
+                                else ''" />
+                            <xsl:if test="$valeur_type != ''">
+                                <xsl:element name="dc:type">
+                                    <xsl:value-of select="concat(
+                                        upper-case(substring($valeur_type, 1, 1)),
+                                        substring($valeur_type, 2)
+                                    )" />
+                                </xsl:element>
+                            </xsl:if>
+                        </xsl:variable>
+
+                        <!-- Ajout des données refnum et de la table selon l'option. -->
                         <xsl:choose>
                             <!-- Table seule. -->
                             <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
@@ -683,9 +700,10 @@ Historique
                                     /metadata/@ordre = 'refnum seulement'">
                                 <xsl:sequence select="$refnum_titre" />
                                 <xsl:sequence select="$refnum_description" />
+                                <xsl:sequence select="$refnum_type" />
                             </xsl:when>
 
-                            <!-- Ajout systématique du refnum (titre et description), sauf doublon. -->
+                            <!-- Ajout systématique des données refnum, sauf doublon. -->
                             <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
                                     /metadata/@ordre = 'refnum et table'">
                                 <xsl:if test="not($metadata/dc:title = $refnum_titre)">
@@ -694,10 +712,13 @@ Historique
                                 <xsl:if test="not($metadata/dc:description = $refnum_description)">
                                     <xsl:sequence select="$refnum_description" />
                                 </xsl:if>
+                                <xsl:if test="not($metadata/dc:type = $refnum_type)">
+                                    <xsl:sequence select="$refnum_type" />
+                                </xsl:if>
                                 <xsl:sequence select="$metadata" />
                             </xsl:when>
 
-                            <!-- Ajout du refnum (titre et description) si non défini dans la table. -->
+                            <!-- Ajout des données refnum si non défini dans la table. -->
                             <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
                                     /metadata/@ordre = 'table sinon refnum'">
                                 <xsl:if test="not($metadata/dc:title)">
@@ -705,6 +726,9 @@ Historique
                                 </xsl:if>
                                 <xsl:if test="not($metadata/dc:description)">
                                     <xsl:sequence select="$refnum_description" />
+                                </xsl:if>
+                                <xsl:if test="not($metadata/dc:type)">
+                                    <xsl:sequence select="$refnum_type" />
                                 </xsl:if>
                                 <xsl:sequence select="$metadata" />
                             </xsl:when>

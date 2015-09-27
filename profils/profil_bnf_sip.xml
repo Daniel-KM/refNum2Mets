@@ -38,6 +38,9 @@ Le détail des paramètres se trouve dans le format "Archive".
             <description>
                 <copie valeur="label" />
             </description>
+            <type>
+                <copie valeur="type" />
+            </type>
         </DescriptiveMetadataSection_fichiers>
         <AdministrativeMetadataSection remplir="true">
             <spar fin="8" remplir="true" />
@@ -64,12 +67,15 @@ Le détail des paramètres se trouve dans le format "Archive".
                 <titreFichierNP>fixe</titreFichierNP>
                 <titreFichierNPTexte>NP</titreFichierNPTexte>
                 <titreFichierNPTexteAp></titreFichierNPTexteAp>
+                <type ajouter="false" />
             </orderLabel>
             <label remplir="true">
                 <titreFichier>nom</titreFichier>
                 <titreFichierNP>nom</titreFichierNP>
                 <titreFichierNPTexte>NP [</titreFichierNPTexte>
                 <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+                <!-- Conserver cette information permet de conserver le type refNum. -->
+                <type ajouter="true" normal="false" separateur=" : " />
             </label>
         </StructuralMap>
         <StructuralLinks remplir="false" />

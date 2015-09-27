@@ -34,6 +34,9 @@ Le détail des paramètres se trouve dans le format "Archive".
             <description>
                 <copie valeur="label" />
             </description>
+            <type>
+                <copie valeur="type" />
+            </type>
         </DescriptiveMetadataSection_fichiers>
         <AdministrativeMetadataSection remplir="true">
             <spar fin="8" remplir="false" />
@@ -58,12 +61,14 @@ Le détail des paramètres se trouve dans le format "Archive".
                 <titreFichierNP>numéro déduit</titreFichierNP>
                 <titreFichierNPTexte>NP [</titreFichierNPTexte>
                 <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+                <type ajouter="false" />
             </orderLabel>
             <label remplir="true">
                 <titreFichier>nom</titreFichier>
                 <titreFichierNP>nom</titreFichierNP>
                 <titreFichierNPTexte>NP [</titreFichierNPTexte>
                 <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+                <type ajouter="true" normal="false" separateur=" : " />
             </label>
         </StructuralMap>
         <StructuralLinks remplir="false" />

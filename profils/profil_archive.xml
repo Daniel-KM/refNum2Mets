@@ -42,6 +42,9 @@ de la BnF. -->
             <description>
                 <copie valeur="label" />
             </description>
+            <type>
+                <copie valeur="type" />
+            </type>
         </DescriptiveMetadataSection_fichiers>
         <AdministrativeMetadataSection remplir="true">
             <!-- Ajoute les événements Spar : création du paquet, info sur chaque
@@ -86,6 +89,8 @@ de la BnF. -->
                 <!-- Utilisés en fonction du choix "titreFichierNP". -->
                 <titreFichierNPTexte>NP [</titreFichierNPTexte>
                 <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+                <!-- Ajouter l'information du type refNum. -->
+                <type ajouter="false" />
             </orderLabel>
             <!-- Pour mémoire, doit être différent du "orderLabel". -->
             <label remplir="true">
@@ -93,6 +98,8 @@ de la BnF. -->
                 <titreFichierNP>nom</titreFichierNP>
                 <titreFichierNPTexte>NP [</titreFichierNPTexte>
                 <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
+                <!-- Ajouter l'information du type refNum, sauf pour les pages normales. -->
+                <type ajouter="true" normal="false" separateur=" : " />
             </label>
         </StructuralMap>
         <!-- Non géré et inutile pour le refNum. -->

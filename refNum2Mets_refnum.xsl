@@ -314,53 +314,72 @@ Elle permet de normaliser certaines données du refNum.
         <xsl:param name="objet" />
         <xsl:param name="format" />
 
-        <xsl:choose>
-            <xsl:when test="$objet/@numeroPage != '' and $objet/@numeroPage != 'NP'">
-                <xsl:choose>
-                    <xsl:when test="$format/titreFichier = 'numéro'">
-                        <xsl:choose>
-                            <!-- Exception : convertir en romain le numéro de page romain. -->
-                            <xsl:when test="$objet/@typePagination = 'R'">
-                                <xsl:value-of select="normalize-space(r2m:conversionArabeVersRomain($objet/@numeroPage))" />
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="normalize-space($objet/@numeroPage)" />
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:when>
-                    <xsl:when test="$format/titreFichier = 'nom'">
-                        <xsl:choose>
-                            <!-- Pagination en chiffres arabes. -->
-                            <xsl:when test="$objet/@typePagination = 'A'">
-                                <xsl:value-of select="normalize-space(concat('Page ', $objet/@numeroPage))" />
-                            </xsl:when>
-                            <!-- Pagination en chiffres romains. -->
-                            <xsl:when test="$objet/@typePagination = 'R'">
-                                <xsl:value-of select="normalize-space(concat('Page ', r2m:conversionArabeVersRomain($objet/@numeroPage)))" />
-                            </xsl:when>
-                            <!-- Foliotation. -->
-                            <xsl:when test="$objet/@typePagination = 'F'">
-                                <xsl:value-of select="normalize-space(concat('Folio ', $objet/@numeroPage, ' (recto)'))" />
-                            </xsl:when>
-                            <!-- Pagination autre. -->
-                            <xsl:when test="$objet/@typePagination = 'X'">
-                                <xsl:value-of select="normalize-space(concat('Page ', $objet/@numeroPage))" />
-                            </xsl:when>
-                            <!-- Peut arriver ici dans le cas de lots ou d'une erreur. -->
-                            <xsl:otherwise>
-                                <xsl:value-of select="normalize-space(concat('Image ', $objet/@numeroPage))" />
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:when>
-                </xsl:choose>
-            </xsl:when>
+        <xsl:variable name="nomPage">
+            <xsl:choose>
+                <xsl:when test="$objet/@numeroPage != '' and $objet/@numeroPage != 'NP'">
+                    <xsl:choose>
+                        <xsl:when test="$format/titreFichier = 'numéro'">
+                            <xsl:choose>
+                                <!-- Exception : convertir en romain le numéro de page romain. -->
+                                <xsl:when test="$objet/@typePagination = 'R'">
+                                    <xsl:value-of select="normalize-space(r2m:conversionArabeVersRomain($objet/@numeroPage))" />
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="normalize-space($objet/@numeroPage)" />
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:when>
 
-            <!-- Non paginée. -->
-            <xsl:otherwise>
-                <xsl:value-of select="r2m:nomPageNonPaginee($objet, $format)" />
-            </xsl:otherwise>
-        </xsl:choose>
+                        <xsl:when test="$format/titreFichier = 'nom'">
+                            <xsl:choose>
+                                <!-- Pagination en chiffres arabes. -->
+                                <xsl:when test="$objet/@typePagination = 'A'">
+                                    <xsl:value-of select="normalize-space(concat('Page ', $objet/@numeroPage))" />
+                                </xsl:when>
+                                <!-- Pagination en chiffres romains. -->
+                                <xsl:when test="$objet/@typePagination = 'R'">
+                                    <xsl:value-of select="normalize-space(concat('Page ', r2m:conversionArabeVersRomain($objet/@numeroPage)))" />
+                                </xsl:when>
+                                <!-- Foliotation. -->
+                                <xsl:when test="$objet/@typePagination = 'F'">
+                                    <xsl:value-of select="normalize-space(concat('Folio ', $objet/@numeroPage, ' (recto)'))" />
+                                </xsl:when>
+                                <!-- Pagination autre. -->
+                                <xsl:when test="$objet/@typePagination = 'X'">
+                                    <xsl:value-of select="normalize-space(concat('Page ', $objet/@numeroPage))" />
+                                </xsl:when>
+                                <!-- Peut arriver ici dans le cas de lots ou d'une erreur. -->
+                                <xsl:otherwise>
+                                    <xsl:value-of select="normalize-space(concat('Image ', $objet/@numeroPage))" />
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:when>
+                    </xsl:choose>
+                </xsl:when>
 
+                <!-- Non paginée. -->
+                <xsl:otherwise>
+                    <xsl:value-of select="r2m:nomPageNonPaginee($objet, $format)" />
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
+        <xsl:value-of select="$nomPage" />
+
+        <!-- Pour le label ou la description, il est possible d'ajouter le type
+        refnum de page, s'il est différent. -->
+        <xsl:if test="$format/type/@ajouter = 'true'">
+            <!-- Récupère le type, sauf s'il est normal et non requis. -->
+            <xsl:if test="(not(empty($objet/@typePage)) and $objet/@typePage != 'N')
+                        or ($objet/@typePage = 'N' and $format/type/@normal = 'true')">
+                <xsl:variable name="typePage"
+                    select="$codes/typePage/entry[@code = $objet/@typePage]" />
+                <xsl:if test="$typePage != $nomPage">
+                    <xsl:value-of select="$format/type/@separateur" />
+                    <xsl:value-of select="$typePage" />
+                </xsl:if>
+            </xsl:if>
+        </xsl:if>
     </xsl:function>
 
     <!-- Retourne le nom d'une page non paginée à partir de l'objet. -->

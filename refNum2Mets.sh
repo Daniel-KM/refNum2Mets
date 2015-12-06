@@ -28,6 +28,19 @@ prepareHashs='true'
 reindente='true'
 supprimeFichiersIntermediaires='false'
 
+# Vérifie l'outil xsl.
+if [ -r '/etc/debian_version' ]; then
+    distro='Debian'
+elif [ -r '/etc/redhat-release' ]; then
+    distro='Red Hat'
+    echo 'Ne pas tenir compte de la remarque éventuelle "Cannot find CatalogManager.properties".'
+    echo
+else
+    echo Impossible de déterminer la ligne de commande pour convertir le xml.
+    exit 1;
+fi
+
+
 # Valeurs par défaut.
 if [ "$dossier" = '' ]
 then
@@ -137,8 +150,19 @@ do
         find . -type f | cut -sd / -f 2- | xargs sha1sum | awk '{print $2"  "$1}' | sort > "$hashspath"
     fi
 
-    # Commande pour Debian 8.
-    CLASSPATH=/usr/share/java/Saxon-HE.jar java net.sf.saxon.Transform -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpath" -o:"$metspath"
+    if [ "$distro" = 'Debian' ]
+    then
+        # Debien 6 avec Saxon-B.
+        # saxonb-xslt -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpath" -o:"$metspath"
+
+        # Commande pour Debian 8 avec Saxon-HE.
+        CLASSPATH=/usr/share/java/Saxon-HE.jar java net.sf.saxon.Transform -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpath" -o:"$metspath"
+    elif [ "$distro" = 'Red Hat' ]
+    then
+        saxon -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpath" -o:"$metspath"
+    else
+        exit 1;
+    fi
 
     # Améliore l'indentation, ce qui est impossible avec la version libre de
     # saxon.

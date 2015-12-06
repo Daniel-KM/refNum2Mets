@@ -195,6 +195,14 @@ norme Mets.
     Template principal
     =============================================================== -->
 
+    <!-- Ce template de base ne change rien, mais vérifie que la lecture des
+    fichiers associés est possible. -->
+    <xsl:template match="/">
+        <xsl:call-template name="test_fichiers" />
+
+        <xsl:apply-templates select="/refNum:refNum" />
+    </xsl:template>
+
     <xsl:template match="/refNum:refNum">
         <xsl:element name="mets">
             <xsl:namespace name="" select="'http://www.loc.gov/METS/'" />
@@ -2331,6 +2339,33 @@ norme Mets.
                 </xsl:element>
             </xsl:if>
         </xsl:for-each>
+    </xsl:template>
+
+    <!-- Teste la présence des fichiers associés pour éviter une erreur ultérieure.
+    Si une erreur se produit, les chemins dans le fichier de configuration doivent
+    être modifiés ou supprimés. -->
+    <xsl:template name="test_fichiers">
+        <!--  Ce test n'est utile que si la fonction unparsed-text-available()
+        est indisponible. -->
+        <xsl:if test="not(function-available('unparsed-text-available'))">
+            <!-- Retourne une erreur si les fichiers n'existent pas pour indiquer
+            qu'il faut modifier le fichier de configuration. -->
+            <xsl:if test="r2m:existeFichier('notices')">
+                <xsl:if test="r2m:trouveNotice('test_refNum')"></xsl:if>
+            </xsl:if>
+            <xsl:if test="r2m:existeFichier('arks')">
+                <xsl:if test="r2m:trouveArk('test_refNum')"></xsl:if>
+            </xsl:if>
+            <xsl:if test="r2m:existeFichier('fichier_metadata')">
+                <xsl:if test="r2m:trouveMetadata('test_refNum')"></xsl:if>
+            </xsl:if>
+            <xsl:if test="r2m:existeFichier('fichier_checksums')">
+                <xsl:if test="r2m:trouveChecksum('test_refNum')"></xsl:if>
+            </xsl:if>
+            <xsl:if test="r2m:existeFichier('fichier_tailles')">
+                <xsl:if test="r2m:trouveTaille('test_refNum')"></xsl:if>
+            </xsl:if>
+        </xsl:if>
     </xsl:template>
 
     <!-- Ne rien écrire d'autre. -->

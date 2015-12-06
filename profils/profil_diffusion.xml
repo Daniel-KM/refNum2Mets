@@ -16,7 +16,7 @@ Le détail des paramètres se trouve dans le format "Archive".
     <section>
         <MetsHeader remplir="true" />
         <DescriptiveMetadataSection remplir="true">
-            <descriptiveFormatWrapper>dc:dc</descriptiveFormatWrapper>
+            <descriptiveFormatWrapper prefix="dc" namespace="http://purl.org/dc/elements/1.1/">dc:dc</descriptiveFormatWrapper>
             <metadata ordre="table sinon refnum" />
             <tomaison>
                 <ajoutPremierTitre remplir="false" />

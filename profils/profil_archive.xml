@@ -10,7 +10,7 @@ de la BnF. -->
     <section>
         <MetsHeader remplir="true" />
         <DescriptiveMetadataSection remplir="true">
-            <descriptiveFormatWrapper>dc:dc</descriptiveFormatWrapper>
+            <descriptiveFormatWrapper prefix="dc" namespace="http://purl.org/dc/elements/1.1/">dc:dc</descriptiveFormatWrapper>
             <!-- Notices : soit la "table", soit le "refnum", soit "table sinon refnum". -->
             <metadata ordre="table sinon refnum" />
             <!-- Conversion de la tomaison en Dublin Core pour le refnum. -->

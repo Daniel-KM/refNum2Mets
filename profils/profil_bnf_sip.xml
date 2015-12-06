@@ -13,7 +13,7 @@ Le détail des paramètres se trouve dans le format "Archive".
     <section>
         <MetsHeader remplir="false" />
         <DescriptiveMetadataSection remplir="true">
-            <descriptiveFormatWrapper>spar_dc:spar_dc</descriptiveFormatWrapper>
+            <descriptiveFormatWrapper prefix="spar_dc" namespace="http://bibnum.bnf.fr/ns/spar_dc">spar_dc:spar_dc</descriptiveFormatWrapper>
             <metadata ordre="table sinon refnum" />
             <tomaison>
                 <ajoutPremierTitre remplir="true" />

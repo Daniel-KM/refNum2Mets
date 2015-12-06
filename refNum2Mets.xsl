@@ -93,6 +93,7 @@ norme Mets.
 
 * Historique *
 
+2015/12/07 Nettoyage des fichiers et des espaces de nom
 2015/09/21 Ajout des notices de documents et des métadonnées descriptives des pages
 2015/09/07 Corrections de détails et ajout d'un script pour traiter les dossiers
 2015/06/22 Version pour publication
@@ -341,6 +342,11 @@ norme Mets.
                 <xsl:attribute name="LABEL">Notice du document</xsl:attribute>
                 <xsl:element name="xmlData">
                     <xsl:element name="{$profil/section/DescriptiveMetadataSection/descriptiveFormatWrapper}">
+                        <xsl:if test="$profil/section/DescriptiveMetadataSection/descriptiveFormatWrapper/@namespace != ''">
+                            <xsl:namespace
+                                name="{$profil/section/DescriptiveMetadataSection/descriptiveFormatWrapper/@prefix}"
+                                select="$profil/section/DescriptiveMetadataSection/descriptiveFormatWrapper/@namespace" />
+                        </xsl:if>
 
                         <!-- Préparation de la notice du tableur pour le document. -->
                         <xsl:variable name="notice">
@@ -630,6 +636,11 @@ norme Mets.
                 <xsl:attribute name="LABEL">Notice de vue</xsl:attribute>
                 <xsl:element name="xmlData">
                     <xsl:element name="{$profil/section/DescriptiveMetadataSection/descriptiveFormatWrapper}">
+                        <xsl:if test="$profil/section/DescriptiveMetadataSection/descriptiveFormatWrapper/@namespace != ''">
+                            <xsl:namespace
+                                name="{$profil/section/DescriptiveMetadataSection/descriptiveFormatWrapper/@prefix}"
+                                select="$profil/section/DescriptiveMetadataSection/descriptiveFormatWrapper/@namespace" />
+                        </xsl:if>
                         <!-- Préparation des métadonnées du tableur pour l'objet numérisé. -->
                         <xsl:variable name="metadata">
                             <xsl:variable name="href" select="r2m:adresseFichier(., 'master')" />
@@ -748,63 +759,69 @@ norme Mets.
                         </xsl:variable>
 
                         <!-- Ajout des données refnum et de la table selon l'option. -->
-                        <xsl:choose>
-                            <!-- Table seule. -->
-                            <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
-                                    /metadata/@ordre = 'table'">
-                                <xsl:sequence select="$metadata" />
-                            </xsl:when>
+                        <!-- On utilise une variable générale pour simplifier la
+                        gestion des espaces de nom. -->
+                        <xsl:variable name="metadataFichier">
+                            <xsl:choose>
+                                <!-- Table seule. -->
+                                <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
+                                        /metadata/@ordre = 'table'">
+                                    <xsl:sequence select="$metadata" />
+                                </xsl:when>
 
-                            <!-- Refnum seul. -->
-                            <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
-                                    /metadata/@ordre = 'refnum'">
-                                <xsl:sequence select="$refnum_titre" />
-                                <xsl:sequence select="$refnum_description" />
-                                <xsl:sequence select="$refnum_type" />
-                                <xsl:sequence select="$refnum_format_orientation" />
-                                <xsl:sequence select="$refnum_format_position" />
-                            </xsl:when>
-
-                            <!-- Ajout systématique des données refnum, sauf doublon. -->
-                            <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
-                                    /metadata/@ordre = 'refnum et table'">
-                                <xsl:if test="not($metadata/dc:title = $refnum_titre)">
+                                <!-- Refnum seul. -->
+                                <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
+                                        /metadata/@ordre = 'refnum'">
                                     <xsl:sequence select="$refnum_titre" />
-                                </xsl:if>
-                                <xsl:if test="not($metadata/dc:description = $refnum_description)">
                                     <xsl:sequence select="$refnum_description" />
-                                </xsl:if>
-                                <xsl:if test="not($metadata/dc:type = $refnum_type)">
                                     <xsl:sequence select="$refnum_type" />
-                                </xsl:if>
-                                <xsl:if test="not($metadata/dc:format = $refnum_format_orientation)">
-                                    <xsl:sequence select="$refnum_format_orientation" />
-                                </xsl:if>
-                                <xsl:if test="not($metadata/dc:format = $refnum_format_position)">
-                                    <xsl:sequence select="$refnum_format_position" />
-                                </xsl:if>
-                                <xsl:sequence select="$metadata" />
-                            </xsl:when>
-
-                            <!-- Ajout des données refnum si non définis dans la table. -->
-                            <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
-                                    /metadata/@ordre = 'table sinon refnum'">
-                                <xsl:if test="not($metadata/dc:title)">
-                                    <xsl:sequence select="$refnum_titre" />
-                                </xsl:if>
-                                <xsl:if test="not($metadata/dc:description)">
-                                    <xsl:sequence select="$refnum_description" />
-                                </xsl:if>
-                                <xsl:if test="not($metadata/dc:type)">
-                                    <xsl:sequence select="$refnum_type" />
-                                </xsl:if>
-                                <xsl:if test="not($metadata/dc:format)">
                                     <xsl:sequence select="$refnum_format_orientation" />
                                     <xsl:sequence select="$refnum_format_position" />
-                                </xsl:if>
-                                <xsl:sequence select="$metadata" />
-                            </xsl:when>
-                        </xsl:choose>
+                                </xsl:when>
+
+                                <!-- Ajout systématique des données refnum, sauf doublon. -->
+                                <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
+                                        /metadata/@ordre = 'refnum et table'">
+                                    <xsl:if test="not($metadata/dc:title = $refnum_titre)">
+                                        <xsl:sequence select="$refnum_titre" />
+                                    </xsl:if>
+                                    <xsl:if test="not($metadata/dc:description = $refnum_description)">
+                                        <xsl:sequence select="$refnum_description" />
+                                    </xsl:if>
+                                    <xsl:if test="not($metadata/dc:type = $refnum_type)">
+                                        <xsl:sequence select="$refnum_type" />
+                                    </xsl:if>
+                                    <xsl:if test="not($metadata/dc:format = $refnum_format_orientation)">
+                                        <xsl:sequence select="$refnum_format_orientation" />
+                                    </xsl:if>
+                                    <xsl:if test="not($metadata/dc:format = $refnum_format_position)">
+                                        <xsl:sequence select="$refnum_format_position" />
+                                    </xsl:if>
+                                    <xsl:sequence select="$metadata" />
+                                </xsl:when>
+
+                                <!-- Ajout des données refnum si non définis dans la table. -->
+                                <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
+                                        /metadata/@ordre = 'table sinon refnum'">
+                                    <xsl:if test="not($metadata/dc:title)">
+                                        <xsl:sequence select="$refnum_titre" />
+                                    </xsl:if>
+                                    <xsl:if test="not($metadata/dc:description)">
+                                        <xsl:sequence select="$refnum_description" />
+                                    </xsl:if>
+                                    <xsl:if test="not($metadata/dc:type)">
+                                        <xsl:sequence select="$refnum_type" />
+                                    </xsl:if>
+                                    <xsl:if test="not($metadata/dc:format)">
+                                        <xsl:sequence select="$refnum_format_orientation" />
+                                        <xsl:sequence select="$refnum_format_position" />
+                                    </xsl:if>
+                                    <xsl:sequence select="$metadata" />
+                                </xsl:when>
+                            </xsl:choose>
+                        </xsl:variable>
+
+                        <xsl:apply-templates select="$metadataFichier" mode="copy-prefix-namespace" />
                     </xsl:element>
                 </xsl:element>
             </xsl:element>
@@ -1380,6 +1397,11 @@ norme Mets.
                 <xsl:attribute name="LABEL">Notice administrative Dublin Core</xsl:attribute>
                 <xsl:element name="xmlData">
                     <xsl:element name="{$profil/section/DescriptiveMetadataSection/descriptiveFormatWrapper}">
+                        <xsl:if test="$profil/section/DescriptiveMetadataSection/descriptiveFormatWrapper/@namespace != ''">
+                            <xsl:namespace
+                                name="{$profil/section/DescriptiveMetadataSection/descriptiveFormatWrapper/@prefix}"
+                                select="$profil/section/DescriptiveMetadataSection/descriptiveFormatWrapper/@namespace" />
+                        </xsl:if>
 
                         <!-- A la BnF, le format de la source est en "description",
                         pas en "format" ou "Medium". -->
@@ -2285,6 +2307,24 @@ norme Mets.
             <xsl:copy-of select="@*" />
             <xsl:value-of select="text()" />
             <xsl:apply-templates select="child::*" mode="copy-namespace" />
+        </xsl:element>
+    </xsl:template>
+
+    <!-- Retourne un sous-arbre en gérant correctement les préfixes et espaces de nom.
+    Ce modèle remplace un copy-of qui enlève le préfixe et ajoute un espace de nom
+    vide, notamment lorsque la source a fusionné les espaces de nom.
+    Comme c'est un modèle récursif, il doit être utilisé uniquement pour les petits
+    arbres.
+    Idem que copy-prefix, sauf qu'ici, le préfixe n'est pas connu, donc on utilise
+    l'espace de nom. En outre, le prefixe est conservé.
+    -->
+    <!-- TODO Fusionner copy-prefix et copy-namespace en ajoutant toujours un préfixe. -->
+    <xsl:template match="*" mode="copy-prefix-namespace">
+        <xsl:variable name="namespace" select="namespace-uri()" />
+        <xsl:element name="{name()}" namespace="{$namespace}">
+            <xsl:copy-of select="@*" />
+            <xsl:value-of select="text()" />
+            <xsl:apply-templates select="child::*" mode="copy-prefix-namespace" />
         </xsl:element>
     </xsl:template>
 

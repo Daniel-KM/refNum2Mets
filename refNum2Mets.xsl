@@ -62,6 +62,15 @@ pages non paginées, dont le numéro est déduit des pages précédentes et
 suivantes. L'algorithme répond à la plupart des usages courants, mais une
 vérification peut s'avérer utile.
 
+* Éléments de production *
+
+- Le nombre de vues des objets (nombreVueObjets) et le nombre des images (nombreImages)
+sont inutiles, car disponibles directement dans le nombre de fichiers.
+- La date de numérisation est mis au niveau du fichier (dateTimeCreated).
+- L'identifiant support est mis au niveau du document. L'ordre n'est pas récupéré
+actuellement.
+- L'historique n'est pas repris actuellement.
+
 * Autres remarques *
 
 - Dans l'exemple BnF, traitement/operation/entrée|description|resultat
@@ -90,6 +99,8 @@ norme Mets.
 - Gérer typeGammeCommandee / typeGammeRealisee
 - Ajouter la légende des images
 - Ajouter périodique
+- Identifiant support : unique actuellement
+- Ajouter historique de production
 
 * Historique *
 
@@ -897,53 +908,6 @@ norme Mets.
                 <xsl:apply-templates select="." mode="spar_digiprovMD_fin"/>
             </xsl:if>
         </xsl:element>
-
-    <!--
-        // Production.
-        $production = &$this->_xml->document->production;
-
-        if (!empty($production->dateNumerisation)) {
-            $doc['metadata']['Dublin Core']['Date'][] = 'Numérisation : ' . trim($production->dateNumerisation);
-            // Added field.
-            // $doc['metadata']['Item Type Metadata']['Date de numérisation'][] = trim($production->dateNumerisation);
-        }
-
-        if (!empty($production->nombreVueObjets)) {
-            $doc['metadata']['Dublin Core']['Format'][] = 'Nombre de vues : ' . trim($production->nombreVueObjets);
-        }
-
-        if (!empty($production->nombreImages)) {
-            $doc['metadata']['Dublin Core']['Format'][] = 'Nombre d’images : ' . trim($production->nombreImages);
-        }
-
-        if (!empty($production->identifiantSupport)) {
-            $doc['metadata']['Dublin Core']['Identifier'][] = sprintf('Support de numérisation : %s%s',
-                trim($production->identifiantSupport),
-                empty($production->identifiantSupport['ordre']) ? '' : ' [' . trim($production->identifiantSupport['ordre']) . ']');
-        }
-
-        if (!empty($production->objetAssocie)) {
-            $objetAssocies = array(
-                'ADAPTATIF' => 'Adaptif',
-                'ALTO' => 'ALTO',
-                'EPUB' => 'epub',
-                'EXTRAIT' => 'Extrait',
-                'TDM' => 'Table des matières',
-                'TUILES' => 'Tuiles',
-                'TXT' => 'Texte',
-            );
-            $objetAssocie = trim($production->objetAssocie);
-            $doc['metadata']['Dublin Core']['Format'][] = sprintf('Objet associé : %s%s',
-                (isset($objetAssocies[$objetAssocie]) ? $objetAssocies[$objetAssocie] : $objetAssocie),
-                (empty($production->objetAssocie['date']) ? '' : ' [' . $production->objetAssocie['date'] . ']'));
-        }
-
-        /*
-        if (!empty($production->historique)) {
-            $doc['metadata']['refNum']['Historique'][] = $production->historique->asXML();
-        }
-        */
-    -->
     </xsl:template>
 
     <xsl:template match="refNum:vueObjet/refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio']"
@@ -1228,20 +1192,41 @@ norme Mets.
                     </niso:orientation>
                 </xsl:if>
 
-                <xsl:if test="$parametres/section/AdministrativeMetadataSection/techMD/info/producteur">
-                    <niso:imageProducer>
-                        <xsl:value-of select="$parametres/section/AdministrativeMetadataSection/techMD/info/producteur" />
-                    </niso:imageProducer>
-                </xsl:if>
-
                 <xsl:if test="$parametres/section/AdministrativeMetadataSection/techMD/info/prestataire">
                     <niso:processingAgency>
                         <xsl:value-of select="$parametres/section/AdministrativeMetadataSection/techMD/info/prestataire" />
                     </niso:processingAgency>
                 </xsl:if>
 
+                <xsl:apply-templates select="." mode="NisoGeneralCapture" />
+
             </xmlData>
         </mdWrap>
+    </xsl:template>
+
+    <!-- Les métadonnées générales de capture sont établies au niveau du document
+    en refNum, mais recopiées au niveau de chaque image pour Mets. -->
+    <xsl:template match="refNum:vueObjet/refNum:image"
+        mode="NisoGeneralCapture">
+
+        <xsl:if test="ancestor::refNum:document/refNum:production/refNum:dateNumerisation != ''
+            or $parametres/section/AdministrativeMetadataSection/techMD/info/producteur != ''
+            ">
+            <niso:GeneralCaptureInformation>
+            <!-- La dateTimeCreated et le captureDevice pourraient être également
+            extraite de l'image elle-même via le script. -->
+            <xsl:if test="ancestor::refNum:document/refNum:production/refNum:dateNumerisation != ''">
+                <niso:dateTimeCreated>
+                    <xsl:value-of select="ancestor::refNum:document/refNum:production/refNum:dateNumerisation" />
+                </niso:dateTimeCreated>
+            </xsl:if>
+            <xsl:if test="$parametres/section/AdministrativeMetadataSection/techMD/info/producteur">
+                <niso:imageProducer>
+                    <xsl:value-of select="$parametres/section/AdministrativeMetadataSection/techMD/info/producteur" />
+                </niso:imageProducer>
+            </xsl:if>
+            </niso:GeneralCaptureInformation>
+        </xsl:if>
     </xsl:template>
 
     <!-- TODO Format MIX non finalisé et nécessite informations extérieures sur l'image. -->
@@ -1424,7 +1409,12 @@ norme Mets.
                                 <xsl:value-of select="normalize-space(.)" />
                             </xsl:element>
                         </xsl:for-each>
-
+                        <xsl:if test="refNum:document/refNum:Production/refNum:identifiantSupport != ''">
+                            <dc:identifier>
+                                <xsl:text>Identifiant support : </xsl:text>
+                                <xsl:value-of select="refNum:document/refNum:Production/refNum:identifiantSupport" />
+                            </dc:identifier>
+                        </xsl:if>
                     </xsl:element>
                 </xsl:element>
             </xsl:element>

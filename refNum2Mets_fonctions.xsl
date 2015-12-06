@@ -56,15 +56,15 @@ Elle contient des fonctions générales.
     sinon ceux du présent dossier. -->
     <xsl:variable name="dirname" as="xs:string" select="
             string-join(tokenize(document-uri(/), '/')[position() &lt; last()], '/')" />
-    <xsl:variable name="notices" as="xs:string"
+    <xsl:variable name="notices" as="xs:string?"
         select="r2m:cheminFichier($parametres/documents/metadata/liste)" />
-    <xsl:variable name="arks" as="xs:string"
+    <xsl:variable name="arks" as="xs:string?"
         select="r2m:cheminFichier($parametres/documents/ark/liste)" />
-    <xsl:variable name="fichier_metadata" as="xs:string"
+    <xsl:variable name="fichier_metadata" as="xs:string?"
         select="r2m:cheminFichier($parametres/fichiers/metadata/liste)" />
-    <xsl:variable name="fichier_checksums" as="xs:string"
+    <xsl:variable name="fichier_checksums" as="xs:string?"
         select="r2m:cheminFichier($parametres/fichiers/checksums/liste)" />
-    <xsl:variable name="fichier_tailles" as="xs:string"
+    <xsl:variable name="fichier_tailles" as="xs:string?"
         select="r2m:cheminFichier($parametres/fichiers/tailles/liste)" />
 
     <xsl:variable name="separateur" select="replace(
@@ -92,20 +92,27 @@ Elle contient des fonctions générales.
                 <xsl:value-of select="if ($fichier_metadata) then true() else false()" />
             </xsl:when>
             <xsl:when test="$fichier = 'fichier_checksums'">
-                <xsl:value-of select="if ($fichier_metadata) then true() else false()" />
+                <xsl:value-of select="if ($fichier_checksums) then true() else false()" />
             </xsl:when>
             <xsl:when test="$fichier = 'fichier_tailles'">
-                <xsl:value-of select="if ($fichier_metadata) then true() else false()" />
+                <xsl:value-of select="if ($fichier_tailles) then true() else false()" />
             </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="false()" />
+            </xsl:otherwise>
         </xsl:choose>
     </xsl:function>
 
     <!-- Détermine le nom complet d'un fichier de données, qui peut être dans le
     dossier des sources ou dans le dossier des documents. -->
-    <xsl:function name="r2m:cheminFichier" as="xs:string">
+    <xsl:function name="r2m:cheminFichier" as="xs:string?">
         <xsl:param name="nomFichier" />
 
         <xsl:choose>
+            <!-- Pas de fichier. -->
+            <xsl:when test="$nomFichier = ''">
+                <xsl:text></xsl:text>
+            </xsl:when>
             <xsl:when test="function-available('unparsed-text-available')">
                 <xsl:value-of select="
                     if ($nomFichier/@chemin = 'xml')
@@ -132,116 +139,124 @@ Elle contient des fonctions générales.
     </xsl:function>
 
     <!-- Extrait une valeur d'un fichier (la valeur est en dernière colonne, après la clé). -->
-    <xsl:function name="r2m:extraitValeur" as="xs:string?">
-        <xsl:param name="fichier" />
-        <xsl:param name="nom" />
+    <xsl:function name="r2m:extraitValeur" as="xs:string">
+        <xsl:param name="fichier" as="xs:string?" />
+        <xsl:param name="nom" as="xs:string?" />
 
-        <xsl:variable name="separe" select="' '" />
+        <!-- Vérifie si le fichier est préparé. -->
+        <xsl:choose>
+            <xsl:when test="$fichier">
+                <xsl:variable name="separe" select="' '" />
 
-        <!-- TODO Optimiser si besoin. -->
-        <xsl:variable name="resultat">
-            <xsl:for-each select="tokenize(unparsed-text($fichier, 'UTF-8'), '\r?\n')">
-                <xsl:variable name="cle" select="string-join(tokenize(., $separe)[position() lt last()], $separe)" />
-                <!-- Nettoie la clé (trim). -->
-                <xsl:if test="replace($cle, '^\s*(.+?)\s*$', '$1') = $nom">
-                    <xsl:value-of select="normalize-space(tokenize(., $separe)[last()])" />
-                </xsl:if>
-            </xsl:for-each>
-        </xsl:variable>
-        <xsl:value-of select="string($resultat)" />
+                <!-- TODO Optimiser si besoin. -->
+                <xsl:variable name="resultat">
+                    <xsl:for-each select="tokenize(unparsed-text($fichier, 'UTF-8'), '\r?\n')">
+                        <xsl:variable name="cle" select="string-join(tokenize(., $separe)[position() lt last()], $separe)" />
+                        <!-- Nettoie la clé (trim). -->
+                        <xsl:if test="replace($cle, '^\s*(.+?)\s*$', '$1') = $nom">
+                            <xsl:value-of select="normalize-space(tokenize(., $separe)[last()])" />
+                        </xsl:if>
+                    </xsl:for-each>
+                </xsl:variable>
+                <!-- Retourner le fichier en tant que texte. -->
+                <xsl:value-of select="string($resultat)" />
+            </xsl:when>
+
+            <!-- Pas de fichier. -->
+            <xsl:otherwise>
+                <xsl:text></xsl:text>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:function>
 
     <!-- Extrait une valeur d'un fichier (la valeur est en première colonne, la clé ensuite). -->
-    <xsl:function name="r2m:extraitValeurInverse" as="xs:string?">
-        <xsl:param name="fichier" />
-        <xsl:param name="nom" />
+    <xsl:function name="r2m:extraitValeurInverse" as="xs:string">
+        <xsl:param name="fichier" as="xs:string?" />
+        <xsl:param name="nom" as="xs:string?" />
 
-        <xsl:variable name="separe" select="' '" />
+        <!-- Vérifie si le fichier est préparé. -->
+        <xsl:choose>
+            <xsl:when test="$fichier">
+                <xsl:variable name="separe" select="' '" />
 
-        <!-- TODO Optimiser si besoin. -->
-        <xsl:variable name="resultat">
-            <xsl:for-each select="tokenize(unparsed-text($fichier, 'UTF-8'), '\r?\n')">
-                <xsl:if test="normalize-space(substring-after(., $separe)) = $nom">
-                    <xsl:value-of select="normalize-space(substring-before(., $separe))" />
-                </xsl:if>
-            </xsl:for-each>
-        </xsl:variable>
-        <xsl:value-of select="string($resultat)" />
+                <!-- TODO Optimiser si besoin. -->
+                <xsl:variable name="resultat">
+                    <xsl:for-each select="tokenize(unparsed-text($fichier, 'UTF-8'), '\r?\n')">
+                        <xsl:if test="normalize-space(substring-after(., $separe)) = $nom">
+                            <xsl:value-of select="normalize-space(substring-before(., $separe))" />
+                        </xsl:if>
+                    </xsl:for-each>
+                </xsl:variable>
+                <!-- Retourner le fichier en tant que texte. -->
+                <xsl:value-of select="string($resultat)" />
+            </xsl:when>
+
+            <!-- Pas de fichier. -->
+            <xsl:otherwise>
+                <xsl:text></xsl:text>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:function>
 
     <!-- Récupère une ligne de cellules d'un tableur OpenDocument. -->
     <!-- L'identifiant doit être dans la première colonne. -->
     <xsl:function name="r2m:extraitCellules">
-        <xsl:param name="tableur" as="xs:string" />
+        <xsl:param name="tableur" as="xs:string?" />
         <xsl:param name="identifiant" as="xs:string" />
 
-        <!-- TODO Optimiser si besoin. -->
-        <xsl:variable name="row" select="document($tableur)
-                /office:document-content/office:body/office:spreadsheet/table:table[1]
-                /table:table-row[table:table-cell[1]/text:p = $identifiant]" />
-
-        <xsl:if test="not(empty($row))">
-            <!-- D'abord, reconstruire la liste des cellules pour gérer les cellules
-            identiques ou vides. -->
-            <xsl:variable name="row_simple">
-                <xsl:for-each select="$row/table:table-cell">
-                    <xsl:choose>
-                        <xsl:when test="@table:number-columns-repeated">
-                            <xsl:variable name="current_cell" select="." />
-                            <xsl:for-each select="1 to  @table:number-columns-repeated">
-                                <xsl:sequence select="$current_cell" />
-                            </xsl:for-each>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:sequence select="." />
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:for-each>
-            </xsl:variable>
-
-            <!-- Ensuite, lier les cellules au nom des colonnes (qui doivent être du Dublin Core). -->
-            <xsl:variable name="cellules">
-                <xsl:for-each select="document($tableur)
+        <!-- Vérifie si le fichier est préparé. -->
+        <xsl:choose>
+            <xsl:when test="$tableur">
+                <!-- TODO Optimiser si besoin. -->
+                <xsl:variable name="row" select="document($tableur)
                         /office:document-content/office:body/office:spreadsheet/table:table[1]
-                        /table:table-row[1]/table:table-cell
-                        ">
-                    <!-- La première cellule est le nom du fichier, inutile désormais. -->
-                    <xsl:if test="position() != 1">
-                        <xsl:variable name="position" select="position()" />
+                        /table:table-row[table:table-cell[1]/text:p = $identifiant]" />
 
-                        <!-- Ne crée la métadonnée que s'il y a un contenu. -->
-                        <xsl:if test="normalize-space($row_simple/table:table-cell[$position]) != ''">
-                            <xsl:variable name="name" select="
-                                if (starts-with(text:p[1], 'dc:'))
-                                then text:p[1]
-                                else if (starts-with(text:p[1], 'Dublin Core'))
-                                    then concat('dc:', lower-case(normalize-space(substring-after(text:p[1], ':'))))
-                                    else concat('dc:', lower-case(normalize-space(text:p[1])))
-                                " />
-
-                            <!-- Prise en compte les cellules multivaluées s'il y a un séparateur. -->
+                <xsl:if test="not(empty($row))">
+                    <!-- D'abord, reconstruire la liste des cellules pour gérer les cellules
+                    identiques ou vides. -->
+                    <xsl:variable name="row_simple">
+                        <xsl:for-each select="$row/table:table-cell">
                             <xsl:choose>
-                                <!-- Le séparateur est le saut de ligne interne à une cellule. -->
-                                <xsl:when test="$separateur = 'EOL'">
-                                    <xsl:for-each select="$row_simple/table:table-cell[$position]/text:p">
-                                        <!-- Évite de créer un contenu pour un double saut. -->
-                                        <xsl:if test="normalize-space(.)">
-                                            <xsl:element name="{$name}">
-                                                <!-- Nettoie le résultat (trim). -->
-                                                <xsl:sequence select="replace(., '^\s*(.+?)\s*$', '$1')" />
-                                            </xsl:element>
-                                        </xsl:if>
+                                <xsl:when test="@table:number-columns-repeated">
+                                    <xsl:variable name="current_cell" select="." />
+                                    <xsl:for-each select="1 to  @table:number-columns-repeated">
+                                        <xsl:sequence select="$current_cell" />
                                     </xsl:for-each>
                                 </xsl:when>
-
-                                <!-- Autre séparateur ou pas de séparateur. -->
                                 <xsl:otherwise>
-                                    <xsl:variable name="contenu"
-                                        select="string-join($row_simple/table:table-cell[$position]/text:p/text(), '')" />
+                                    <xsl:sequence select="." />
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:for-each>
+                    </xsl:variable>
+
+                    <!-- Ensuite, lier les cellules au nom des colonnes (qui doivent être du Dublin Core). -->
+                    <xsl:variable name="cellules">
+                        <xsl:for-each select="document($tableur)
+                                /office:document-content/office:body/office:spreadsheet/table:table[1]
+                                /table:table-row[1]/table:table-cell
+                                ">
+                            <!-- La première cellule est le nom du fichier, inutile désormais. -->
+                            <xsl:if test="position() != 1">
+                                <xsl:variable name="position" select="position()" />
+
+                                <!-- Ne crée la métadonnée que s'il y a un contenu. -->
+                                <xsl:if test="normalize-space($row_simple/table:table-cell[$position]) != ''">
+                                    <xsl:variable name="name" select="
+                                        if (starts-with(text:p[1], 'dc:'))
+                                        then text:p[1]
+                                        else if (starts-with(text:p[1], 'Dublin Core'))
+                                            then concat('dc:', lower-case(normalize-space(substring-after(text:p[1], ':'))))
+                                            else concat('dc:', lower-case(normalize-space(text:p[1])))
+                                        " />
+
+                                    <!-- Prise en compte les cellules multivaluées s'il y a un séparateur. -->
                                     <xsl:choose>
-                                        <xsl:when test="$separateur != '' and contains(string($contenu), $parametres/separateur)">
-                                            <xsl:for-each select="tokenize(string($contenu), $separateur)">
-                                                <!-- Évite de créer un contenu pour un séparateur oublié. -->
+                                        <!-- Le séparateur est le saut de ligne interne à une cellule. -->
+                                        <xsl:when test="$separateur = 'EOL'">
+                                            <xsl:for-each select="$row_simple/table:table-cell[$position]/text:p">
+                                                <!-- Évite de créer un contenu pour un double saut. -->
                                                 <xsl:if test="normalize-space(.)">
                                                     <xsl:element name="{$name}">
                                                         <!-- Nettoie le résultat (trim). -->
@@ -251,22 +266,45 @@ Elle contient des fonctions générales.
                                             </xsl:for-each>
                                         </xsl:when>
 
-                                        <!-- Pas de séparateur. -->
+                                        <!-- Autre séparateur ou pas de séparateur. -->
                                         <xsl:otherwise>
-                                            <xsl:element name="{$name}">
-                                                <xsl:sequence select="$contenu" />
-                                            </xsl:element>
+                                            <xsl:variable name="contenu"
+                                                select="string-join($row_simple/table:table-cell[$position]/text:p/text(), '')" />
+                                            <xsl:choose>
+                                                <xsl:when test="$separateur != '' and contains(string($contenu), $parametres/separateur)">
+                                                    <xsl:for-each select="tokenize(string($contenu), $separateur)">
+                                                        <!-- Évite de créer un contenu pour un séparateur oublié. -->
+                                                        <xsl:if test="normalize-space(.)">
+                                                            <xsl:element name="{$name}">
+                                                                <!-- Nettoie le résultat (trim). -->
+                                                                <xsl:sequence select="replace(., '^\s*(.+?)\s*$', '$1')" />
+                                                            </xsl:element>
+                                                        </xsl:if>
+                                                    </xsl:for-each>
+                                                </xsl:when>
+
+                                                <!-- Pas de séparateur. -->
+                                                <xsl:otherwise>
+                                                    <xsl:element name="{$name}">
+                                                        <xsl:sequence select="$contenu" />
+                                                    </xsl:element>
+                                                </xsl:otherwise>
+                                            </xsl:choose>
                                         </xsl:otherwise>
                                     </xsl:choose>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                       </xsl:if>
-                    </xsl:if>
-                </xsl:for-each>
-            </xsl:variable>
+                               </xsl:if>
+                            </xsl:if>
+                        </xsl:for-each>
+                    </xsl:variable>
 
-            <xsl:sequence select="$cellules" />
-        </xsl:if>
+                    <xsl:sequence select="$cellules" />
+                </xsl:if>
+            </xsl:when>
+            <!-- Pas de fichier. -->
+            <xsl:otherwise>
+                <xsl:text></xsl:text>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:function>
 
     <!-- Récupère la notice d'un document. -->
@@ -274,7 +312,9 @@ Elle contient des fonctions générales.
         <!-- Identifiant du document refnum -->
         <xsl:param name="identifiant" />
 
-        <xsl:sequence select="r2m:extraitCellules($notices, $identifiant)" />
+        <xsl:if test="$notices">
+            <xsl:sequence select="r2m:extraitCellules($notices, $identifiant)" />
+        </xsl:if>
     </xsl:function>
 
     <!-- Récupère les métadonnées d'un fichier. -->
@@ -282,7 +322,9 @@ Elle contient des fonctions générales.
         <!-- Adresse du fichier texte / image / audio. -->
         <xsl:param name="fichier" />
 
-        <xsl:sequence select="r2m:extraitCellules($fichier_metadata, $fichier)" />
+        <xsl:if test="$fichier_metadata">
+            <xsl:sequence select="r2m:extraitCellules($fichier_metadata, $fichier)" />
+        </xsl:if>
     </xsl:function>
 
     <!-- Récupère l'identifiant ark à partir de l'identifiant du document. -->
@@ -290,7 +332,9 @@ Elle contient des fonctions générales.
         <!-- Identifiant du document refnum -->
         <xsl:param name="identifiant" />
 
-        <xsl:value-of select="r2m:extraitValeur($arks, $identifiant)" />
+        <xsl:if test="$arks">
+            <xsl:value-of select="r2m:extraitValeur($arks, $identifiant)" />
+        </xsl:if>
     </xsl:function>
 
     <!-- Récupère le hash d'un fichier. -->
@@ -298,7 +342,9 @@ Elle contient des fonctions générales.
         <!-- Adresse du fichier texte / image / audio. -->
         <xsl:param name="fichier" />
 
-        <xsl:value-of select="r2m:extraitValeur($fichier_checksums, $fichier)" />
+        <xsl:if test="$fichier_checksums">
+            <xsl:value-of select="r2m:extraitValeur($fichier_checksums, $fichier)" />
+        </xsl:if>
     </xsl:function>
 
     <!-- Récupère la taille d'un fichier. -->
@@ -306,7 +352,9 @@ Elle contient des fonctions générales.
         <!-- Adresse du fichier texte / image / audio. -->
         <xsl:param name="fichier" />
 
-        <xsl:value-of select="r2m:extraitValeur($fichier_tailles, $fichier)" />
+        <xsl:if test="$fichier_tailles">
+            <xsl:value-of select="r2m:extraitValeur($fichier_tailles, $fichier)" />
+        </xsl:if>
     </xsl:function>
 
     <!-- L'uuid est créée à partir de l'heure et du generate-id (uuid version 1).
@@ -350,7 +398,7 @@ Elle contient des fonctions générales.
 
     <!-- Création d'une chaine de caractères en hexa à partir d'une chaîne.
     Basé sur http://lists.xml.org/archives/xml-dev/200109/msg00248.html -->
-    <xsl:function name="r2m:convertStringToNumsys" as="xs:string" >
+    <xsl:function name="r2m:convertStringToNumsys" as="xs:string?" >
         <xsl:param name="string" as="xs:string" />
         <xsl:param name="base" as="xs:integer" />
 

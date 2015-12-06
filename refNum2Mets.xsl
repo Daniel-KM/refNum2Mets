@@ -33,10 +33,23 @@ consacrée aux bibliothèques numériques [http://bibnum.bnf.fr] sur le site de 
 BnF, mais il est possible de s'en écarter pour simplifier ou enrichir le
 résultat.
 
-L'ensemble des paramètres sont à indiquer dans le fichier de configuration
-associé.
+* Remarques générales *
 
-Remarques générales
+- Le script associé "refNum2Mets.sh" permet de convertir l'ensemble des fichiers
+refNum d'un dossier en Mets, en ajoutant les données techniques des images et
+les métadonnées qui peuvent se trouver dans des fichiers associés.
+
+* Fichiers (images, ocr...) *
+
+- L'ensemble des paramètres sont à indiquer dans le fichier de configuration
+associé. Les fichiers qui y sont indiqués doivent exister, même vides, sinon la
+transformation échoue.
+- Les dossiers par défaut sont définis dans refNum2Mets_codes.xml. Pour les
+fichiers originaux, ils doivent se trouver dans un sous-dossier "master" (et non
+pas "PNG" ou "TIFF"). Pour les fichiers d'OCR (ALTO), le dossier par défaut est
+"ocr".
+
+* Metadonnées *
 
 - Les formats des identifiants respectent le format BnF, qui définit le préfixe
 obligatoire :
@@ -48,6 +61,9 @@ obligatoire :
 pages non paginées, dont le numéro est déduit des pages précédentes et
 suivantes. L'algorithme répond à la plupart des usages courants, mais une
 vérification peut s'avérer utile.
+
+* Autres remarques *
+
 - Dans l'exemple BnF, traitement/operation/entrée|description|resultat
 correspondent à des "detailsOperation", mais ce format contient aussi une
 description et un résultat, ce qui entraîne, comme dans l'exemple Mets BnF, des
@@ -65,20 +81,18 @@ n'apparaissent donc pas dans la conversion vers le refNum. Même si elles peuven
 cela ne présente pas d'intérêt et les informations ne sont pas requises par la
 norme Mets.
 
-TODO
+* TODO *
+
 - Vérifier avec davantage d'exemples.
-- Ajouter ALTO (déjà inclus via fichiers associés).
 - Vérifier la gestion de plusieurs images pour une même vueObjet.
 - Ajouter des contrôles de cohérence du refNum (nombre d'objets et fichiers...).
-- Récupérer les infos des images pour les données techniques.
-- Récupérer les infos techniques des images via un script.
-- Code de résolution des images ?
-- Gestion de supports plus différents.
+- Gestion des autres types de support.
 - Gérer typeGammeCommandee / typeGammeRealisee
 - Ajouter la légende des images
 - Ajouter périodique
 
-Historique
+* Historique *
+
 2015/09/21 Ajout des notices de documents et des métadonnées descriptives des pages
 2015/09/07 Corrections de détails et ajout d'un script pour traiter les dossiers
 2015/06/22 Version pour publication
@@ -174,8 +188,8 @@ Historique
             <xsl:namespace name="" select="'http://www.loc.gov/METS/'" />
             <xsl:namespace name="premis" select="'info:lc/xmlns/premis-v2'" />
             <xsl:namespace name="xsi" select="'http://www.w3.org/2001/XMLSchema-instance'" />
-            <xsl:namespace name="dc" select="'http://purl.org/dc/elements/1.1/'" />
             <xsl:namespace name="xlink" select="'http://www.w3.org/1999/xlink'" />
+            <xsl:namespace name="dc" select="'http://purl.org/dc/elements/1.1/'" />
             <xsl:namespace name="dcterms" select="'http://purl.org/dc/terms/'" />
             <xsl:for-each select="$parametres/racine/namespace | $profil/namespace">
                 <xsl:namespace name="{@prefix}" select="." />
@@ -2289,5 +2303,7 @@ Historique
         </xsl:for-each>
     </xsl:template>
 
-</xsl:stylesheet>
+    <!-- Ne rien écrire d'autre. -->
+    <xsl:template match="text()" />
 
+</xsl:stylesheet>

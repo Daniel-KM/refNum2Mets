@@ -8,6 +8,8 @@
 # - Les noms de fichiers ne doivent pas contenir d'espace (problème dans
 # l'extraction des tailles de fichiers).
 #
+# Il est recommandé d'avoir un sous-dossier par document, sinon les hashs sont
+# calculés sur tous les fichiers pour chaque refNum.
 # Les noms de fichiers doivent correspondre à ceux de refNum2Mets_config.xml.
 # Les dossiers doivent correspondre à ceux de refNum2Mets_codes.xml (<objetAssocie>).
 # Recommandé : "master" pour les fichiers master (et non "PNG" ou "TIFF") et
@@ -18,7 +20,7 @@
 # - saxon-he
 #
 # Auteur Daniel Berthereau <daniel.berthereau@mines-paristech.fr>
-# Copyright Daniel Berthereau, 2015-09-21
+# Copyright Daniel Berthereau, 2015-09-21 / 2015-12-07
 # Licence CeCILL v2.1
 #
 # Commande :
@@ -30,6 +32,7 @@ prepareTailles='true'
 prepareHashs='true'
 reindente='true'
 supprimeFichiersIntermediaires='false'
+recursif='true'
 
 # Vérifie l'outil xsl.
 if [ -r '/etc/debian_version' ]; then
@@ -47,6 +50,13 @@ fi
 if [ "$dossier" = '' ]
 then
     dossier=$(pwd)
+fi
+
+if [ "$recursif" = 'true' ]
+then
+     recursif=''
+else
+     recursif='-maxdepth 1'
 fi
 
 # Si ods est présent, on sauve ses métadonnées en xml, sinon on prend le xml.
@@ -72,7 +82,7 @@ echo Traitement du dossier \"$dossier\" via \"$xslpath\".
 echo
 
 # Traitement du dossier
-file -i $dossier/* | grep --ignore-case 'application/xml' | awk -F':' '{ print $1 }' | while read file
+find "$dossier" $recursif -type f -name '*.xml' -print0 | xargs -0 file -i '{}' | grep --ignore-case 'application/xml' | awk -F':' '{ print $1 }' | while read file
 do
     # Vérification rapide si c'est un fichier refNum (sans validation avancée).
     xmlroot=$(xmllint --xpath 'local-name(/*)' "$file")
@@ -150,7 +160,7 @@ do
     then
         echo '  ' Calcul des tailles des fichiers du dossier...
         taillespath="$dirname/$fichiersTailles"
-        find . -type f -print0 | xargs -0 stat --format '%n  %s' | cut -sd / -f 2- | sort > "$taillespath"
+        find "$dirname" -type f -print0 | xargs -0 stat --format '%n  %s' | cut -sd / -f 2- | sort > "$taillespath"
     fi
 
     # Préparation des hashs des fichiers du dossier courant.
@@ -158,7 +168,7 @@ do
     then
         echo '  ' Calcul des hash sha1 des fichiers du dossier...
         hashspath="$dirname/$fichiersHashs"
-        find . -type f | cut -sd / -f 2- | xargs sha1sum | awk '{print $2"  "$1}' | sort > "$hashspath"
+        find "$dirname" -type f | cut -sd / -f 2- | xargs sha1sum | awk '{print $2"  "$1}' | sort > "$hashspath"
     fi
 
     if [ "$distro" = 'Debian' ]

@@ -8,6 +8,8 @@ refnum2Mets est un outil pour convertir des fichiers xml du format refNum
 vers le format Mets, deux formats utilisés pour gérer des documents numérisés
 et pour construire des bibliothèques numériques.
 
+* Présentation *
+
 Le format refNum est un format défini par la Bibliothèque nationale de France
 (BnF) pour gérer les numérisations de documents (livres, journaux, objets,
 audio). Il est officiellement abandonné depuis décembre 2014 au profit du Mets
@@ -23,31 +25,45 @@ manuscrits, périodiques, lots de photos), mis en ligne sur leurs sites
 respectifs Bibliothèque patrimoniale des Mines [https://patrimoine.mines-paristech.fr]
 et Collections patrimoniales des Ponts [http://patrimoine.enpc.fr] via la
 plateforme libre Omeka [https://omeka.org]. Elle gère aussi quelques variantes
-du refNum (genre inconnu, dates multiples, etc.). À l'inverse, certaines spécificités du
-refNum ne sont pas prises en compte, notamment pour les objets "texte" et
-"audio" et pour les fichiers associés.
+du refNum (genre inconnu, dates multiples, etc.). À l'inverse, certaines
+spécificités du refNum ne sont pas prises en compte, notamment pour les objets
+"texte" et "audio" et pour les fichiers associés.
 
-Le format est conçu sur la base du profil METS SIP de la BnF (noms des
-identifiants...) et sur les différents documents disponibles sur la page
-consacrée aux bibliothèques numériques [http://bibnum.bnf.fr] sur le site de la
-BnF, mais il est possible de s'en écarter pour simplifier ou enrichir le
-résultat.
+* Profils *
+
+Compte tenu de la versatilité du Mets, un profil doit être choisi. Trois principaux
+sont présents dans le sous-dossier "profils" : profil_diffusion.xml (par défaut),
+qui permet d'obtenir un mets simple destiné à l'import dans Omeka. profil_bnf.xml,
+qui crée un mets conforme au profil de la BnF, destiné à l'archivage pérenne, et
+profil_archive.xml, un profil proche du précédent mais sans les spécificités BnF.
+
+Quoi qu'il en soit, l'ensemble du processus de conversion se base bien sur le
+profil METS SIP de la BnF, par exemple pour les noms des identifiants., et sur
+les différents documents disponibles sur la page consacrée aux bibliothèques
+numériques [http://bibnum.bnf.fr] sur le site de la BnF. Il est possible de s'en
+écarter pour simplifier ou enrichir le résultat.
 
 * Remarques générales *
 
-- Le script associé "refNum2Mets.sh" permet de convertir l'ensemble des fichiers
-refNum d'un dossier en Mets, en ajoutant les données techniques des images et
-les métadonnées qui peuvent se trouver dans des fichiers associés.
-
-* Fichiers (images, ocr...) *
+- Compte tenu du fait que le Mets conserver davantage de données que le refNum,
+des fichiers associés peuvent être nécessaires pour les enregistrer. Ils sont
+nécessaire, car Xsl ne peut pas accéder directement aux informations contenus
+dans les fichiers images, etc.
 
 - L'ensemble des paramètres sont à indiquer dans le fichier de configuration
 associé. Les fichiers qui y sont indiqués doivent exister, même vides, sinon la
-transformation échoue.
+transformation peur échouer dans le cas ou la fonction xslt "unparsed-text-available()"
+n'est pas disponible.
+
 - Les dossiers par défaut sont définis dans refNum2Mets_codes.xml. Pour les
 fichiers originaux, ils doivent se trouver dans un sous-dossier "master" (et non
 pas "PNG" ou "TIFF"). Pour les fichiers d'OCR (ALTO), le dossier par défaut est
 "ocr".
+
+- Le script associé "refNum2Mets.sh" permet de convertir l'ensemble des fichiers
+refNum d'un dossier en Mets, en ajoutant les données techniques des images et
+les métadonnées qui peuvent se trouver dans des fichiers associés. Il utilise les
+noms de fichiers qui figurent dans la feuille de configuration par défaut.
 
 * Metadonnées *
 

@@ -3,12 +3,15 @@
 # Convertit tous les fichiers refNum d'un dossier en Mets via xslt Saxon-HE.
 #
 # - Les métadonnées peuvent se trouver dans des tables ODS ou en xml.
-# - Les fichiers originaux sont conservés.
+# - Les fichiers originaux sont conservés sans modification.
 # - Le hash de tous les fichiers est calculé, ce qui peut être long.
 # - Les noms de fichiers ne doivent pas contenir d'espace (problème dans
 # l'extraction des tailles de fichiers).
 #
 # Les noms de fichiers doivent correspondre à ceux de refNum2Mets_config.xml.
+# Les dossiers doivent correspondre à ceux de refNum2Mets_codes.xml (<objetAssocie>).
+# Recommandé : "master" pour les fichiers master (et non "PNG" ou "TIFF") et
+# "ocr" pour les fichiers d'ocr.
 #
 # Utilise :
 # - xmllint
@@ -39,7 +42,6 @@ else
     echo Impossible de déterminer la ligne de commande pour convertir le xml.
     exit 1;
 fi
-
 
 # Valeurs par défaut.
 if [ "$dossier" = '' ]
@@ -99,6 +101,15 @@ do
     tailleFichiers=$(du -sh | cut -f 1)
 
     echo $filename '=>' $metsfilename \($nombreFichiers fichiers, $tailleFichiers\)
+
+    # Info sur les fichiers.
+    subdircount=$(find "$dirname" -maxdepth 1 -type d | wc -l)
+    if [ $subdircount -eq 1 ]; then
+        echo '   * Attention : Pas de sous-dossier : les liens vers les fichiers devront être vérifiés.'
+    elif [ $subdircount -gt 1 ] && [ ! -d 'master' ]; then
+        echo '   * Attention : Pas de sous-dossier "master". Les hash et tailles ne seront pas ajoutés.'
+        echo '   *' Vérifier si la configuration est bien adaptée aux noms de sous-dossiers spécifiques.
+    fi
 
     # Extraction des notices des documents si besoin.
     if [ -f "$documentsMetadata" ]

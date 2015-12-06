@@ -310,7 +310,7 @@ Elle permet de normaliser certaines données du refNum.
     </xsl:function>
 
     <!-- Retourne le nom d'une page à partir d'un objet ou d'un fichier. -->
-    <xsl:function name="r2m:nomPage">
+    <xsl:function name="r2m:nomPage" as="xs:string?">
         <xsl:param name="objet" />
         <xsl:param name="format" />
 
@@ -364,22 +364,25 @@ Elle permet de normaliser certaines données du refNum.
             </xsl:choose>
         </xsl:variable>
 
-        <xsl:value-of select="$nomPage" />
-
         <!-- Pour le label ou la description, il est possible d'ajouter le type
         refnum de page, s'il est différent. -->
-        <xsl:if test="$format/type/@ajouter = 'true'">
-            <!-- Récupère le type, sauf s'il est normal et non requis. -->
-            <xsl:if test="(not(empty($objet/@typePage)) and $objet/@typePage != 'N')
-                        or ($objet/@typePage = 'N' and $format/type/@normal = 'true')">
-                <xsl:variable name="typePage"
-                    select="$codes/typePage/entry[@code = $objet/@typePage]" />
-                <xsl:if test="$typePage != $nomPage">
-                    <xsl:value-of select="$format/type/@separateur" />
-                    <xsl:value-of select="$typePage" />
+        <xsl:variable name="ajoutTypePage">
+            <xsl:if test="$format/type/@ajouter = 'true'">
+                <!-- Récupère le type, sauf s'il est normal et non requis. -->
+                <xsl:if test="(not(empty($objet/@typePage)) and $objet/@typePage != 'N')
+                            or ($objet/@typePage = 'N' and $format/type/@normal = 'true')">
+                    <xsl:variable name="typePage"
+                        select="$codes/typePage/entry[@code = $objet/@typePage]" />
+                    <xsl:if test="$typePage != $nomPage">
+                        <xsl:value-of select="$format/type/@separateur" />
+                        <xsl:value-of select="$typePage" />
+                    </xsl:if>
                 </xsl:if>
             </xsl:if>
-        </xsl:if>
+        </xsl:variable>
+
+        <!-- La concaténation permet d'éviter les problèmes d'espace. -->
+        <xsl:value-of select="concat($nomPage, $ajoutTypePage)" />
     </xsl:function>
 
     <!-- Retourne le nom d'une page non paginée à partir de l'objet. -->
@@ -716,4 +719,3 @@ Elle permet de normaliser certaines données du refNum.
     </xsl:function>
 
 </xsl:stylesheet>
-

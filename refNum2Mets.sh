@@ -37,9 +37,11 @@ supprimeFichiersIntermediaires='false'
 recursif='true'
 
 # Vérifie l'outil xsl.
-if [ -r '/etc/debian_version' ]; then
+if [ -r '/etc/debian_version' ]
+then
     distro='Debian'
-elif [ -r '/etc/redhat-release' ]; then
+elif [ -r '/etc/redhat-release' ]
+then
     distro='Red Hat'
     echo 'Ne pas tenir compte de la remarque éventuelle "Cannot find CatalogManager.properties".'
     echo
@@ -80,18 +82,22 @@ SCRIPTPATH=$(dirname "$SCRIPT")
 if [ -z "$xslformat" ]
 then
     xslpath="$SCRIPTPATH/refNum2Mets.xsl"
-else
+elif [ -e "$xslformat" ]
+then
     xslpath="$xslformat"
-    if [ ! -e "$xslformat" ]
+else
+    xslpath="$SCRIPTPATH/$xslformat"
+    if [ ! -e "$xslpath" ]
     then
-        xslpath="$SCRIPTPATH/$xslformat"
-    else
         echo La feuille \"$xslformat\" n\'existe pas.
         exit 1
     fi
 fi
 
 xslidentitypath="$SCRIPTPATH/identity.xsl"
+
+tailleDossier=${#dossier}
+tailleDossier=$(( $tailleDossier + 2 ))
 
 echo Traitement du dossier \"$dossier\" via \"$xslpath\".
 echo
@@ -111,6 +117,9 @@ do
     name="${filename%.*}"
     extension="${filename##*.}"
 
+    tailleDir=${#dirname}
+    tailleDir=$(( $tailleDir + 2 ))
+
     # Vérifie s'il y a une double extension (.refnum.xml).
     if [ "${name##*.}" = 'refnum' ]
     then
@@ -125,49 +134,48 @@ do
     nombreFichiers=$(find $dirname -follow -type f | wc -l)
     tailleFichiers=$(du -sh | cut -f 1)
 
+    # Ajout d'un message d'information sur le traitement du refnum.
     echo $filename '=>' $metsfilename \($nombreFichiers fichiers, $tailleFichiers\)
 
     # Info sur les fichiers.
     subdircount=$(find "$dirname" -maxdepth 1 -type d | wc -l)
-    if [ $subdircount -eq 1 ]; then
+    if [ $subdircount -eq 1 ]
+    then
         echo '   * Attention : Pas de sous-dossier : les liens vers les fichiers devront être vérifiés.'
-    elif [ $subdircount -gt 1 ] && [ ! -d 'master' ]; then
+    elif [ $subdircount -gt 1 ] && [ ! -d "$dirname/master" ]
+    then
         echo '   * Attention : Pas de sous-dossier "master". Les hash et tailles ne seront pas ajoutés.'
         echo '   *' Vérifier si la configuration est bien adaptée aux noms de sous-dossiers spécifiques.
     fi
 
     # Extraction des notices des documents si besoin.
-    if [ -f "$documentsMetadata" ]
+    if [ -f "$dirname/$documentsMetadata" ] && [ -s "$dirname/$documentsMetadata" ]
     then
         noticespath="$dirname/$documentsMetadataXml"
         echo '  ' Utilisation des notices de "$documentsMetadata" décompressées dans "$noticespath".
-        unzip -p "$documentsMetadata" content.xml > "$noticespath"
+        unzip -p "$dirname/$documentsMetadata" content.xml > "$noticespath"
+    elif [ -f "$dirname/$documentsMetadataXml" ] && [ -s "$dirname/$documentsMetadataXml" ]
+    then
+        echo '  ' Utilisation des notices de "$documentsMetadataXml".
+        noticespath="$dirname/$documentsMetadataXml"
     else
-        if [ -f "$documentsMetadataXml" ]
-        then
-            echo '  ' Utilisation des notices de "$documentsMetadataXml".
-            noticespath="$dirname/$documentsMetadataXml"
-        else
-            echo '  ' Pas de notices pour les documents.
-            noticespath=""
-        fi
+        echo '  ' Pas de notices pour les documents.
+        noticespath=""
     fi
 
     # Extraction des métadonnées des fichiers si besoin.
-    if [ -f "$fichiersMetadata" ]
+    if [ -f "$dirname/$fichiersMetadata" ] && [ -f "$dirname/$fichiersMetadata" ]
     then
         metadatapath="$dirname/$fichiersMetadataXml"
         echo '  ' Utilisation des métadonnées de "$fichiersMetadata" décompressées dans "$metadatapath".
-        unzip -p "$fichiersMetadata" content.xml > "$metadatapath"
+        unzip -p "$dirname/$fichiersMetadata" content.xml > "$metadatapath"
+    elif [ -f "$dirname/$fichiersMetadataXml" ] &&[ -s "$dirname/$fichiersMetadataXml" ]
+    then
+        echo '  ' Utilisation des métadonnées de "$fichiersMetadataXml".
+        metadatapath="$dirname/$fichiersMetadataXml"
     else
-        if [ -f "$fichiersMetadataXml" ]
-        then
-            echo '  ' Utilisation des métadonnées de "$fichiersMetadataXml".
-            metadatapath="$dirname/$fichiersMetadataXml"
-        else
-            echo '  ' Pas de métadonnées pour les fichiers.
-            metadatapath=""
-        fi
+        echo '  ' Pas de métadonnées pour les fichiers.
+        metadatapath=""
     fi
 
     # Préparation des tailles des fichiers du dossier courant.
@@ -175,7 +183,8 @@ do
     then
         echo '  ' Calcul des tailles des fichiers du dossier...
         taillespath="$dirname/$fichiersTailles"
-        find "$dirname" -type f -print0 | xargs -0 stat --format '%n  %s' | cut -sd / -f 2- | sort > "$taillespath"
+        #find "$dirname" -type f -print0 | xargs -0 stat --format '%n  %s' | cut -sd / -f 2- | sort > "$taillespath"
+        find "$dirname" -type f -print0 | xargs -0 stat --format '%n  %s' | cut -c ${tailleDir}- | sort > "$taillespath"
     fi
 
     # Préparation des hashs des fichiers du dossier courant.
@@ -183,7 +192,8 @@ do
     then
         echo '  ' Calcul des hash sha1 des fichiers du dossier...
         hashspath="$dirname/$fichiersHashs"
-        find "$dirname" -type f | cut -sd / -f 2- | xargs sha1sum | awk '{print $2"  "$1}' | sort > "$hashspath"
+        # find "$dirname" -type f | cut -sd / -f 2- | xargs sha1sum | awk '{print $2"  "$1}' | sort > "$hashspath"
+        find "$dirname" -type f -print0 | xargs -0 sha1sum | awk '{print $2"  "$1}' | cut -c ${tailleDir}- | sort > "$hashspath"
     fi
 
     if [ "$distro" = 'Debian' ]

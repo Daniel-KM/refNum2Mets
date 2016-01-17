@@ -436,8 +436,10 @@ Elle permet de normaliser certaines données du refNum.
         manuscrit paginé (donc une monographie), des dessins. des feuillets
         réunis sous le nom de page, un ensemble de documents de quelques
         pages... Le nommage suit les mêmes règles, sauf pour la couverture. -->
-        <xsl:variable name="précédente_numérotée" select="($objet/preceding-sibling::refNum:vueObjet[@typePagination != 'N'])[last()]"/>
-        <xsl:variable name="suivante_numérotée" select="($objet/following-sibling::refNum:vueObjet[@typePagination != 'N'])[1]"/>
+        <xsl:variable name="précédente_numérotée"
+            select="($objet/preceding-sibling::refNum:vueObjet[@typePagination != 'N'])[last()]"/>
+        <xsl:variable name="suivante_numérotée"
+            select="($objet/following-sibling::refNum:vueObjet[@typePagination != 'N'])[1]"/>
 
         <xsl:choose>
             <!-- Aucune page numérotée. -->
@@ -619,10 +621,14 @@ Elle permet de normaliser certaines données du refNum.
 
         <xsl:choose>
             <xsl:when test="name($fichier) = 'texte' or name($fichier) = 'image' or name($fichier) = 'audio'">
-                <xsl:variable name="dateCommentaireFichier" select="$fichier/refNum:commentaire[position() = last()]/@date" />
-                <xsl:variable name="dateCommentaireObjet" select="$fichier/parent::refNum:vueObjet/refNum:commentaire[position() = last()]/@date" />
-                <xsl:variable name="dateCommentaireStructure" select="$fichier/ancestor::refNum:structure/refNum:commentaire[position() = last()]/@date" />
-                <xsl:variable name="dateObjetAssocie" select="$fichier/ancestor::refNum:document/refNum:production/refNum:objetAssocie[text() = $objetAssocie][position() = last()]/@date" />
+                <xsl:variable name="dateCommentaireFichier"
+                    select="$fichier/refNum:commentaire[position() = last()]/@date" />
+                <xsl:variable name="dateCommentaireObjet"
+                    select="$fichier/parent::refNum:vueObjet/refNum:commentaire[position() = last()]/@date" />
+                <xsl:variable name="dateCommentaireStructure"
+                    select="$fichier/ancestor::refNum:structure/refNum:commentaire[position() = last()]/@date" />
+                <xsl:variable name="dateObjetAssocie"
+                    select="$fichier/ancestor::refNum:document/refNum:production/refNum:objetAssocie[text() = $objetAssocie][position() = last()]/@date" />
                 <!-- TODO Ajouter la date correspondant à l'objet associé dans l'historique des opérations, même si c'est redondant. -->
 
                 <xsl:variable name="comparaison_1" select="r2m:maxDate($dateCommentaireFichier, $dateCommentaireObjet)" />

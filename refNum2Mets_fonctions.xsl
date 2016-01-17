@@ -54,8 +54,8 @@ Elle contient des fonctions générales.
 
     <!-- Fichiers additionnels : utilise ceux présents à côté du fichier refNum,
     sinon ceux du présent dossier. -->
-    <xsl:variable name="dirname" as="xs:string" select="
-            string-join(tokenize(document-uri(/), '/')[position() &lt; last()], '/')" />
+    <xsl:variable name="dirname" as="xs:string"
+        select="string-join(tokenize(document-uri(/), '/')[position() &lt; last()], '/')" />
     <xsl:variable name="notices" as="xs:string?"
         select="r2m:cheminFichier($parametres/documents/metadata/liste)" />
     <xsl:variable name="arks" as="xs:string?"

@@ -161,7 +161,7 @@ Mainteneur actuel :
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2015 pour l’École des Mines de Paris ([Mines ParisTech])
+* Copyright Daniel Berthereau, 2015-2016 pour l’École des Mines de Paris ([Mines ParisTech])
 
 
 [refNum2Mets]: https://github.com/Daniel-KM/refNum2Mets

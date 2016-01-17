@@ -47,7 +47,8 @@ Elle permet de définir les numéros des identifiants des sections et sous-secti
     <!-- Le nombre de fichiers est celui des seuls masters et non des objets associés.
     L'élement "nombreImages" n'est pas utilisé, car il n'y a pas que des images. -->
     <xsl:variable name="nombreFichiers"
-        select="count(/refNum:refNum/refNum:document/refNum:structure/refNum:vueObjet/refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio'])" />
+        select="count(/refNum:refNum/refNum:document/refNum:structure/refNum:vueObjet
+            /refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio'])" />
     <xsl:variable name="nombreObjetsAssocies"
         select="count(/refNum:refNum/refNum:document/refNum:production/refNum:objetAssocie)" />
     <xsl:variable name="objetsAssocies"

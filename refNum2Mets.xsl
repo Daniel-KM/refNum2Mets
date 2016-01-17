@@ -282,7 +282,8 @@ norme Mets.
             </xsl:if>
 
             <xsl:if test="$profil/section/DescriptiveMetadataSection_fichiers/@remplir = 'true'">
-                <xsl:apply-templates select="refNum:document/refNum:structure/refNum:vueObjet/refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio']"
+                <xsl:apply-templates select="refNum:document/refNum:structure/refNum:vueObjet
+                        /refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio']"
                     mode="DescriptiveMetadataSection" />
             </xsl:if>
 
@@ -437,7 +438,8 @@ norme Mets.
                                 </xsl:call-template>
 
                                 <!-- dc:subject -->
-                                <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'CADRECLASSEMENTDEWEY'][normalize-space(.) != '']">
+                                <xsl:for-each select="refNum:document/refNum:bibliographie
+                                        /refNum:reference[@type = 'CADRECLASSEMENTDEWEY'][normalize-space(.) != '']">
                                     <dc:subject>
                                         <xsl:value-of select="normalize-space(.)" />
                                     </dc:subject>
@@ -580,7 +582,8 @@ norme Mets.
                                     </dc:identifier>
                                 </xsl:if>
                                 <!-- TODO En section descriptive ou administrative ? -->
-                                <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'IDDOCUMENT'][normalize-space(.) != '']">
+                                <xsl:for-each select="refNum:document/refNum:bibliographie
+                                        /refNum:reference[@type = 'IDDOCUMENT'][normalize-space(.) != '']">
                                     <dc:identifier>
                                         <xsl:text>ID document : </xsl:text>
                                         <xsl:value-of select="normalize-space(.)" />
@@ -592,19 +595,22 @@ norme Mets.
 
                                 <!-- dc:source -->
                                 <!-- Voir http://dublincore.org/documents/usageguide/elements.shtml#source -->
-                                <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'COTEORIGINAL'][normalize-space(.) != '']">
+                                <xsl:for-each select="refNum:document/refNum:bibliographie
+                                        /refNum:reference[@type = 'COTEORIGINAL'][normalize-space(.) != '']">
                                     <dc:source>
                                         <xsl:text>Cote original : </xsl:text>
                                         <xsl:value-of select="normalize-space(.)" />
                                     </dc:source>
                                 </xsl:for-each>
-                                <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'COTEOBJETREPRODUIT'][normalize-space(.) != '']">
+                                <xsl:for-each select="refNum:document/refNum:bibliographie
+                                        /refNum:reference[@type = 'COTEOBJETREPRODUIT'][normalize-space(.) != '']">
                                     <dc:source>
                                         <xsl:text>Cote objet reproduit : </xsl:text>
                                         <xsl:value-of select="normalize-space(.)" />
                                     </dc:source>
                                 </xsl:for-each>
-                                <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'SOURCE'][normalize-space(.) != '']">
+                                <xsl:for-each select="refNum:document/refNum:bibliographie
+                                        /refNum:reference[@type = 'SOURCE'][normalize-space(.) != '']">
                                     <dc:source>
                                         <xsl:value-of select="normalize-space(.)" />
                                     </dc:source>
@@ -624,13 +630,15 @@ norme Mets.
                                 </xsl:call-template>
 
                                 <!-- dc:relation -->
-                                <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'NOTICEBIBLIOGRAPHIQUE'][normalize-space(.) != '']">
+                                <xsl:for-each select="refNum:document/refNum:bibliographie
+                                        /refNum:reference[@type = 'NOTICEBIBLIOGRAPHIQUE'][normalize-space(.) != '']">
                                     <dc:relation>
                                         <xsl:value-of select="normalize-space(.)" />
                                     </dc:relation>
                                 </xsl:for-each>
                                 <!-- TODO En section descriptive ou administrative ? -->
-                                <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'CODEBARREBNF'][normalize-space(.) != '']">
+                                <xsl:for-each select="refNum:document/refNum:bibliographie
+                                        /refNum:reference[@type = 'CODEBARREBNF'][normalize-space(.) != '']">
                                     <dc:relation>
                                         <xsl:text>Code-barre BnF : </xsl:text>
                                         <xsl:value-of select="normalize-space(.)" />
@@ -872,13 +880,15 @@ norme Mets.
 
             <!-- TechMD si souhaité, pour master et les objets associés. -->
             <xsl:if test="$profil/section/AdministrativeMetadataSection/techMD/@remplir = 'true'">
-                <xsl:apply-templates select="refNum:document/refNum:structure/refNum:vueObjet/refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio']"
+                <xsl:apply-templates select="refNum:document/refNum:structure/refNum:vueObjet
+                        /refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio']"
                     mode="techMD">
                     <xsl:with-param name="objetAssocie" select="'master'" />
                 </xsl:apply-templates>
 
                 <xsl:for-each select="refNum:document/refNum:production/refNum:objetAssocie">
-                    <xsl:apply-templates select="../../refNum:structure/refNum:vueObjet/refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio']"
+                    <xsl:apply-templates select="../../refNum:structure/refNum:vueObjet
+                            /refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio']"
                         mode="techMD">
                         <xsl:with-param name="objetAssocie" select="." />
                     </xsl:apply-templates>
@@ -913,13 +923,15 @@ norme Mets.
             <xsl:if test="$profil/section/AdministrativeMetadataSection/digiprovMD/@remplir = 'true'">
                 <!-- Contrôle de validité. -->
                 <xsl:if test="$profil/section/AdministrativeMetadataSection/digiprovMD/valide/@remplir = 'true'">
-                    <xsl:apply-templates select="refNum:document/refNum:structure/refNum:vueObjet/refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio']"
+                    <xsl:apply-templates select="refNum:document/refNum:structure/refNum:vueObjet
+                            /refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio']"
                         mode="digiprovMD_valid">
                         <xsl:with-param name="objetAssocie" select="'master'" />
                     </xsl:apply-templates>
 
                     <xsl:for-each select="refNum:document/refNum:production/refNum:objetAssocie">
-                        <xsl:apply-templates select="../../refNum:structure/refNum:vueObjet/refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio']"
+                        <xsl:apply-templates select="../../refNum:structure/refNum:vueObjet
+                                /refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio']"
                             mode="digiprovMD_valid">
                             <xsl:with-param name="objetAssocie" select="." />
                         </xsl:apply-templates>
@@ -1415,7 +1427,8 @@ norme Mets.
                         <!-- A la BnF, le format de la source est en "description",
                         pas en "format" ou "Medium". -->
                         <!-- dc:description -->
-                        <xsl:for-each-group select="refNum:document/refNum:structure/refNum:vueObjet/refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio']"
+                        <xsl:for-each-group select="refNum:document/refNum:structure/refNum:vueObjet
+                                /refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio']"
                             group-by="@supportOrigine">
                             <dc:description xml:lang="fr">
                                 <xsl:value-of select="$codes/supportOrigine/entry[@code = current()/@supportOrigine]" />
@@ -1423,7 +1436,8 @@ norme Mets.
                         </xsl:for-each-group>
 
                         <!-- dc:identifier -->
-                        <xsl:for-each select="refNum:document/refNum:bibliographie/refNum:reference[@type = 'CODEBARREPROVENANCE'][normalize-space(.) != '']">
+                        <xsl:for-each select="refNum:document/refNum:bibliographie
+                                /refNum:reference[@type = 'CODEBARREPROVENANCE'][normalize-space(.) != '']">
                             <xsl:element name="dc:identifier">
                                 <xsl:if test="$profil/section/AdministrativeMetadataSection/sourceMD/codeBarreSelect">
                                     <xsl:attribute name="xsi:type">
@@ -1570,7 +1584,8 @@ norme Mets.
                         <xsl:choose>
                             <xsl:when test="detailsOperation:detailsOperation/detailsOperation:description">
                                 <premis:eventDetail>
-                                    <xsl:value-of select="$codes/detailsOperation/description/entry[@code = current()/detailsOperation:detailsOperation/detailsOperation:description]" />
+                                    <xsl:value-of select="$codes/detailsOperation/description/entry
+                                            [@code = current()/detailsOperation:detailsOperation/detailsOperation:description]" />
                                 </premis:eventDetail>
                             </xsl:when>
                             <xsl:otherwise>
@@ -1884,7 +1899,8 @@ norme Mets.
         <xsl:element name="fileSec">
             <!-- Groupe principal des fichiers (texte, image ou audio, non mélangés). -->
             <!-- TODO Faut-il séparer par texte / image / audio ? -->
-            <xsl:if test="refNum:document/refNum:structure/refNum:vueObjet/refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio']">
+            <xsl:if test="refNum:document/refNum:structure/refNum:vueObjet
+                    /refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio']">
                 <xsl:apply-templates select="." mode="FileGroup">
                     <xsl:with-param name="objetAssocie" select="'master'" />
                 </xsl:apply-templates>
@@ -1910,7 +1926,9 @@ norme Mets.
             <xsl:attribute name="USE">
                 <xsl:value-of select="$codes/objetAssocie/entry[@code = $objetAssocie]/@use" />
             </xsl:attribute>
-            <xsl:apply-templates select="refNum:document/refNum:structure/refNum:vueObjet/refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio']" mode="fichier">
+            <xsl:apply-templates select="refNum:document/refNum:structure/refNum:vueObjet
+                    /refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio']"
+                mode="fichier">
                 <xsl:with-param name="objetAssocie" select="$objetAssocie" />
             </xsl:apply-templates>
         </xsl:element>
@@ -2113,19 +2131,22 @@ norme Mets.
                         </xsl:if>
                     </xsl:if>
 
-                    <xsl:apply-templates select="refNum:document/refNum:structure/refNum:vueObjet" mode="StructuralMap" />
+                    <xsl:apply-templates select="refNum:document/refNum:structure/refNum:vueObjet"
+                        mode="StructuralMap" />
 
                 </xsl:element>
             </xsl:when>
 
             <xsl:otherwise>
-                <xsl:apply-templates select="refNum:document/refNum:structure/refNum:vueObjet" mode="StructuralMap" />
+                <xsl:apply-templates select="refNum:document/refNum:structure/refNum:vueObjet"
+                        mode="StructuralMap" />
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
     <xsl:template match="/refNum:refNum" mode="amd_document">
-        <xsl:if test="($nombreOperations > 0) and $profil/section/AdministrativeMetadataSection/digiprovMD/@remplir = 'true'">
+        <xsl:if test="($nombreOperations > 0)
+                and $profil/section/AdministrativeMetadataSection/digiprovMD/@remplir = 'true'">
             <xsl:for-each select="1 to $nombreOperations">
                 <xsl:text> AMD.</xsl:text>
                 <xsl:value-of select="r2m:genereIndexAmd('digiprovMD', ., '')" />
@@ -2140,7 +2161,9 @@ norme Mets.
             <xsl:text> AMD.</xsl:text>
             <xsl:value-of select="r2m:genereIndexAmd('spar_techMD', 0, '')" />
 
-            <xsl:variable name="maxSparFin" select="$profil/section/AdministrativeMetadataSection/spar/@fin + number($parametres/periodique/@remplir = 'true')" />
+            <xsl:variable name="maxSparFin" select="
+                $profil/section/AdministrativeMetadataSection/spar/@fin
+                + number($parametres/periodique/@remplir = 'true')" />
             <xsl:for-each select="1 to xs:integer($maxSparFin)">
                 <xsl:text> AMD.</xsl:text>
                 <xsl:value-of select="r2m:genereIndexAmd('spar_fin', ., '')" />
@@ -2247,8 +2270,9 @@ norme Mets.
         <xsl:param name="numeroId" select="0" />
 
         <premis:eventIdentifier>
-            <xsl:variable name="eventIdentifierFormat" select="$profil/section/AdministrativeMetadataSection/digiprovMD
-                /eventIdentifierFormat[@utiliser = 'true'][1]/@nom" />
+            <xsl:variable name="eventIdentifierFormat"
+                select="$profil/section/AdministrativeMetadataSection/digiprovMD
+                    /eventIdentifierFormat[@utiliser = 'true'][1]/@nom" />
             <xsl:choose>
                 <xsl:when test="$eventIdentifierFormat = 'uuid'">
                     <premis:eventIdentifierType>UUID</premis:eventIdentifierType>

@@ -18,15 +18,17 @@
 # Utilise :
 # - xmllint
 # - saxon-he
+# - bash 4.3 (testé sur Debian et Fedora)
 #
 # Auteur Daniel Berthereau <daniel.berthereau@mines-paristech.fr>
-# Copyright Daniel Berthereau, 2015-09-21 / 2015-12-07
+# Copyright Daniel Berthereau, 2015-09-21 / 2016-01-18
 # Licence CeCILL v2.1
 #
 # Commande :
-# refNum2Mets.sh dossier
+# refNum2Mets.sh dossier xslformat
 
 dossier=$1
+xslformat=$2
 
 prepareTailles='true'
 prepareHashs='true'
@@ -47,7 +49,7 @@ else
 fi
 
 # Valeurs par défaut.
-if [ "$dossier" = '' ]
+if [ "$dossier" = '' ] || [ "$dossier" = '.' ]
 then
     dossier=$(pwd)
 fi
@@ -75,7 +77,20 @@ SCRIPT=$(readlink -f "$0")
 # Absolute path this script is in, thus /home/user/bin
 SCRIPTPATH=$(dirname "$SCRIPT")
 
-xslpath="$SCRIPTPATH/refNum2Mets.xsl"
+if [ -z "$xslformat" ]
+then
+    xslpath="$SCRIPTPATH/refNum2Mets.xsl"
+else
+    xslpath="$xslformat"
+    if [ ! -e "$xslformat" ]
+    then
+        xslpath="$SCRIPTPATH/$xslformat"
+    else
+        echo La feuille \"$xslformat\" n\'existe pas.
+        exit 1
+    fi
+fi
+
 xslidentitypath="$SCRIPTPATH/identity.xsl"
 
 echo Traitement du dossier \"$dossier\" via \"$xslpath\".

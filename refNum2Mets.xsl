@@ -702,7 +702,7 @@ norme Mets.
                                 <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
                                         /titre/copie/@valeur = 'orderLabel'">
                                     <xsl:variable name="valeur_titre"
-                                    select="r2m:nomImage(., $profil/section/StructuralMap/orderLabel)" />
+                                    select="r2m:nomImage(.., $profil/section/StructuralMap/orderLabel)" />
                                     <xsl:if test="$valeur_titre != ''">
                                         <xsl:element name="dc:title">
                                             <xsl:sequence select="r2m:attributPagination(.)" />
@@ -713,7 +713,7 @@ norme Mets.
                                 <xsl:when test="$profil/section/DescriptiveMetadataSection_fichiers
                                         /title/copie/@valeur = 'label'">
                                     <xsl:variable name="valeur_titre"
-                                    select="r2m:nomImage(., $profil/section/StructuralMap/label)" />
+                                    select="r2m:nomImage(.., $profil/section/StructuralMap/label)" />
                                     <xsl:if test="$valeur_titre != ''">
                                         <xsl:element name="dc:title">
                                             <xsl:value-of select="$valeur_titre" />
@@ -726,7 +726,7 @@ norme Mets.
                         <!-- Préparation de la description depuis le refnum. -->
                         <xsl:variable name="refnum_description">
                             <xsl:variable name="valeur_description" select="
-                            r2m:nomImage(., $profil/section/StructuralMap
+                            r2m:nomImage(.., $profil/section/StructuralMap
                                 /*[local-name() = $profil/section/DescriptiveMetadataSection_fichiers
                                     /description/copie/@valeur
                                 ])" />

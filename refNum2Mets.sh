@@ -7,6 +7,9 @@
 # - Le hash de tous les fichiers est calculé, ce qui peut être long.
 # - Les noms de fichiers ne doivent pas contenir d'espace (problème dans
 # l'extraction des tailles de fichiers).
+# - Si un paramètre est absent et qu'il y en a d'autres après, indiquer "".
+# - Le paramètre xslpre permet de réaliser un prétraitrement xsl sur les refnum.
+# Les refnum ainsi modifiés peuvent être conservés (extension ".pre.xml").
 #
 # Il est recommandé d'avoir un sous-dossier par document, sinon les hashs sont
 # calculés sur tous les fichiers pour chaque refNum.
@@ -25,10 +28,11 @@
 # Licence CeCILL v2.1
 #
 # Commande :
-# refNum2Mets.sh dossier xslformat
+# refNum2Mets.sh dossier xslformat xslpre
 
 dossier=$1
 xslformat=$2
+xslpre=$3
 
 prepareTailles='true'
 prepareHashs='true'
@@ -91,6 +95,20 @@ else
     then
         echo La feuille \"$xslformat\" n\'existe pas.
         exit 1
+    fi
+fi
+
+if [ "$xslpre" != "" ]
+then
+    if [ ! -e "$xslpre" ]
+    then
+        if [ ! -e "$SCRIPTPATH/$xslpre" ]
+        then
+            echo La feuille \"$xslpre\" n\'existe pas.
+            exit 1
+        else
+            xslpre="$SCRIPTPATH/$xslpre"
+        fi
     fi
 fi
 
@@ -196,6 +214,27 @@ do
         find "$dirname" -type f -print0 | xargs -0 sha1sum | awk '{print $2"  "$1}' | cut -c ${tailleDir}- | sort > "$hashspath"
     fi
 
+    if [ "$xslpre" != "" ]
+    then
+        echo '  ' Prétraitrement des fichiers refNum via "$xslpre"...
+        filebis="${file%.*}.pre.xml"
+        if [ "$distro" = 'Debian' ]
+        then
+            # Debien 6 avec Saxon-B.
+            # saxonb-xslt -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpath" -o:"$metspath"
+
+            # Commande pour Debian 8 avec Saxon-HE.
+            CLASSPATH=/usr/share/java/Saxon-HE.jar java net.sf.saxon.Transform -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpre" -o:"$filebis"
+        elif [ "$distro" = 'Red Hat' ]
+        then
+            saxon -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpre" -o:"$filebis"
+        else
+            echo "Xsl processor unmanaged."
+            exit 1;
+        fi
+        file=$filebis
+    fi
+
     if [ "$distro" = 'Debian' ]
     then
         # Debien 6 avec Saxon-B.
@@ -207,6 +246,7 @@ do
     then
         saxon -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpath" -o:"$metspath"
     else
+        echo "Xsl processor unmanaged."
         exit 1;
     fi
 

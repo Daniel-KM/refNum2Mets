@@ -526,6 +526,7 @@ norme Mets.
                                         </dc:type>
                                         <dc:type>
                                             <xsl:choose>
+                                                <!-- Pour gérer une spécificité BnF (spar_dc) -->
                                                 <xsl:when test="$profil/section/DescriptiveMetadataSection/genreSelect != ''">
                                                     <xsl:value-of select="$codes/genre/entry[@code = upper-case($genre)]
                                                         /@*[name() = $profil/section/DescriptiveMetadataSection/genreSelect]" />
@@ -543,11 +544,11 @@ norme Mets.
                                                 <xsl:value-of select="$genre" />
                                             </dc:type>
                                         </xsl:if>
-                                        <xsl:call-template name="ajout_metadonnees">
-                                            <xsl:with-param name="element" select="'dc:type'" />
-                                        </xsl:call-template>
                                     </xsl:otherwise>
                                 </xsl:choose>
+                                <xsl:call-template name="ajout_metadonnees">
+                                    <xsl:with-param name="element" select="'dc:type'" />
+                                </xsl:call-template>
 
                                 <!-- dc:format -->
                                 <xsl:variable name="nombrePages" select="normalize-space(refNum:document/refNum:bibliographie/refNum:nombrePages)" />

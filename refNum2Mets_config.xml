@@ -192,7 +192,7 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
             <!-- Type par défaut (dcmi vocabulary pour dc:type), utilisé pour le genre
             "Multimédia" ou en son absence. -->
                 <dc>
-                    <type>Moving Image</type>
+                    <type></type>
                     <source></source>
                     <language>fre</language>
                     <coverage></coverage>

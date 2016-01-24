@@ -30,6 +30,9 @@ Historique :
       <entry code="PERIODIQUE" type="Text" spar_dc="periodical" nomPage="Page">Publication en série imprimée</entry>
       <!-- Non standard. -->
       <entry code="MANUSCRIT" type="Text" spar_dc="monograph" nomPage="Page">Manuscrit</entry>
+      <entry code="COMPTE-RENDU" type="Text" spar_dc="monograph" nomPage="Page">Compte-rendu</entry>
+      <entry code="JOURNAL DE VOYAGE" type="Text" spar_dc="monograph" nomPage="Page">Journal de voyage</entry>
+      <entry code="MEMOIRE" type="Text" spar_dc="monograph" nomPage="Page">Mémoire</entry>
     </genre>
 
     <!-- Permet de définir l'identifiant, le media type, l'extension et le sous-dossier

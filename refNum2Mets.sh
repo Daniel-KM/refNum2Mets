@@ -21,7 +21,7 @@
 # Utilise :
 # - xmllint
 # - saxon-b ou saxon-he
-# - bash 4.3 (testé sur Debian et Fedora)
+# - shell/bash 4.3 (testé sur Debian et Fedora)
 #
 # Auteur Daniel Berthereau <daniel.berthereau@mines-paristech.fr>
 # Copyright Daniel Berthereau, 2015-09-21 / 2016-01-18
@@ -40,11 +40,9 @@ supprimeFichiersIntermediaires='false'
 recursif='true'
 
 # Vérifie l'outil xsl.
-if [ -r '/etc/debian_version' ]
-then
+if [ -r '/etc/debian_version' ]; then
     distro='Debian'
-elif [ -r '/etc/redhat-release' ]
-then
+elif [ -r '/etc/redhat-release' ]; then
     distro='Red Hat'
     echo 'Ne pas tenir compte de la remarque éventuelle "Cannot find CatalogManager.properties".'
     echo
@@ -54,13 +52,11 @@ else
 fi
 
 # Valeurs par défaut.
-if [ "$dossier" = '' ] || [ "$dossier" = '.' ]
-then
+if [ -z "$dossier" ] || [ "$dossier" = '.' ]; then
     dossier=$(pwd)
 fi
 
-if [ "$recursif" = 'true' ]
-then
+if [ "$recursif" = 'true' ]; then
      recursif=''
 else
      recursif='-maxdepth 1'
@@ -84,12 +80,9 @@ SCRIPTPATH=$(dirname "$SCRIPT")
 
 xslpath="$SCRIPTPATH/refNum2Mets.xsl"
 
-if [ "$xslpre" != "" ]
-then
-    if [ ! -e "$xslpre" ]
-    then
-        if [ ! -e "$SCRIPTPATH/$xslpre" ]
-        then
+if [ -n "$xslpre" ]; then
+    if [ ! -e "$xslpre" ]; then
+        if [ ! -e "$SCRIPTPATH/$xslpre" ]; then
             echo "La feuille \"$xslpre\" n\'existe pas."
             exit 1
         else
@@ -119,8 +112,7 @@ do
 
     # Vérification rapide si c'est un fichier refNum (sans validation avancée).
     xmlroot=$(xmllint --xpath 'local-name(/*)' "$file")
-    if [ "$xmlroot" != 'refNum' ]
-    then
+    if [ "$xmlroot" != 'refNum' ]; then
         echo "* $filename n'est pas un fichier refNum."
         continue
     fi
@@ -132,8 +124,7 @@ do
     fi
 
     # Vérifie s'il y a une double extension (.refnum.xml).
-    if [ "${name##*.}" = 'refnum' ]
-    then
+    if [ "${name##*.}" = 'refnum' ]; then
         name="${name%.*}"
     fi
 
@@ -150,23 +141,19 @@ do
 
     # Info sur les fichiers.
     subdircount=$(find "$dirname" -maxdepth 1 -type d | wc -l)
-    if [ $subdircount -eq 1 ]
-    then
+    if [ $subdircount -eq 1 ]; then
         echo '  * Attention : Pas de sous-dossier : les liens vers les fichiers devront être vérifiés.'
-    elif [ $subdircount -gt 1 ] && [ ! -d "$dirname/master" ]
-    then
+    elif [ $subdircount -gt 1 ] && [ ! -d "$dirname/master" ]; then
         echo '  * Attention : Pas de sous-dossier "master". Les hash et tailles ne seront pas ajoutés.'
         echo '  * Vérifier si la configuration est bien adaptée aux noms de sous-dossiers spécifiques.'
     fi
 
     # Extraction des notices des documents si besoin.
-    if [ -f "$dirname/$documentsMetadata" ] && [ -s "$dirname/$documentsMetadata" ]
-    then
+    if [ -f "$dirname/$documentsMetadata" ] && [ -s "$dirname/$documentsMetadata" ]; then
         noticespath="$dirname/$documentsMetadataXml"
         echo "  Utilisation des notices de \"$documentsMetadata\" décompressées dans \"$noticespath\"."
         unzip -p "$dirname/$documentsMetadata" content.xml > "$noticespath"
-    elif [ -f "$dirname/$documentsMetadataXml" ] && [ -s "$dirname/$documentsMetadataXml" ]
-    then
+    elif [ -f "$dirname/$documentsMetadataXml" ] && [ -s "$dirname/$documentsMetadataXml" ]; then
         echo "  Utilisation des notices de \"$documentsMetadataXml\"."
         noticespath="$dirname/$documentsMetadataXml"
     else
@@ -175,13 +162,11 @@ do
     fi
 
     # Extraction des métadonnées des fichiers si besoin.
-    if [ -f "$dirname/$fichiersMetadata" ] && [ -f "$dirname/$fichiersMetadata" ]
-    then
+    if [ -f "$dirname/$fichiersMetadata" ] && [ -f "$dirname/$fichiersMetadata" ]; then
         metadatapath="$dirname/$fichiersMetadataXml"
         echo "  Utilisation des métadonnées de \"$fichiersMetadata\" décompressées dans \"$metadatapath\"."
         unzip -p "$dirname/$fichiersMetadata" content.xml > "$metadatapath"
-    elif [ -f "$dirname/$fichiersMetadataXml" ] &&[ -s "$dirname/$fichiersMetadataXml" ]
-    then
+    elif [ -f "$dirname/$fichiersMetadataXml" ] && [ -s "$dirname/$fichiersMetadataXml" ]; then
         echo "  Utilisation des métadonnées de \"$fichiersMetadataXml\"."
         metadatapath="$dirname/$fichiersMetadataXml"
     else
@@ -190,8 +175,7 @@ do
     fi
 
     # Préparation des tailles des fichiers du dossier courant.
-    if [ "$prepareTailles" = 'true' ]
-    then
+    if [ "$prepareTailles" = 'true' ]; then
         echo '  Calcul des tailles des fichiers du dossier...'
         taillespath="$dirname/$fichiersTailles"
         #find "$dirname" -type f -print0 | xargs -0 stat --format '%n  %s' | cut -sd / -f 2- | sort > "$taillespath"
@@ -199,27 +183,23 @@ do
     fi
 
     # Préparation des hashs des fichiers du dossier courant.
-    if [ "$prepareHashs" = 'true' ]
-    then
+    if [ "$prepareHashs" = 'true' ]; then
         echo '  Calcul des hash sha1 des fichiers du dossier...'
         hashspath="$dirname/$fichiersHashs"
         # find "$dirname" -type f | cut -sd / -f 2- | xargs sha1sum | awk '{print $2"  "$1}' | sort > "$hashspath"
         find "$dirname" -type f -print0 | xargs -0 sha1sum | awk '{print $2"  "$1}' | cut -c ${tailleDir}- | sort > "$hashspath"
     fi
 
-    if [ "$xslpre" != "" ]
-    then
+    if [ -n "$xslpre" ]; then
         echo "  Prétraitrement des fichiers refNum via \"$xslpre\"..."
         filebis="${file%.*}.pre.xml"
-        if [ "$distro" = 'Debian' ]
-        then
+        if [ "$distro" = 'Debian' ]; then
             # Debien 6 avec Saxon-B.
             # saxonb-xslt -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpath" -o:"$metspath"
 
             # Commande pour Debian 8 avec Saxon-HE.
             CLASSPATH=/usr/share/java/Saxon-HE.jar java net.sf.saxon.Transform -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpre" -o:"$filebis"
-        elif [ "$distro" = 'Red Hat' ]
-        then
+        elif [ "$distro" = 'Red Hat' ]; then
             saxon -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpre" -o:"$filebis"
         else
             echo 'Xsl processor unmanaged.'
@@ -228,15 +208,13 @@ do
         file=$filebis
     fi
 
-    if [ "$distro" = 'Debian' ]
-    then
+    if [ "$distro" = 'Debian' ]; then
         # Debien 6 avec Saxon-B.
         # saxonb-xslt -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpath" -o:"$metspath"
 
         # Commande pour Debian 8 avec Saxon-HE.
         CLASSPATH=/usr/share/java/Saxon-HE.jar java net.sf.saxon.Transform -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpath" -o:"$metspath"
-    elif [ "$distro" = 'Red Hat' ]
-    then
+    elif [ "$distro" = 'Red Hat' ]; then
         saxon -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpath" -o:"$metspath"
     else
         echo 'Xsl processor unmanaged.'
@@ -245,29 +223,23 @@ do
 
     # Améliore l'indentation, ce qui est impossible avec la version libre de
     # saxon.
-    if [ "$reindente" = 'true' ]
-    then
+    if [ "$reindente" = 'true' ]; then
         xmllint --format --recover --output "$metspath" "$metspath"
     fi
 
     # Suppression éventuelle des fichiers intermédiaires.
-    if [ "$supprimeFichiersIntermediaires" = 'true' ]
-    then
+    if [ "$supprimeFichiersIntermediaires" = 'true' ]; then
         echo '  Suppression des fichiers intermédaires créés par ce script.'
-        if [ -f "$documentsMetadata" ]
-        then
+        if [ -f "$documentsMetadata" ]; then
             rm -f "$noticespath"
         fi
-        if [ -f "$fichiersMetadata" ]
-        then
+        if [ -f "$fichiersMetadata" ]; then
             rm -f "$metadatapath"
         fi
-        if [ "$prepareTailles" = 'true' ]
-        then
+        if [ "$prepareTailles" = 'true' ]; then
             rm -f "$taillespath"
         fi
-        if [ "$prepareHashs" = 'true' ]
-        then
+        if [ "$prepareHashs" = 'true' ]; then
             rm -f "$hashspath"
         fi
     fi

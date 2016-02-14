@@ -137,11 +137,11 @@ norme Mets.
     xmlns:fn="http://www.w3.org/2005/xpath-functions"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:r2m="refNum2Mets"
+
     xmlns:refNum="http://bibnum.bnf.fr/ns/refNum"
+
     xmlns:detailsOperation="http://bibnum.bnf.fr/ns/detailsOperation"
-
     xmlns:spar_dc="http://bibnum.bnf.fr/ns/spar_dc"
-
     xmlns:alto="http://bibnum.bnf.fr/ns/alto_prod"
 
     xmlns="http://www.loc.gov/METS/"

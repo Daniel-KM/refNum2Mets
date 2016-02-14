@@ -18,7 +18,9 @@ Elle permet de normaliser certaines données du refNum.
     xmlns:fn="http://www.w3.org/2005/xpath-functions"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:r2m="refNum2Mets"
+
     xmlns:refNum="http://bibnum.bnf.fr/ns/refNum"
+
     xmlns:detailsOperation="http://bibnum.bnf.fr/ns/detailsOperation"
 
     exclude-result-prefixes="

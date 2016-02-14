@@ -18,7 +18,9 @@ Elle contient des fonctions générales.
     xmlns:fn="http://www.w3.org/2005/xpath-functions"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:r2m="refNum2Mets"
+
     xmlns:refNum="http://bibnum.bnf.fr/ns/refNum"
+
     xmlns:detailsOperation="http://bibnum.bnf.fr/ns/detailsOperation"
 
     xmlns:dc="http://purl.org/dc/elements/1.1/"

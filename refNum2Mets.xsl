@@ -168,7 +168,13 @@ norme Mets.
     <xsl:import href="refNum2Mets_numerotation.xsl" />
     <xsl:import href="refNum2Mets_bnf.xsl" />
 
-    <xsl:output method="xml" indent="yes" encoding="UTF-8"/>
+    <xsl:output
+        omit-xml-declaration="no"
+        method="xml"
+        indent="yes"
+        encoding="UTF-8"
+        version="1.0"
+        standalone="yes"/>
 
     <xsl:strip-space elements="*"/>
 

@@ -20,7 +20,7 @@
 #
 # Utilise :
 # - xmllint
-# - saxon-he
+# - saxon-b ou saxon-he
 # - bash 4.3 (testé sur Debian et Fedora)
 #
 # Auteur Daniel Berthereau <daniel.berthereau@mines-paristech.fr>
@@ -28,11 +28,10 @@
 # Licence CeCILL v2.1
 #
 # Commande :
-# refNum2Mets.sh dossier xslformat xslpre
+# refNum2Mets.sh dossier xslpre
 
 dossier=$1
-xslformat=$2
-xslpre=$3
+xslpre=$2
 
 prepareTailles='true'
 prepareHashs='true'
@@ -83,20 +82,7 @@ SCRIPT=$(readlink -f "$0")
 # Absolute path this script is in, thus /home/user/bin
 SCRIPTPATH=$(dirname "$SCRIPT")
 
-if [ -z "$xslformat" ]
-then
-    xslpath="$SCRIPTPATH/refNum2Mets.xsl"
-elif [ -e "$xslformat" ]
-then
-    xslpath="$xslformat"
-else
-    xslpath="$SCRIPTPATH/$xslformat"
-    if [ ! -e "$xslpath" ]
-    then
-        echo La feuille \"$xslformat\" n\'existe pas.
-        exit 1
-    fi
-fi
+xslpath="$SCRIPTPATH/refNum2Mets.xsl"
 
 if [ "$xslpre" != "" ]
 then

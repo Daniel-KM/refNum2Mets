@@ -67,6 +67,9 @@ cd metadata
 ../refNum2Mets.sh
 ```
 
+Le processeur Saxon doit être installé auparavant via le paquet libsaxonb-java
+ou libsaxonhe-java.
+
 
 Notes sur la conversion
 -----------------------

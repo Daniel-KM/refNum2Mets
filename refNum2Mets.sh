@@ -49,7 +49,6 @@ xslProcess() {
             ;;
         'Red Hat')
             saxon -ext:on -versionmsg:off -s:"$1" -xsl:"$2" -o:"$3"
-            exit 1
             ;;
         *)
             echo 'Xsl processor unmanaged.'
@@ -119,7 +118,7 @@ echo Traitement du dossier \"$dossier\" via \"$xslpath\".
 echo
 
 # Traitement du dossier
-find "$dossier" $recursif -type f -name '*.xml' -print0 | xargs -0 file -i '{}' | grep --ignore-case 'application/xml' | awk -F':' '{ print $1 }' | while read file
+find "$dossier" $recursif -type f -name '*.xml' -print0 | xargs -0 file --mime '{}' | grep --ignore-case 'application/xml' | awk -F':' '{ print $1 }' | while read file
 do
     dirname=$(dirname "$file")
     filename=$(basename "$file")

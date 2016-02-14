@@ -107,6 +107,9 @@ de la BnF. -->
                 <!-- Page non paginée : "vide", "fixe", "ordre", "numéro NP", "numéro déduit", "nom". -->
                 <titreFichierNP>numéro déduit</titreFichierNP>
                 <!-- Utilisés en fonction du choix "titreFichierNP". -->
+                <!-- C'est le numéro de l'image qui est entre crochets : si le
+                numéro est déduit correctement, il est mis en clair et c'est le
+                label qui indique que c'est une page non paginée. -->
                 <titreFichierNPTexte>[</titreFichierNPTexte>
                 <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
                 <!-- Ajouter l'information du type refNum. -->

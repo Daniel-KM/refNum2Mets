@@ -391,7 +391,7 @@ Elle permet de normaliser certaines données du refNum.
 
         <xsl:variable name="nomPage">
             <xsl:choose>
-                <xsl:when test="$objet/@numeroPage != '' and $objet/@numeroPage != 'NP'">
+                <xsl:when test="$objet/@numeroPage and $objet/@numeroPage != '' and $objet/@numeroPage != 'NP'">
                     <xsl:choose>
                         <xsl:when test="$format/titreFichier = 'numéro'">
                             <xsl:choose>
@@ -531,20 +531,20 @@ Elle permet de normaliser certaines données du refNum.
                 <xsl:choose>
                     <!-- Pagination en chiffres arabes. -->
                     <xsl:when test="($suivante_numérotée/@typePagination = 'A')
-                        and ($suivante_numérotée/@numeroPage > 1)
-                        and ($suivante_numérotée/@numeroPage + $objet/@ordre > $suivante_numérotée/@ordre)
+                        and (number($suivante_numérotée/@numeroPage) > 1)
+                        and (number($suivante_numérotée/@numeroPage) + $objet/@ordre > $suivante_numérotée/@ordre)
                         ">
                         <xsl:value-of select="r2m:nomPageNonPagineeFormat(
-                            $suivante_numérotée/@numeroPage - $suivante_numérotée/@ordre + $objet/@ordre,
+                            number($suivante_numérotée/@numeroPage) - $suivante_numérotée/@ordre + $objet/@ordre,
                             true(), $format, 'Page ', ' (non paginée)')" />
                     </xsl:when>
                     <!-- Pagination en chiffres romain. -->
                     <xsl:when test="($suivante_numérotée/@typePagination = 'R')
-                        and ($suivante_numérotée/@numeroPage > 1)
-                        and ($suivante_numérotée/@numeroPage + $objet/@ordre > $suivante_numérotée/@ordre)
+                        and (number($suivante_numérotée/@numeroPage) > 1)
+                        and (number($suivante_numérotée/@numeroPage) + $objet/@ordre > $suivante_numérotée/@ordre)
                         ">
                         <xsl:value-of select="r2m:nomPageNonPagineeFormat(
-                            r2m:conversionArabeVersRomain($suivante_numérotée/@numeroPage - $suivante_numérotée/@ordre + $objet/@ordre),
+                            r2m:conversionArabeVersRomain(number($suivante_numérotée/@numeroPage) - $suivante_numérotée/@ordre + $objet/@ordre),
                             true(), $format, 'Page ', ' (non paginée)')" />
                     </xsl:when>
                     <!-- Couvertures et pages de garde (sauf lot). -->
@@ -589,9 +589,10 @@ Elle permet de normaliser certaines données du refNum.
             <!-- Foliotation. -->
             <xsl:when test="($précédente_numérotée/@typePagination = 'F')
                 and ($précédente_numérotée/@ordre + 1 = $objet/@ordre)
+                and number($précédente_numérotée/@numeroPage)
                 ">
                 <xsl:value-of select="r2m:nomPageNonPagineeFormat(
-                    $précédente_numérotée/@numeroPage,
+                    number($précédente_numérotée/@numeroPage),
                     'folio', $format, 'Folio ', ' (verso)')" />
             </xsl:when>
             <!-- Pages finales et couverture (sauf lot). -->
@@ -620,25 +621,43 @@ Elle permet de normaliser certaines données du refNum.
             </xsl:when>
             <!-- La page se situe entre deux numéros et son numéro est
             déterminable avec une bonne probabilité. -->
-            <!-- Pagination entre deux chiffres arabes, avec test de
-            cohérence par comparaison de la précédente et de la suivante. -->
-            <xsl:when test="($précédente_numérotée/@typePagination = 'A')
-                    and ($suivante_numérotée/@typePagination = 'A')
-                    and ($suivante_numérotée/@numeroPage - $suivante_numérotée/@ordre = $précédente_numérotée/@numeroPage - $précédente_numérotée/@ordre)
-                    ">
-                    <xsl:value-of select="r2m:nomPageNonPagineeFormat(
-                        $suivante_numérotée/@numeroPage - $suivante_numérotée/@ordre + $objet/@ordre,
-                        true(), $format, 'Page ', ' (non paginée)')" />
-            </xsl:when>
-            <!-- Pagination entre deux chiffres romains, avec test de
-            cohérence par comparaison de la précédente et de la suivante.. -->
-            <xsl:when test="($précédente_numérotée/@typePagination = 'R')
-                    and ($suivante_numérotée/@typePagination = 'R')
-                    and ($suivante_numérotée/@numeroPage - $suivante_numérotée/@ordre = $précédente_numérotée/@numeroPage - $précédente_numérotée/@ordre)
-                    ">
-                    <xsl:value-of select="r2m:nomPageNonPagineeFormat(
-                        r2m:conversionArabeVersRomain($suivante_numérotée/@numeroPage - $suivante_numérotée/@ordre + $objet/@ordre),
-                        true(), $format, 'Page ', ' (non paginée)')" />
+            <!--  Un test de validité sur les numéros de page évite une erreur
+            avec les fichiers mal formatés. -->
+            <xsl:when test="number($précédente_numérotée/@numeroPage)
+                    and number($suivante_numérotée/@numeroPage)">
+                <xsl:choose>
+                    <!-- Pagination entre deux chiffres arabes, avec test de
+                    cohérence par comparaison de la précédente et de la suivante. -->
+                    <xsl:when test="($précédente_numérotée/@typePagination = 'A')
+                            and ($suivante_numérotée/@typePagination = 'A')
+                            and ($suivante_numérotée/@numeroPage - $suivante_numérotée/@ordre
+                                = $précédente_numérotée/@numeroPage - $précédente_numérotée/@ordre
+                            )
+                            ">
+                            <xsl:value-of select="r2m:nomPageNonPagineeFormat(
+                                $suivante_numérotée/@numeroPage - $suivante_numérotée/@ordre + $objet/@ordre,
+                                true(), $format, 'Page ', ' (non paginée)')" />
+                    </xsl:when>
+                    <!-- Pagination entre deux chiffres romains, avec test de
+                    cohérence par comparaison de la précédente et de la suivante.. -->
+                    <xsl:when test="($précédente_numérotée/@typePagination = 'R')
+                            and ($suivante_numérotée/@typePagination = 'R')
+                            and ($suivante_numérotée/@numeroPage - $suivante_numérotée/@ordre
+                                = $précédente_numérotée/@numeroPage - $précédente_numérotée/@ordre
+                            )
+                            ">
+                            <xsl:value-of select="r2m:nomPageNonPagineeFormat(
+                                r2m:conversionArabeVersRomain($suivante_numérotée/@numeroPage - $suivante_numérotée/@ordre + $objet/@ordre),
+                                true(), $format, 'Page ', ' (non paginée)')" />
+                    </xsl:when>
+                    <!-- Impossible à déterminer, sans doute avec du hors-texte,
+                    ou un document mal numéroté. -->
+                    <xsl:otherwise>
+                        <xsl:value-of select="r2m:nomPageNonPagineeFormat(
+                            $objet/@ordre,
+                            false(), $format, 'Image ', '')" />
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:when>
             <!-- Impossible à déterminer, sans doute avec du hors-texte,
             ou un document mal numéroté. -->

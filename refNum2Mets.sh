@@ -113,6 +113,13 @@ do
     xmlroot=$(xmllint --xpath 'local-name(/*)' "$file")
     if [ "$xmlroot" != 'refNum' ]
     then
+        echo "* $filename n'est pas un fichier refNum."
+        continue
+    fi
+
+    schema=$(xmllint --xpath 'namespace-uri(/*)' "$file")
+    if [ "$schema" != "http://bibnum.bnf.fr/ns/refNum" ] && [ "$schema" != "https://patrimoine.mines-paristech.fr/ns/refNum" ]; then
+        echo "* $filename n'est pas un fichier refNum."
         continue
     fi
 

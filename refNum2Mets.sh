@@ -16,7 +16,7 @@
 # Les noms de fichiers doivent correspondre à ceux de refNum2Mets_config.xml.
 # Les dossiers doivent correspondre à ceux de refNum2Mets_codes.xml (<objetAssocie>).
 # Recommandé : "master" pour les fichiers master (et non "PNG" ou "TIFF") et
-# "ocr" pour les fichiers d'ocr.
+# "ocr" pour les fichiers d'ocr (alto).
 #
 # Utilise :
 # - xmllint
@@ -49,7 +49,7 @@ then
     echo 'Ne pas tenir compte de la remarque éventuelle "Cannot find CatalogManager.properties".'
     echo
 else
-    echo Impossible de déterminer la ligne de commande pour convertir le xml.
+    echo 'Impossible de déterminer la ligne de commande pour convertir le xml.'
     exit 1;
 fi
 
@@ -90,7 +90,7 @@ then
     then
         if [ ! -e "$SCRIPTPATH/$xslpre" ]
         then
-            echo La feuille \"$xslpre\" n\'existe pas.
+            echo "La feuille \"$xslpre\" n\'existe pas."
             exit 1
         else
             xslpre="$SCRIPTPATH/$xslpre"
@@ -109,6 +109,14 @@ echo
 # Traitement du dossier
 find "$dossier" $recursif -type f -name '*.xml' -print0 | xargs -0 file -i '{}' | grep --ignore-case 'application/xml' | awk -F':' '{ print $1 }' | while read file
 do
+    dirname=$(dirname "$file")
+    filename=$(basename "$file")
+    name="${filename%.*}"
+    extension="${filename##*.}"
+
+    tailleDir=${#dirname}
+    tailleDir=$(( $tailleDir + 2 ))
+
     # Vérification rapide si c'est un fichier refNum (sans validation avancée).
     xmlroot=$(xmllint --xpath 'local-name(/*)' "$file")
     if [ "$xmlroot" != 'refNum' ]
@@ -122,14 +130,6 @@ do
         echo "* $filename n'est pas un fichier refNum."
         continue
     fi
-
-    dirname=$(dirname "$file")
-    filename=$(basename "$file")
-    name="${filename%.*}"
-    extension="${filename##*.}"
-
-    tailleDir=${#dirname}
-    tailleDir=$(( $tailleDir + 2 ))
 
     # Vérifie s'il y a une double extension (.refnum.xml).
     if [ "${name##*.}" = 'refnum' ]
@@ -152,25 +152,25 @@ do
     subdircount=$(find "$dirname" -maxdepth 1 -type d | wc -l)
     if [ $subdircount -eq 1 ]
     then
-        echo '   * Attention : Pas de sous-dossier : les liens vers les fichiers devront être vérifiés.'
+        echo '  * Attention : Pas de sous-dossier : les liens vers les fichiers devront être vérifiés.'
     elif [ $subdircount -gt 1 ] && [ ! -d "$dirname/master" ]
     then
-        echo '   * Attention : Pas de sous-dossier "master". Les hash et tailles ne seront pas ajoutés.'
-        echo '   *' Vérifier si la configuration est bien adaptée aux noms de sous-dossiers spécifiques.
+        echo '  * Attention : Pas de sous-dossier "master". Les hash et tailles ne seront pas ajoutés.'
+        echo '  * Vérifier si la configuration est bien adaptée aux noms de sous-dossiers spécifiques.'
     fi
 
     # Extraction des notices des documents si besoin.
     if [ -f "$dirname/$documentsMetadata" ] && [ -s "$dirname/$documentsMetadata" ]
     then
         noticespath="$dirname/$documentsMetadataXml"
-        echo '  ' Utilisation des notices de "$documentsMetadata" décompressées dans "$noticespath".
+        echo "  Utilisation des notices de \"$documentsMetadata\" décompressées dans \"$noticespath\"."
         unzip -p "$dirname/$documentsMetadata" content.xml > "$noticespath"
     elif [ -f "$dirname/$documentsMetadataXml" ] && [ -s "$dirname/$documentsMetadataXml" ]
     then
-        echo '  ' Utilisation des notices de "$documentsMetadataXml".
+        echo "  Utilisation des notices de \"$documentsMetadataXml\"."
         noticespath="$dirname/$documentsMetadataXml"
     else
-        echo '  ' Pas de notices pour les documents.
+        echo '  Pas de notices pour les documents.'
         noticespath=""
     fi
 
@@ -178,21 +178,21 @@ do
     if [ -f "$dirname/$fichiersMetadata" ] && [ -f "$dirname/$fichiersMetadata" ]
     then
         metadatapath="$dirname/$fichiersMetadataXml"
-        echo '  ' Utilisation des métadonnées de "$fichiersMetadata" décompressées dans "$metadatapath".
+        echo "  Utilisation des métadonnées de \"$fichiersMetadata\" décompressées dans \"$metadatapath\"."
         unzip -p "$dirname/$fichiersMetadata" content.xml > "$metadatapath"
     elif [ -f "$dirname/$fichiersMetadataXml" ] &&[ -s "$dirname/$fichiersMetadataXml" ]
     then
-        echo '  ' Utilisation des métadonnées de "$fichiersMetadataXml".
+        echo "  Utilisation des métadonnées de \"$fichiersMetadataXml\"."
         metadatapath="$dirname/$fichiersMetadataXml"
     else
-        echo '  ' Pas de métadonnées pour les fichiers.
+        echo '  Pas de métadonnées pour les fichiers.'
         metadatapath=""
     fi
 
     # Préparation des tailles des fichiers du dossier courant.
     if [ "$prepareTailles" = 'true' ]
     then
-        echo '  ' Calcul des tailles des fichiers du dossier...
+        echo '  Calcul des tailles des fichiers du dossier...'
         taillespath="$dirname/$fichiersTailles"
         #find "$dirname" -type f -print0 | xargs -0 stat --format '%n  %s' | cut -sd / -f 2- | sort > "$taillespath"
         find "$dirname" -type f -print0 | xargs -0 stat --format '%n  %s' | cut -c ${tailleDir}- | sort > "$taillespath"
@@ -201,7 +201,7 @@ do
     # Préparation des hashs des fichiers du dossier courant.
     if [ "$prepareHashs" = 'true' ]
     then
-        echo '  ' Calcul des hash sha1 des fichiers du dossier...
+        echo '  Calcul des hash sha1 des fichiers du dossier...'
         hashspath="$dirname/$fichiersHashs"
         # find "$dirname" -type f | cut -sd / -f 2- | xargs sha1sum | awk '{print $2"  "$1}' | sort > "$hashspath"
         find "$dirname" -type f -print0 | xargs -0 sha1sum | awk '{print $2"  "$1}' | cut -c ${tailleDir}- | sort > "$hashspath"
@@ -209,7 +209,7 @@ do
 
     if [ "$xslpre" != "" ]
     then
-        echo '  ' Prétraitrement des fichiers refNum via "$xslpre"...
+        echo "  Prétraitrement des fichiers refNum via \"$xslpre\"..."
         filebis="${file%.*}.pre.xml"
         if [ "$distro" = 'Debian' ]
         then
@@ -222,7 +222,7 @@ do
         then
             saxon -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpre" -o:"$filebis"
         else
-            echo "Xsl processor unmanaged."
+            echo 'Xsl processor unmanaged.'
             exit 1;
         fi
         file=$filebis
@@ -239,7 +239,7 @@ do
     then
         saxon -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpath" -o:"$metspath"
     else
-        echo "Xsl processor unmanaged."
+        echo 'Xsl processor unmanaged.'
         exit 1;
     fi
 
@@ -253,7 +253,7 @@ do
     # Suppression éventuelle des fichiers intermédiaires.
     if [ "$supprimeFichiersIntermediaires" = 'true' ]
     then
-        echo '  ' Suppression des fichiers intermédaires créés par ce script.
+        echo '  Suppression des fichiers intermédaires créés par ce script.'
         if [ -f "$documentsMetadata" ]
         then
             rm -f "$noticespath"
@@ -272,9 +272,10 @@ do
         fi
     fi
 
+    echo
 done
 
 echo
-echo Traitement terminé.
+echo 'Traitement terminé.'
 
 exit 0

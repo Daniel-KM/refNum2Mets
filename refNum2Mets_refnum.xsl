@@ -523,6 +523,7 @@ Elle permet de normaliser certaines données du refNum.
                     $objet/@ordre,
                     false(), $format, 'Image ', '')" />
             </xsl:when>
+
             <!-- Pages initiales. -->
             <xsl:when test="not($précédente_numérotée)">
                 <!-- Exemple : si la première page numérotée est 3, on
@@ -538,6 +539,7 @@ Elle permet de normaliser certaines données du refNum.
                             number($suivante_numérotée/@numeroPage) - $suivante_numérotée/@ordre + $objet/@ordre,
                             true(), $format, 'Page ', ' (non paginée)')" />
                     </xsl:when>
+
                     <!-- Pagination en chiffres romain. -->
                     <xsl:when test="($suivante_numérotée/@typePagination = 'R')
                         and (number($suivante_numérotée/@numeroPage) > 1)
@@ -547,6 +549,7 @@ Elle permet de normaliser certaines données du refNum.
                             r2m:conversionArabeVersRomain(number($suivante_numérotée/@numeroPage) - $suivante_numérotée/@ordre + $objet/@ordre),
                             true(), $format, 'Page ', ' (non paginée)')" />
                     </xsl:when>
+
                     <!-- Couvertures et pages de garde (sauf lot). -->
                     <xsl:otherwise>
                         <xsl:choose>
@@ -556,6 +559,7 @@ Elle permet de normaliser certaines données du refNum.
                                     $objet/@ordre,
                                     false(), $format, 'Image ', '')" />
                             </xsl:when>
+
                             <!-- Couvertures. -->
                             <xsl:when test="$objet/@ordre = 1">
                                 <xsl:text>Couverture</xsl:text>
@@ -566,6 +570,7 @@ Elle permet de normaliser certaines données du refNum.
                             <xsl:when test="$objet/@typePage = 'P'">
                                 <xsl:text>Page de titre</xsl:text>
                             </xsl:when>
+
                             <!-- Pages de garde. -->
                             <xsl:otherwise>
                                 <!-- Exception. -->
@@ -575,6 +580,7 @@ Elle permet de normaliser certaines données du refNum.
                                             $objet/@ordre,
                                             false(), $format, 'Page de garde ', '')" />
                                     </xsl:when>
+
                                     <xsl:otherwise>
                                         <xsl:value-of select="r2m:nomPageNonPagineeFormat(
                                             $objet/@ordre - 2,
@@ -586,6 +592,7 @@ Elle permet de normaliser certaines données du refNum.
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:when>
+
             <!-- Foliotation. -->
             <xsl:when test="($précédente_numérotée/@typePagination = 'F')
                 and ($précédente_numérotée/@ordre + 1 = $objet/@ordre)
@@ -595,6 +602,7 @@ Elle permet de normaliser certaines données du refNum.
                     number($précédente_numérotée/@numeroPage),
                     'folio', $format, 'Folio ', ' (verso)')" />
             </xsl:when>
+
             <!-- Pages finales et couverture (sauf lot). -->
             <xsl:when test="not($suivante_numérotée)">
                 <xsl:choose>
@@ -619,8 +627,10 @@ Elle permet de normaliser certaines données du refNum.
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:when>
+
             <!-- La page se situe entre deux numéros et son numéro est
             déterminable avec une bonne probabilité. -->
+
             <!--  Un test de validité sur les numéros de page évite une erreur
             avec les fichiers mal formatés. -->
             <xsl:when test="number($précédente_numérotée/@numeroPage)
@@ -638,6 +648,26 @@ Elle permet de normaliser certaines données du refNum.
                                 $suivante_numérotée/@numeroPage - $suivante_numérotée/@ordre + $objet/@ordre,
                                 true(), $format, 'Page ', ' (non paginée)')" />
                     </xsl:when>
+
+                    <!-- Pagination entre deux chiffres arabes, avec test de
+                    cohérence par comparaison de la précédente et de la suivante
+                    et écart double (insertion de feuillets). Exemple :
+                    5 > 11 / 6 > 12 / 7 > x > 13R / 8 > x > 13V / 9 > x > 14R / 10 > x > 14V / 11 > 15.
+                    On considère que les feuilles sont numérotées dans l'ordre
+                    normal : ordre impair = recto.
+                    -->
+                    <xsl:when test="($précédente_numérotée/@typePagination = 'A')
+                            and ($suivante_numérotée/@typePagination = 'A')
+                            and (
+                                ($suivante_numérotée/@numeroPage - $précédente_numérotée/@numeroPage - 1) * 2
+                                    = $suivante_numérotée/@ordre - $précédente_numérotée/@ordre - 1
+                            )
+                            ">
+                            <xsl:value-of select="r2m:nomPageNonPagineeFormat(
+                                    $suivante_numérotée/@numeroPage - ceiling(($suivante_numérotée/@ordre - $objet/@ordre) div 2),
+                                    'folio', $format, 'Folio ', if ($objet/@ordre mod 2 = 1) then ' (recto)' else ' (verso')" />
+                    </xsl:when>
+
                     <!-- Pagination entre deux chiffres romains, avec test de
                     cohérence par comparaison de la précédente et de la suivante.. -->
                     <xsl:when test="($précédente_numérotée/@typePagination = 'R')
@@ -650,6 +680,40 @@ Elle permet de normaliser certaines données du refNum.
                                 r2m:conversionArabeVersRomain($suivante_numérotée/@numeroPage - $suivante_numérotée/@ordre + $objet/@ordre),
                                 true(), $format, 'Page ', ' (non paginée)')" />
                     </xsl:when>
+
+                    <!-- Pagination entre deux chiffres romains, avec test de
+                    cohérence par comparaison de la précédente et de la suivante
+                    et écart double (insertion de feuillets). Exemple :
+                    5 > 11 / 6 > 12 / 7 > x > 13R / 8 > x > 13V / 9 > x > 14R / 10 > x > 14V / 11 > 15.
+                    On considère que les feuilles sont numérotées dans l'ordre
+                    normal : ordre impair = recto.
+                    -->
+                    <xsl:when test="($précédente_numérotée/@typePagination = 'R')
+                            and ($suivante_numérotée/@typePagination = 'R')
+                            and (
+                                ($suivante_numérotée/@numeroPage - $précédente_numérotée/@numeroPage - 1) * 2
+                                = $suivante_numérotée/@ordre - $précédente_numérotée/@ordre - 1
+                            )
+                            ">
+                            <xsl:value-of select="r2m:nomPageNonPagineeFormat(
+                                    r2m:conversionArabeVersRomain($suivante_numérotée/@numeroPage - ceiling(($suivante_numérotée/@ordre - $objet/@ordre) div 2)),
+                                    'folio', $format, 'Folio ', if ($objet/@ordre mod 2 = 1) then ' (recto)' else ' (verso')" />
+                    </xsl:when>
+
+                    <!-- Pagination entre deux folios, avec test de cohérence
+                    par comparaison de la précédente et de la suivante. -->
+                    <xsl:when test="($précédente_numérotée/@typePagination = 'F')
+                            and ($suivante_numérotée/@typePagination = 'F')
+                            and (
+                                $suivante_numérotée/@numeroPage - $précédente_numérotée/@numeroPage
+                                = ($suivante_numérotée/@ordre - $précédente_numérotée/@ordre) div 2
+                            )
+                            ">
+                            <xsl:value-of select="r2m:nomPageNonPagineeFormat(
+                                    $suivante_numérotée/@numeroPage - ceiling(($suivante_numérotée/@ordre - $objet/@ordre) div 2),
+                                    'folio', $format, 'Folio ', if ($objet/@ordre mod 2 = 1) then ' (recto)' else ' (verso')" />
+                    </xsl:when>
+
                     <!-- Impossible à déterminer, sans doute avec du hors-texte,
                     ou un document mal numéroté. -->
                     <xsl:otherwise>
@@ -659,6 +723,7 @@ Elle permet de normaliser certaines données du refNum.
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:when>
+
             <!-- Impossible à déterminer, sans doute avec du hors-texte,
             ou un document mal numéroté. -->
             <xsl:otherwise>

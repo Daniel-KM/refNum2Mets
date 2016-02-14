@@ -107,7 +107,7 @@ de la BnF. -->
                 <!-- Page non paginée : "vide", "fixe", "ordre", "numéro NP", "numéro déduit", "nom". -->
                 <titreFichierNP>numéro déduit</titreFichierNP>
                 <!-- Utilisés en fonction du choix "titreFichierNP". -->
-                <titreFichierNPTexte>NP [</titreFichierNPTexte>
+                <titreFichierNPTexte>[</titreFichierNPTexte>
                 <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
                 <!-- Ajouter l'information du type refNum. -->
                 <type ajouter="false" />

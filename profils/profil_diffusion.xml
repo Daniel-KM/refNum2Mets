@@ -66,7 +66,7 @@ Le détail des paramètres se trouve dans le format "Archive".
             <orderLabel remplir="true">
                 <titreFichier>numéro</titreFichier>
                 <titreFichierNP>numéro déduit</titreFichierNP>
-                <titreFichierNPTexte>NP [</titreFichierNPTexte>
+                <titreFichierNPTexte>[</titreFichierNPTexte>
                 <titreFichierNPTexteAp>]</titreFichierNPTexteAp>
                 <type ajouter="false" />
             </orderLabel>

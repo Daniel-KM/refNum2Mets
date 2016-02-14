@@ -93,7 +93,10 @@ de la BnF. -->
                 <valide remplir="true" />
             </digiprovMD>
         </AdministrativeMetadataSection>
-        <FileSection remplir="true" />
+        <FileSection remplir="true">
+            <ajout format="pdf" remplir="true" sousDossier="false" />
+            <ajout format="djvu" remplir="false" sousDossier="false" />
+        </FileSection>
         <StructuralMap remplir="true">
             <!-- Si le nom est vide, le paramètre par défaut sera utilisé. -->
             <structure_types nom="" />

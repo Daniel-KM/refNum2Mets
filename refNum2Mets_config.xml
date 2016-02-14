@@ -173,7 +173,7 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
                 <name>Daniel Berthereau</name>
             </agent>
             <agent ROLE="OTHER" OTHERROLE="BUILDER" TYPE="OTHER" OTHERTYPE="SOFTWARE">
-                <name>Script refNum2Mets.xsl version 20160118 (https://github.com/Daniel-KM/refNum2Mets)</name>
+                <name>Script refNum2Mets.xsl version 20160215 (https://github.com/Daniel-KM/refNum2Mets)</name>
             </agent>
             <!--
             <agent ROLE="OTHER" TYPE="ORGANIZATION">
@@ -189,8 +189,6 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
         -->
         <DescriptiveMetadataSection>
             <elementsCommuns>
-            <!-- Type par défaut (dcmi vocabulary pour dc:type), utilisé pour le genre
-            "Multimédia" ou en son absence. -->
                 <dc>
                     <type></type>
                     <source></source>
@@ -270,6 +268,9 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
         </AdministrativeMetadataSection>
 
         <FileSection>
+            <!-- Pour l'instant, géré uniquement au niveau du profil. -->
+            <!-- <ajout format="pdf" remplir="true" sousDossier="false" /> -->
+            <!-- <ajout format="djvu" remplir="false" sousDossier="false" /> -->
         </FileSection>
 
         <StructuralMap>
@@ -280,6 +281,20 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
             <!-- Structure par défaut, si elle n'est pas défini dans le profil. -->
             <!-- Cf. la liste des structures en bas. -->
             <structure_types nom="Document" />
+            <!-- Les fichiers complémentaires qui représentent l'ensemble du
+            document, par exemple en pdf ou en epub, peuivent être indiqués de
+            plusieurs façons dans la structure. Le document peut être "intégré"
+            au niveau de l'élément <div> correspondant, "inclus" au même niveau
+            que les fichiers de chaque page, être placé dans un élément <structMap>
+            "séparé" avec le type indiqué, ou "exclu" de la structure.
+            Attention : s'il n'y a ni niveau 0 ni niveau 1 et que le choix est
+            "intégré", alors le fichier sera "inclus" au niveau de la structure.
+            Voir http://listserv.loc.gov/cgi-bin/wa?A2=ind1007&L=METS&D=0&I=-3&P=919
+            -->
+            <fichier_complet position="intégré" />
+            <!-- <fichier_complet position="inclus" /> -->
+            <!-- <fichier_complet position="séparé" type="document" /> -->
+            <!-- <fichier_complet position="exclu" /> -->
         </StructuralMap>
     </section>
 

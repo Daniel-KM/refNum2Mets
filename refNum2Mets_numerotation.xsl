@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Description : Convertit un fichier refNum en Mets.
-Version : 20150921
+Version : 20160215
 Auteur : Daniel Berthereau pour l'École des Mines de Paris [http://bib.mines-paristech.fr]
 
 Cette feuille dépend de refNum2Mets.xsl.
@@ -9,7 +9,7 @@ Elle permet de définir les numéros des identifiants des sections et sous-secti
 
 @see http://bibnum.bnf.fr/ns/refNum.xsd
 @see https://github.com/Daniel-KM/refNum2Mets
-@copyright Daniel Berthereau, 2015
+@copyright Daniel Berthereau, 2015-2016
 @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-fr.html
 -->
 
@@ -252,5 +252,16 @@ Elle permet de définir les numéros des identifiants des sections et sous-secti
         </xsl:choose>
     </xsl:function>
 
-</xsl:stylesheet>
+    <!-- Détermine le nombre total d'objets, normaux (master) ou associés (Alto...). -->
+    <!-- TODO Utiliser "key". -->
+    <xsl:function name="r2m:totalObjets">
+        <!-- Le fichier correspond au xml refNum. -->
+        <xsl:param name="fichier" />
 
+        <xsl:variable name="objets" select="count($fichier
+                /refNum:document/refNum:structure/refNum:vueObjet
+                /refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio'])" />
+        <xsl:value-of select="$objets
+            * (1 + count($fichier/refNum:document/refNum:production/refNum:objetAssocie))" />
+    </xsl:function>
+</xsl:stylesheet>

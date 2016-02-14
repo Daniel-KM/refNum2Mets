@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Description : Convertit un fichier refNum en Mets.
-Version : 20150921
+Version : 20160215
 Auteur : Daniel Berthereau pour l'École des Mines de Paris [http://bib.mines-paristech.fr]
 
 Cette feuille dépend de refNum2Mets.xsl.
@@ -9,7 +9,7 @@ Elle permet de normaliser certaines données du refNum.
 
 @see http://bibnum.bnf.fr/ns/refNum.xsd
 @see https://github.com/Daniel-KM/refNum2Mets
-@copyright Daniel Berthereau, 2015
+@copyright Daniel Berthereau, 2015-2016
 @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-fr.html
 -->
 
@@ -189,6 +189,79 @@ Elle permet de normaliser certaines données du refNum.
                 <xsl:text>/</xsl:text>
             </xsl:if>
             <xsl:if test="$sousDossier != '' and $adresse/sousDossierType = 'true'">
+                <xsl:value-of select="$sousDossier" />
+                <xsl:text>/</xsl:text>
+            </xsl:if>
+            <xsl:choose>
+                <xsl:when test="$adresse/minusculeNomFichier = 'true'">
+                    <xsl:value-of select="lower-case($nomFichier)" />
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="$nomFichier" />
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:text>.</xsl:text>
+            <xsl:choose>
+                <xsl:when test="$adresse/minusculeExtension = 'true'">
+                    <xsl:value-of select="lower-case($extension)" />
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="$extension" />
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
+        <xsl:value-of select="$href" />
+    </xsl:function>
+
+    <!-- Adresse des fichiers spéciaux (non présents dans le refnum, comme le pdf). -->
+    <!-- TODO Factoriser avec r2m:adresseFichier(). -->
+    <xsl:function name="r2m:adresseFichierSupplementaire">
+        <!--  En fait, ici, "fichier" est la base du nom et "objetAssocie" l'extension. -->
+        <xsl:param name="fichier" />
+        <xsl:param name="objetAssocie" />
+
+        <xsl:variable name="typeFichier" select="upper-case($objetAssocie)" />
+
+        <xsl:variable name="sousDossier">
+            <xsl:choose>
+                <xsl:when test="$codes/objetAssocie/entry[@code = $objetAssocie]/@sousDossier">
+                    <xsl:value-of select="$codes/objetAssocie/entry[@code = $objetAssocie]/@sousDossier" />
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:text></xsl:text>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
+        <xsl:variable name="nomFichier">
+            <xsl:value-of select="$fichier" />
+        </xsl:variable>
+
+        <xsl:variable name="extension">
+            <xsl:choose>
+                <xsl:when test="$codes/objetAssocie/entry[@code = $objetAssocie]/@extension">
+                    <xsl:value-of select="$codes/objetAssocie/entry[@code = $objetAssocie]/@extension" />
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:text></xsl:text>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
+        <xsl:variable name="href">
+            <xsl:value-of select="$adresse/baseUri" />
+            <xsl:if test="$adresse/sousDossierDocumentPremiereLettreExtension = 'true'">
+                <xsl:value-of select="upper-case(substring($codes/objetAssocie/entry
+                    [@code = $objetAssocie]/@extension, 1, 1))" />
+            </xsl:if>
+            <xsl:if test="$adresse/sousDossierDocument = 'true'">
+                <xsl:value-of select="$fichier" />
+                <xsl:text>/</xsl:text>
+            </xsl:if>
+            <xsl:if test="$sousDossier != ''
+                    and $adresse/sousDossierType = 'true'
+                    and $profil/section/FileSection/ajout[@format = $objetAssocie]/@sousDossier = 'true'">
                 <xsl:value-of select="$sousDossier" />
                 <xsl:text>/</xsl:text>
             </xsl:if>

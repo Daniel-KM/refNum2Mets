@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Description : Convertit un fichier refNum en Mets.
-Version : 20150921
+Version : 20160215
 Auteur : Daniel Berthereau pour l'École des Mines de Paris [http://bib.mines-paristech.fr]
 
 refnum2Mets est un outil pour convertir des fichiers xml du format refNum
@@ -120,6 +120,7 @@ norme Mets.
 
 * Historique *
 
+2016/02/15 Ajout des fichiers complémentaires (pdf)
 2015/12/07 Nettoyage des fichiers et des espaces de nom
 2015/09/21 Ajout des notices de documents et des métadonnées descriptives des pages
 2015/09/07 Corrections de détails et ajout d'un script pour traiter les dossiers
@@ -128,7 +129,7 @@ norme Mets.
 
 @see http://bibnum.bnf.fr/ns/refNum.xsd
 @see https://github.com/Daniel-KM/refNum2Mets
-@copyright Daniel Berthereau, 2015
+@copyright Daniel Berthereau, 2015-2016
 @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-fr.html
 -->
 
@@ -1106,6 +1107,8 @@ norme Mets.
                 </xsl:when>
             </xsl:choose>
 
+            <!-- TODO Ajouter les techMD pour la description des fichiers complémentaires. -->
+
         </xsl:element>
     </xsl:template>
 
@@ -1912,6 +1915,35 @@ norme Mets.
                         <xsl:with-param name="objetAssocie" select="." />
                     </xsl:apply-templates>
                 </xsl:for-each>
+
+                <!-- Ajout éventuel de fichiers complémentaires uniques (notamment pdf). -->
+                <xsl:variable name="refNumId" select="refNum:document/@identifiant" />
+                <xsl:variable name="totalObjetsAssocies" select="count(refNum:document/refNum:production/refNum:objetAssocie)" />
+                <!-- <xsl:variable name="totalFichierComplementaires" select="count($profil/section/FileSection/ajout[@remplir = 'true'])" /> -->
+                <!-- TODO Factoriser avec "refNum mode FileGroup". -->
+                <xsl:for-each select="$profil/section/FileSection/ajout[@remplir = 'true']">
+                    <xsl:element name="fileGrp">
+                        <xsl:attribute name="ID">
+                            <xsl:text>GRP.</xsl:text>
+                            <xsl:value-of select="1 + $totalObjetsAssocies + position()" />
+                        </xsl:attribute>
+                        <xsl:attribute name="USE">
+                            <xsl:value-of select="$codes/objetAssocie/entry[@code = current()/@format]/@use" />
+                        </xsl:attribute>
+                        <!--
+                        <xsl:if test="$totalFichierComplementaires &gt; 1">
+                            <xsl:attribute name="GROUPID">
+                                <xsl:value-of select="$codes/objetAssocie/entry[@code = current()/@format]/@use" />
+                                <xsl:text>.1</xsl:text>
+                            </xsl:attribute>
+                        </xsl:if>
+                        -->
+
+                        <xsl:call-template name="ajout_fichier_complementaire">
+                            <xsl:with-param name="refNumId" select="$refNumId" />
+                        </xsl:call-template>
+                    </xsl:element>
+                </xsl:for-each>
             </xsl:if>
         </xsl:element>
     </xsl:template>
@@ -2016,6 +2048,65 @@ norme Mets.
         </xsl:element>
     </xsl:template>
 
+    <!-- TODO Factoriser avec texte / image / audio mode "fichier". -->
+    <xsl:template name="ajout_fichier_complementaire">
+        <xsl:param name="refNumId" />
+
+        <xsl:element name="file">
+            <xsl:attribute name="ID">
+                <xsl:value-of select="$codes/objetAssocie/entry[@code = current()/@format]/@use" />
+                <xsl:text>.1</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="MIMETYPE">
+                <xsl:value-of select="$codes/objetAssocie/entry[@code = current()/@format]/@mimetype" />
+            </xsl:attribute>
+            <!-- Pas de SEQ : fichier unique. -->
+            <!-- TODO Pas de GROUPID ?. -->
+
+            <xsl:variable name="href" select="r2m:adresseFichierSupplementaire($refNumId, current()/@format)" />
+
+            <xsl:if test="$parametres/fichiers/checksums/type">
+                <xsl:variable name="checksumFichier" select="r2m:trouveChecksum($href)" />
+                <xsl:if test="$checksumFichier != ''">
+                    <xsl:attribute name="CHECKSUMTYPE">
+                        <xsl:value-of select="$parametres/fichiers/checksums/type" />
+                    </xsl:attribute>
+                    <xsl:attribute name="CHECKSUM">
+                        <xsl:value-of select="$checksumFichier" />
+                    </xsl:attribute>
+                </xsl:if>
+            </xsl:if>
+
+            <xsl:variable name="tailleFichier" select="r2m:trouveTaille($href)" />
+            <xsl:if test="$tailleFichier != ''">
+                <xsl:attribute name="SIZE">
+                    <xsl:value-of select="$tailleFichier" />
+                </xsl:attribute>
+            </xsl:if>
+
+            <!-- TODO Ajouter ADMID. -->
+
+            <xsl:element name="FLocat">
+                <xsl:attribute name="LOCTYPE">
+                    <xsl:value-of select="$adresse/loctype" />
+                </xsl:attribute>
+                <xsl:if test="$adresse/loctype = 'OTHER'">
+                    <xsl:attribute name="OTHERLOCTYPE">
+                        <xsl:value-of select="$adresse/otherloctype" />
+                    </xsl:attribute>
+                </xsl:if>
+                <xsl:if test="$adresse/xlinkType != ''">
+                    <xsl:attribute name="xlink:type">
+                        <xsl:value-of select="$adresse/xlinkType" />
+                    </xsl:attribute>
+                </xsl:if>
+                <xsl:attribute name="xlink:href">
+                    <xsl:value-of select="$href" />
+                </xsl:attribute>
+            </xsl:element>
+        </xsl:element>
+    </xsl:template>
+
     <xsl:template match="refNum:vueObjet/refNum:*[name() = 'texte' or name() = 'image' or name() = 'audio']"
         mode="amd_fichier">
         <xsl:param name="objetAssocie" select="'master'" />
@@ -2083,7 +2174,33 @@ norme Mets.
                 </xsl:otherwise>
             </xsl:choose>
 
+            <xsl:if test="$parametres/section/StructuralMap/fichier_complet/@position = 'inclus'
+                    or ($parametres/section/StructuralMap/fichier_complet/@position = 'intégré'
+                        and $parametres/structure_types[@nom = $structure_types]/niveau_0/text() = ''
+                        and $parametres/structure_types[@nom = $structure_types]/niveau_1/text() = ''
+                        )">
+                <xsl:call-template name="StructuralMap_fichier_complet_element" />
+            </xsl:if>
+
         </xsl:element>
+
+        <xsl:if test="$parametres/section/StructuralMap/fichier_complet/@position = 'séparé'">
+            <xsl:element name="structMap">
+                <xsl:attribute name="TYPE">
+                    <xsl:choose>
+                        <xsl:when test="$parametres/section/StructuralMap/fichier_complet/@type != ''">
+                            <xsl:value-of select="$parametres/section/StructuralMap/fichier_complet/@type" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:text>document</xsl:text>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:attribute>
+
+            <xsl:call-template name="StructuralMap_fichier_complet_element" />
+
+            </xsl:element>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template match="/refNum:refNum" mode="StructuralMap_niveau_1">
@@ -2132,6 +2249,11 @@ norme Mets.
                         </xsl:if>
                     </xsl:if>
 
+                    <xsl:if test="$parametres/section/StructuralMap/fichier_complet/@position = 'intégré'">
+                        <xsl:apply-templates select="$profil/section/FileSection/ajout[@remplir = 'true']"
+                            mode="StructuralMap_fichier_complet_pointeur" />
+                    </xsl:if>
+
                     <xsl:apply-templates select="refNum:document/refNum:structure/refNum:vueObjet"
                         mode="StructuralMap" />
 
@@ -2139,10 +2261,86 @@ norme Mets.
             </xsl:when>
 
             <xsl:otherwise>
+                <xsl:if test="$parametres/section/StructuralMap/fichier_complet/@position = 'intégré'
+                        and $parametres/structure_types[@nom = $structure_types]/niveau_0/text() != ''">
+                    <xsl:apply-templates select="$profil/section/FileSection/ajout[@remplir = 'true']"
+                        mode="StructuralMap_fichier_complet_pointeur" />
+                </xsl:if>
+
                 <xsl:apply-templates select="refNum:document/refNum:structure/refNum:vueObjet"
                         mode="StructuralMap" />
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="StructuralMap_fichier_complet_element">
+        <xsl:element name="div">
+            <!-- TODO Factoriser avec mode "StructuralMap_niveau_1".-->
+            <xsl:attribute name="TYPE">
+                <xsl:choose>
+                    <xsl:when test="$parametres/structure_types[@nom = $structure_types]/niveau_1/text() != ''">
+                        <xsl:value-of select="$parametres/structure_types[@nom = $structure_types]/niveau_1/text()" />
+                    </xsl:when>
+                    <xsl:when test="$parametres/structure_types[@nom = $structure_types]/niveau_0/text() != ''">
+                        <xsl:value-of select="$parametres/structure_types[@nom = $structure_types]/niveau_0/text()" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:text>document</xsl:text>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:attribute>
+            <xsl:variable name="genre" select="normalize-space(refNum:document/refNum:bibliographie/refNum:genre)" />
+            <xsl:choose>
+                <xsl:when test="$codes/genre/entry[@code = upper-case($genre)]">
+                    <xsl:attribute name="LABEL">
+                        <xsl:value-of select="$codes/genre/entry[@code = upper-case($genre)]" />
+                    </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="$parametres/section/StructuralMap/labelPhysicalGroup != ''">
+                    <xsl:attribute name="LABEL">
+                        <xsl:value-of select="$parametres/section/StructuralMap/labelPhysicalGroup" />
+                    </xsl:attribute>
+                </xsl:when>
+            </xsl:choose>
+            <xsl:attribute name="ID">
+                <xsl:text>DIV.</xsl:text>
+                <xsl:value-of select="3 + count(refNum:document/refNum:structure/refNum:vueObjet)" />
+            </xsl:attribute>
+            <xsl:if test="$profil/section/DescriptiveMetadataSection/@remplir = 'true'">
+                <!-- Contrairement à l'exemple de la BnF, le refNum ne renvoie pas
+                à une autre notice, donc le "set" et le "group" renvoient au même dmd. -->
+                <xsl:attribute name="DMDID">
+                    <xsl:text>DMD.</xsl:text>
+                    <xsl:value-of select="1 + number($parametres/periodique/@remplir = 'true')" />
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="$profil/section/AdministrativeMetadataSection/@remplir = 'true'">
+                    <!-- Pas l'id du sourceMD, il est lié aux fichiers dans fileSec. -->
+                    <!-- Pas l'id des techMD, ils sont liés aux fichiers dans fileSec. -->
+                    <!-- TODO Ajouter les index de rightsMD (interdit pour Mets BnF). -->
+                <xsl:variable name="amdIds">
+                    <xsl:apply-templates select="." mode="amd_document" />
+                </xsl:variable>
+                <xsl:if test="$amdIds != ''">
+                    <xsl:attribute name="ADMID">
+                        <xsl:value-of select="normalize-space($amdIds)" />
+                    </xsl:attribute>
+                </xsl:if>
+            </xsl:if>
+
+            <xsl:apply-templates select="$profil/section/FileSection/ajout[@remplir = 'true']"
+                mode="StructuralMap_fichier_complet_pointeur" />
+        </xsl:element>
+    </xsl:template>
+
+    <xsl:template match="section/FileSection/ajout" mode="StructuralMap_fichier_complet_pointeur">
+        <xsl:element name="fptr">
+            <xsl:attribute name="FILEID">
+                <xsl:value-of select="$codes/objetAssocie/entry[@code = current()/@format]/@use" />
+                <xsl:text>.</xsl:text>
+                <xsl:value-of select="position()" />
+            </xsl:attribute>
+        </xsl:element>
     </xsl:template>
 
     <xsl:template match="/refNum:refNum" mode="amd_document">

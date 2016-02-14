@@ -53,7 +53,10 @@ Le détail des paramètres se trouve dans le format "Archive".
                 <valide remplir="true" />
             </digiprovMD>
         </AdministrativeMetadataSection>
-        <FileSection remplir="true" />
+        <FileSection remplir="true">
+            <ajout format="pdf" remplir="true" sousDossier="false" />
+            <ajout format="djvu" remplir="false" sousDossier="false" />
+        </FileSection>
         <StructuralMap remplir="true">
             <structure_types nom="" />
             <orderLabel remplir="true">

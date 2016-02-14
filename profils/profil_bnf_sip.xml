@@ -63,7 +63,11 @@ Le détail des paramètres se trouve dans le format "Archive".
                 <valide remplir="true" />
             </digiprovMD>
         </AdministrativeMetadataSection>
-        <FileSection remplir="true" />
+        <FileSection remplir="true">
+            <!-- TODO Voir s'il ne faudrait pas les ajouter. -->
+            <ajout format="pdf" remplir="false" sousDossier="false" />
+            <ajout format="djvu" remplir="false" sousDossier="false" />
+        </FileSection>
         <StructuralMap remplir="true">
             <structure_types nom="Mets SIP BnF" />
             <orderLabel remplir="true">

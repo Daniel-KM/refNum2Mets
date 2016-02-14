@@ -20,7 +20,7 @@
 #
 # Utilise :
 # - xmllint
-# - saxon-b ou saxon-he
+# - saxon-b ou saxon-he (recommandé)
 # - shell/bash 4.3 (testé sur Debian et Fedora)
 #
 # Auteur Daniel Berthereau <daniel.berthereau@mines-paristech.fr>
@@ -39,9 +39,28 @@ reindente='true'
 supprimeFichiersIntermediaires='false'
 recursif='true'
 
+xslProcess() {
+    case "$distro" in
+        'Debian Saxon-B')
+            saxonb-xslt -ext:on -versionmsg:off -s:"$1" -xsl:"$2" -o:"$3"
+            ;;
+        'Debian Saxon-HE')
+            CLASSPATH=/usr/share/java/Saxon-HE.jar java net.sf.saxon.Transform -ext:on -versionmsg:off -s:"$1" -xsl:"$2" -o:"$3"
+            ;;
+        'Red Hat')
+            saxon -ext:on -versionmsg:off -s:"$1" -xsl:"$2" -o:"$3"
+            exit 1
+            ;;
+        *)
+            echo 'Xsl processor unmanaged.'
+            exit 1;
+    esac
+}
+
 # Vérifie l'outil xsl.
 if [ -r '/etc/debian_version' ]; then
-    distro='Debian'
+    distro='Debian Saxon-B'
+    command -v saxonb-xslt >/dev/null 2>&1 || { distro='Debian Saxon-HE'; }
 elif [ -r '/etc/redhat-release' ]; then
     distro='Red Hat'
     echo 'Ne pas tenir compte de la remarque éventuelle "Cannot find CatalogManager.properties".'
@@ -193,33 +212,13 @@ do
     if [ -n "$xslpre" ]; then
         echo "  Prétraitrement des fichiers refNum via \"$xslpre\"..."
         filebis="${file%.*}.pre.xml"
-        if [ "$distro" = 'Debian' ]; then
-            # Debien 6 avec Saxon-B.
-            # saxonb-xslt -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpath" -o:"$metspath"
 
-            # Commande pour Debian 8 avec Saxon-HE.
-            CLASSPATH=/usr/share/java/Saxon-HE.jar java net.sf.saxon.Transform -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpre" -o:"$filebis"
-        elif [ "$distro" = 'Red Hat' ]; then
-            saxon -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpre" -o:"$filebis"
-        else
-            echo 'Xsl processor unmanaged.'
-            exit 1;
-        fi
+        xslProcess "$file" "$xslpre" "$filebis"
+
         file=$filebis
     fi
 
-    if [ "$distro" = 'Debian' ]; then
-        # Debien 6 avec Saxon-B.
-        # saxonb-xslt -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpath" -o:"$metspath"
-
-        # Commande pour Debian 8 avec Saxon-HE.
-        CLASSPATH=/usr/share/java/Saxon-HE.jar java net.sf.saxon.Transform -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpath" -o:"$metspath"
-    elif [ "$distro" = 'Red Hat' ]; then
-        saxon -ext:on -versionmsg:off -s:"$file" -xsl:"$xslpath" -o:"$metspath"
-    else
-        echo 'Xsl processor unmanaged.'
-        exit 1;
-    fi
+    xslProcess "$file" "$xslpath" "$metspath"
 
     # Améliore l'indentation, ce qui est impossible avec la version libre de
     # saxon.
@@ -241,6 +240,9 @@ do
         fi
         if [ "$prepareHashs" = 'true' ]; then
             rm -f "$hashspath"
+        fi
+        if [ -n "$xslpre" ]; then
+            rm -f "$filebis"
         fi
     fi
 

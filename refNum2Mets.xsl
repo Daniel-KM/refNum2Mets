@@ -571,31 +571,36 @@ norme Mets.
 
                                 <!-- dc:identifier -->
                                 <xsl:if test="normalize-space(refNum:document/@identifiant) != ''">
-                                    <dc:identifier>
-                                        <xsl:value-of select="normalize-space(refNum:document/@identifiant)" />
-                                    </dc:identifier>
+                                    <xsl:call-template name="copie_metadonnee">
+                                        <xsl:with-param name="metadonnee" select="refNum:document/@identifiant" />
+                                        <xsl:with-param name="element" select="'dc:identifier'" />
+                                        <xsl:with-param name="key" select="'identifiant'" />
+                                    </xsl:call-template>
                                 </xsl:if>
                                 <!-- TODO En section descriptive ou administrative ? -->
                                 <xsl:if test="normalize-space(refNum:document/@numper) != ''">
-                                    <dc:identifier>
-                                        <xsl:text>Numper : </xsl:text>
-                                        <xsl:value-of select="normalize-space(refNum:document/@numper)" />
-                                    </dc:identifier>
+                                    <xsl:call-template name="copie_metadonnee">
+                                        <xsl:with-param name="metadonnee" select="refNum:document/@numper" />
+                                        <xsl:with-param name="element" select="'dc:identifier'" />
+                                        <xsl:with-param name="key" select="'numper'" />
+                                    </xsl:call-template>
                                 </xsl:if>
                                 <!-- TODO En section descriptive ou administrative ? -->
                                 <xsl:if test="normalize-space(refNum:document/@identifiantAutreVersion) != ''">
-                                    <dc:identifier>
-                                        <xsl:text>Identifiant autre version : </xsl:text>
-                                        <xsl:value-of select="normalize-space(refNum:document/@identifiantAutreVersion)" />
-                                    </dc:identifier>
+                                    <xsl:call-template name="copie_metadonnee">
+                                        <xsl:with-param name="metadonnee" select="refNum:document/@identifiantAutreVersion" />
+                                        <xsl:with-param name="element" select="'dc:identifier'" />
+                                        <xsl:with-param name="key" select="'identifiantAutreVersion'" />
+                                    </xsl:call-template>
                                 </xsl:if>
                                 <!-- TODO En section descriptive ou administrative ? -->
                                 <xsl:for-each select="refNum:document/refNum:bibliographie
                                         /refNum:reference[@type = 'IDDOCUMENT'][normalize-space(.) != '']">
-                                    <dc:identifier>
-                                        <xsl:text>ID document : </xsl:text>
-                                        <xsl:value-of select="normalize-space(.)" />
-                                    </dc:identifier>
+                                    <xsl:call-template name="copie_metadonnee">
+                                        <xsl:with-param name="metadonnee" select="." />
+                                        <xsl:with-param name="element" select="'dc:identifier'" />
+                                        <xsl:with-param name="key" select="'reference[@type = IDDOCUMENT]'" />
+                                    </xsl:call-template>
                                 </xsl:for-each>
                                 <xsl:call-template name="ajout_metadonnees">
                                     <xsl:with-param name="element" select="'dc:identifier'" />
@@ -605,23 +610,27 @@ norme Mets.
                                 <!-- Voir http://dublincore.org/documents/usageguide/elements.shtml#source -->
                                 <xsl:for-each select="refNum:document/refNum:bibliographie
                                         /refNum:reference[@type = 'COTEORIGINAL'][normalize-space(.) != '']">
-                                    <dc:source>
-                                        <xsl:text>Cote original : </xsl:text>
-                                        <xsl:value-of select="normalize-space(.)" />
-                                    </dc:source>
+                                    <xsl:call-template name="copie_metadonnee">
+                                        <xsl:with-param name="metadonnee" select="." />
+                                        <xsl:with-param name="element" select="'dc:source'" />
+                                        <xsl:with-param name="key" select="'reference[@type = COTEORIGINAL]'" />
+                                    </xsl:call-template>
                                 </xsl:for-each>
                                 <xsl:for-each select="refNum:document/refNum:bibliographie
                                         /refNum:reference[@type = 'COTEOBJETREPRODUIT'][normalize-space(.) != '']">
-                                    <dc:source>
-                                        <xsl:text>Cote objet reproduit : </xsl:text>
-                                        <xsl:value-of select="normalize-space(.)" />
-                                    </dc:source>
+                                    <xsl:call-template name="copie_metadonnee">
+                                        <xsl:with-param name="metadonnee" select="." />
+                                        <xsl:with-param name="element" select="'dc:source'" />
+                                        <xsl:with-param name="key" select="'reference[@type = COTEOBJETREPRODUIT]'" />
+                                    </xsl:call-template>
                                 </xsl:for-each>
                                 <xsl:for-each select="refNum:document/refNum:bibliographie
                                         /refNum:reference[@type = 'SOURCE'][normalize-space(.) != '']">
-                                    <dc:source>
-                                        <xsl:value-of select="normalize-space(.)" />
-                                    </dc:source>
+                                    <xsl:call-template name="copie_metadonnee">
+                                        <xsl:with-param name="metadonnee" select="." />
+                                        <xsl:with-param name="element" select="'dc:source'" />
+                                        <xsl:with-param name="key" select="'reference[@type = SOURCE]'" />
+                                    </xsl:call-template>
                                 </xsl:for-each>
                                 <xsl:call-template name="ajout_metadonnees">
                                     <xsl:with-param name="element" select="'dc:source'" />
@@ -640,17 +649,20 @@ norme Mets.
                                 <!-- dc:relation -->
                                 <xsl:for-each select="refNum:document/refNum:bibliographie
                                         /refNum:reference[@type = 'NOTICEBIBLIOGRAPHIQUE'][normalize-space(.) != '']">
-                                    <dc:relation>
-                                        <xsl:value-of select="normalize-space(.)" />
-                                    </dc:relation>
+                                    <xsl:call-template name="copie_metadonnee">
+                                        <xsl:with-param name="metadonnee" select="." />
+                                        <xsl:with-param name="element" select="'dc:relation'" />
+                                        <xsl:with-param name="key" select="'reference[@type = NOTICEBIBLIOGRAPHIQUE]'" />
+                                    </xsl:call-template>
                                 </xsl:for-each>
                                 <!-- TODO En section descriptive ou administrative ? -->
                                 <xsl:for-each select="refNum:document/refNum:bibliographie
                                         /refNum:reference[@type = 'CODEBARREBNF'][normalize-space(.) != '']">
-                                    <dc:relation>
-                                        <xsl:text>Code-barre BnF : </xsl:text>
-                                        <xsl:value-of select="normalize-space(.)" />
-                                    </dc:relation>
+                                    <xsl:call-template name="copie_metadonnee">
+                                        <xsl:with-param name="metadonnee" select="." />
+                                        <xsl:with-param name="element" select="'dc:relation'" />
+                                        <xsl:with-param name="key" select="'reference[@type = CODEBARREBNF]'" />
+                                    </xsl:call-template>
                                 </xsl:for-each>
                                 <xsl:call-template name="ajout_metadonnees">
                                     <xsl:with-param name="element" select="'dc:relation'" />
@@ -2568,6 +2580,26 @@ norme Mets.
             <xsl:copy-of select="@*" />
             <xsl:value-of select="text()" />
             <xsl:apply-templates select="child::*" mode="copy-prefix-namespace" />
+        </xsl:element>
+    </xsl:template>
+
+    <!-- Le contenu est déjà vérifié par ailleurs. -->
+    <xsl:template name="copie_metadonnee">
+        <xsl:param name="metadonnee" as="xs:string" />
+        <xsl:param name="element" as="xs:string" />
+        <xsl:param name="key" as="xs:string" />
+
+        <xsl:variable name="namespace" select="substring-before($element, ':')" />
+        <xsl:variable name="elementName" select="substring-after($element, ':')" />
+
+        <xsl:element name="{$element}">
+            <!-- La concaténation évite l'insertion d'espaces indésirables. -->
+            <xsl:value-of select="concat(
+                $parametres//elementsSpecifiques/*[name() = $namespace]
+                    /*[name() = $elementName][@key = $key]/@prefixe,
+                normalize-space($metadonnee),
+                $parametres//elementsSpecifiques/*[name() = $namespace]
+                    /*[name() = $elementName][@key = $key]/@suffixe)" />
         </xsl:element>
     </xsl:template>
 

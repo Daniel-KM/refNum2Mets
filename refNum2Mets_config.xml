@@ -183,11 +183,31 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
             -->
         </MetsHeader>
 
-        <!-- Les valeurs par défaut sont toujours ajoutées, sauf pour defautType,
-        ajouté seulement si aucune n'est trouvé via les informations du fichier refNum source.
+        <!--
+        Modification / ajout de métadonnées.
         Ne sont pas prises en compte si les notices sont dans une table.
         -->
         <DescriptiveMetadataSection>
+            <!-- Ajout d'un préfixe ou d'un suffixe aux élements "dc:identifier",
+            "dc:source" et "dc:relation". -->
+            <elementsSpecifiques>
+                <dc>
+                    <identifier key="identifiant" prefixe="Document : " />
+                    <identifier key="numper" prefixe="Numéro de périodique : " />
+                    <identifier key="identifiantAutreVersion" prefixe="Identifiant autre version : " />
+                    <identifier key="reference[@type = IDDOCUMENT]" prefixe="ID document : " />
+                    <source key="reference[@type = COTEORIGINAL]" prefixe="Cote original : " />
+                    <source key="reference[@type = COTEOBJETREPRODUIT]" prefixe="Cote objet reproduit : " />
+                    <source key="reference[@type = SOURCE]" prefixe="" />
+                    <relation key="reference[@type = NOTICEBIBLIOGRAPHIQUE]" prefixe="" />
+                    <relation key="reference[@type = CODEBARREBNF]" prefixe="Code-barre BnF : " />
+                </dc>
+            </elementsSpecifiques>
+
+            <!-- Les valeurs par défaut sont toujours ajoutées, sauf pour defautType,
+            ajouté seulement si aucune n'est trouvé via les informations du
+            fichier refNum source.
+            -->
             <elementsCommuns>
                 <dc>
                     <type></type>

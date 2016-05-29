@@ -381,7 +381,6 @@ Elle permet de normaliser certaines données du refNum.
                 <!-- TODO Ajout du numéro ou nom de fichier si plusieurs fichiers pour l'objet. -->
             </xsl:otherwise>
         </xsl:choose>
-
     </xsl:function>
 
     <!-- Retourne le nom d'une page à partir d'un objet ou d'un fichier. -->
@@ -395,15 +394,7 @@ Elle permet de normaliser certaines données du refNum.
                         and $objet/@numeroPage != 'NP' and $objet/@numeroPage != '0'">
                     <xsl:choose>
                         <xsl:when test="$format/titreFichier = 'numéro'">
-                            <xsl:choose>
-                                <!-- Exception : convertir en romain le numéro de page romain. -->
-                                <xsl:when test="$objet/@typePagination = 'R'">
-                                    <xsl:value-of select="normalize-space(r2m:conversionArabeVersRomain($objet/@numeroPage))" />
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:value-of select="normalize-space($objet/@numeroPage)" />
-                                </xsl:otherwise>
-                            </xsl:choose>
+                            <xsl:value-of select="r2m:extraitNumeroPage($objet)" />
                         </xsl:when>
 
                         <xsl:when test="$format/titreFichier = 'nom'">
@@ -414,7 +405,15 @@ Elle permet de normaliser certaines données du refNum.
                                 </xsl:when>
                                 <!-- Pagination en chiffres romains. -->
                                 <xsl:when test="$objet/@typePagination = 'R'">
-                                    <xsl:value-of select="normalize-space(concat('Page ', r2m:conversionArabeVersRomain($objet/@numeroPage)))" />
+                                    <xsl:choose>
+                                        <!-- Pagination en chiffres romains, mais mal formaté. -->
+                                        <xsl:when test="not(number($objet/@numeroPage))">
+                                            <xsl:value-of select="normalize-space(concat('Page ', $objet/@numeroPage))" />
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:value-of select="normalize-space(concat('Page ', r2m:conversionArabeVersRomain($objet/@numeroPage)))" />
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </xsl:when>
                                 <!-- Foliotation. -->
                                 <xsl:when test="$objet/@typePagination = 'F'">
@@ -531,6 +530,15 @@ Elle permet de normaliser certaines données du refNum.
                 peut déduire que les deux précédentes sont 1 et 2. -->
                 <!-- Il ne peut pas y avoir de feuillet ici. -->
                 <xsl:choose>
+                    <!-- Numérotation incorrecte de la première page paginée suivante. -->
+                    <xsl:when test="($suivante_numérotée/@typePagination = 'A'
+                                or $suivante_numérotée/@typePagination = 'R')
+                            and not(number($suivante_numérotée/@numeroPage))">
+                        <xsl:value-of select="r2m:nomPageNonPagineeFormat(
+                            $objet/@ordre,
+                            false(), $format, 'Image ', '')" />
+                    </xsl:when>
+
                     <!-- Pagination en chiffres arabes. -->
                     <xsl:when test="($suivante_numérotée/@typePagination = 'A')
                         and (number($suivante_numérotée/@numeroPage) > 1)
@@ -769,6 +777,28 @@ Elle permet de normaliser certaines données du refNum.
         <xsl:param name="nombre" />
 
         <xsl:number value="$nombre" format="I"/>
+    </xsl:function>
+
+    <!-- Extrait le numéro d'une page, notamment s'il est en romain ou mal formaté. -->
+    <xsl:function name="r2m:extraitNumeroPage" as="xs:string?">
+        <xsl:param name="objet" />
+
+        <xsl:choose>
+            <!-- Prend en compte le cas où le numéroPage n'est pas convertissable :
+            "Planche 3", "Pl. III" ou même "III"). -->
+            <xsl:when test="($objet/@typePagination = 'A' or $objet/@typePagination = 'R')
+                    and not(number($objet/@numeroPage))">
+                <!-- TODO Extraire le numéro lorsqu'il est mal formaté. -->
+                <xsl:value-of select="normalize-space($objet/@numeroPage)" />
+            </xsl:when>
+            <!-- Exception : convertir en romain le numéro de page romain (qui est en arabe). -->
+            <xsl:when test="$objet/@typePagination = 'R'">
+                <xsl:value-of select="normalize-space(r2m:conversionArabeVersRomain($objet/@numeroPage))" />
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="normalize-space($objet/@numeroPage)" />
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:function>
 
     <!-- Détermine la date maximale pour un fichier (eventDateTime).

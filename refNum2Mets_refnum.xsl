@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Description : Convertit un fichier refNum en Mets.
-Version : 20160215
+Version : 20160530
 Auteur : Daniel Berthereau pour l'École des Mines de Paris [http://bib.mines-paristech.fr]
 
 Cette feuille dépend de refNum2Mets.xsl.
@@ -396,38 +396,8 @@ Elle permet de normaliser certaines données du refNum.
                         <xsl:when test="$format/titreFichier = 'numéro'">
                             <xsl:value-of select="r2m:extraitNumeroPage($objet)" />
                         </xsl:when>
-
                         <xsl:when test="$format/titreFichier = 'nom'">
-                            <xsl:choose>
-                                <!-- Pagination en chiffres arabes. -->
-                                <xsl:when test="$objet/@typePagination = 'A'">
-                                    <xsl:value-of select="normalize-space(concat('Page ', $objet/@numeroPage))" />
-                                </xsl:when>
-                                <!-- Pagination en chiffres romains. -->
-                                <xsl:when test="$objet/@typePagination = 'R'">
-                                    <xsl:choose>
-                                        <!-- Pagination en chiffres romains, mais mal formaté. -->
-                                        <xsl:when test="not(number($objet/@numeroPage))">
-                                            <xsl:value-of select="normalize-space(concat('Page ', $objet/@numeroPage))" />
-                                        </xsl:when>
-                                        <xsl:otherwise>
-                                            <xsl:value-of select="normalize-space(concat('Page ', r2m:conversionArabeVersRomain($objet/@numeroPage)))" />
-                                        </xsl:otherwise>
-                                    </xsl:choose>
-                                </xsl:when>
-                                <!-- Foliotation. -->
-                                <xsl:when test="$objet/@typePagination = 'F'">
-                                    <xsl:value-of select="normalize-space(concat('Folio ', $objet/@numeroPage, ' (recto)'))" />
-                                </xsl:when>
-                                <!-- Pagination autre. -->
-                                <xsl:when test="$objet/@typePagination = 'X'">
-                                    <xsl:value-of select="normalize-space(concat('Page ', $objet/@numeroPage))" />
-                                </xsl:when>
-                                <!-- Peut arriver ici dans le cas de lots ou d'une erreur. -->
-                                <xsl:otherwise>
-                                    <xsl:value-of select="normalize-space(concat('Image ', $objet/@numeroPage))" />
-                                </xsl:otherwise>
-                            </xsl:choose>
+                            <xsl:value-of select="r2m:definitNomPage($objet)" />
                         </xsl:when>
                     </xsl:choose>
                 </xsl:when>
@@ -785,18 +755,105 @@ Elle permet de normaliser certaines données du refNum.
 
         <xsl:choose>
             <!-- Prend en compte le cas où le numéroPage n'est pas convertissable :
-            "Planche 3", "Pl. III" ou même "III"). -->
-            <xsl:when test="($objet/@typePagination = 'A' or $objet/@typePagination = 'R')
-                    and not(number($objet/@numeroPage))">
-                <!-- TODO Extraire le numéro lorsqu'il est mal formaté. -->
-                <xsl:value-of select="normalize-space($objet/@numeroPage)" />
+            "Planche 3.1". Dans ce cas prend du premier chiffre au dernier chiffre ("3.1"). -->
+            <xsl:when test="$objet/@typePagination = 'A' and not(number($objet/@numeroPage))">
+                <xsl:variable name="chiffres" select="replace($objet/@numeroPage, '[^0-9]', '')" />
+                <xsl:choose>
+                    <xsl:when test="$chiffres = ''">
+                        <xsl:value-of select="normalize-space($objet/@numeroPage)" />
+                    </xsl:when>
+                    <xsl:when test="string-length($chiffres) = 1">
+                        <xsl:value-of select="$chiffres" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:variable name="premier_chiffre" select="substring($chiffres, 1, 1)" />
+                        <xsl:variable name="dernier_chiffre" select="substring($chiffres, string-length($chiffres), 1)" />
+                        <xsl:variable name="position_premier_chiffre" select="1 + string-length(substring-before($objet/@numeroPage, $premier_chiffre))" />
+                        <xsl:variable name="position_dernier_chiffre" select="r2m:lastCharIndex($objet/@numeroPage, $dernier_chiffre)" />
+                        <xsl:value-of select="substring($objet/@numeroPage, $position_premier_chiffre, $position_dernier_chiffre - $position_premier_chiffre + 1)" />
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:when>
+
+            <!-- Prend en compte le cas où le numéroPage n'est pas convertissable :
+            "Planche IX". Dans ce cas prend le premier mot qui soit un nombre romain ("IX"). -->
+            <xsl:when test="$objet/@typePagination = 'R' and not(number($objet/@numeroPage))">
+                <xsl:variable name="nombre" select="r2m:extraitRomain($objet/@numeroPage)" />
+                <xsl:choose>
+                    <xsl:when test="$nombre = '0' or $nombre = ''">
+                        <xsl:value-of select="normalize-space($objet/@numeroPage)" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="$nombre" />
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+
             <!-- Exception : convertir en romain le numéro de page romain (qui est en arabe). -->
             <xsl:when test="$objet/@typePagination = 'R'">
                 <xsl:value-of select="normalize-space(r2m:conversionArabeVersRomain($objet/@numeroPage))" />
             </xsl:when>
+
+            <!-- Cas normal : le numéro page est correctement écrit. -->
             <xsl:otherwise>
                 <xsl:value-of select="normalize-space($objet/@numeroPage)" />
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
+
+    <!-- Détermine le nom d'une page, notamment s'il est en romain ou mal formaté. -->
+    <xsl:function name="r2m:definitNomPage" as="xs:string?">
+        <xsl:param name="objet" />
+
+        <xsl:choose>
+            <!-- Pagination en chiffres arabes. -->
+            <xsl:when test="$objet/@typePagination = 'A'">
+                <xsl:choose>
+                    <!-- Pagination en chiffres arabes, mais mal formaté, donc on garde. -->
+                    <xsl:when test="not(number($objet/@numeroPage))">
+                        <xsl:value-of select="normalize-space($objet/@numeroPage)" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="normalize-space(concat('Page ', $objet/@numeroPage))" />
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+
+            <!-- Pagination en chiffres romains. -->
+            <xsl:when test="$objet/@typePagination = 'R'">
+                <xsl:choose>
+                    <!-- Pagination en chiffres romains, mais mal formaté. -->
+                    <xsl:when test="not(number($objet/@numeroPage))">
+                        <xsl:choose>
+                            <!-- C'est mal formaté et il y a un nom en plus : on garde. -->
+                            <xsl:when test="contains($objet/@numeroPage, ' ')">
+                                <xsl:value-of select="normalize-space($objet/@numeroPage)" />
+                            </xsl:when>
+                            <!-- Normalement, c'est déjà en romain, donc on garde. -->
+                            <xsl:otherwise>
+                                <xsl:value-of select="normalize-space(concat('Page ', $objet/@numeroPage))" />
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="normalize-space(concat('Page ', r2m:conversionArabeVersRomain($objet/@numeroPage)))" />
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+
+            <!-- Foliotation. -->
+            <xsl:when test="$objet/@typePagination = 'F'">
+                <xsl:value-of select="normalize-space(concat('Folio ', $objet/@numeroPage, ' (recto)'))" />
+            </xsl:when>
+
+            <!-- Pagination autre. -->
+            <xsl:when test="$objet/@typePagination = 'X'">
+                <xsl:value-of select="normalize-space(concat('Page ', $objet/@numeroPage))" />
+            </xsl:when>
+
+            <!-- Peut arriver ici dans le cas de lots ou d'une erreur. -->
+            <xsl:otherwise>
+                <xsl:value-of select="normalize-space(concat('Image ', $objet/@numeroPage))" />
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>
@@ -913,5 +970,183 @@ Elle permet de normaliser certaines données du refNum.
                 or (($position = 'Right' or $position = 'R') and number($ordre) mod 2 = 1)
             " />
     </xsl:function>
+
+    <!-- Trouve le nombre romain dans une chaine et le renvoi tel quel. -->
+    <xsl:function name="r2m:extraitRomain" as="xs:string?">
+        <xsl:param name="str" />
+
+        <!-- Pour chaque mot, vérifie si c'est un nombre romain. -->
+        <xsl:variable name="romains">
+            <xsl:for-each select="tokenize($str, ' ')">
+                <xsl:variable name="romain" select="r2m:romanToInteger(.)" />
+                <xsl:choose>
+                    <xsl:when test="$romain > 0">
+                        <xsl:value-of select="." />
+                        <xsl:value-of select="' '" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="''" />
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:for-each>
+        </xsl:variable>
+
+        <!-- Retourne le premier romain le cas échéant. -->
+        <xsl:value-of select="if (string-length($romains) > 0)
+                then substring-before($romains, ' ')
+                else ''" />
+    </xsl:function>
+
+    <!-- Conversion d'un nombre romain en entier.
+    Corrigé à partir de David Carlisle, http://www.stylusstudio.com/xsllist/handler.asp?/xsllist/200412/post31060.html
+    -->
+    <xsl:function name="r2m:romanToInteger" as="xs:integer">
+        <xsl:param name="r" as="xs:string"/>
+
+        <xsl:choose>
+            <xsl:when test="ends-with($r, 'IIX')">
+                <xsl:sequence select="8 + r2m:romanToInteger(substring($r, 1, string-length($r) - 3))"/>
+            </xsl:when>
+            <xsl:when test="ends-with($r, 'IIL')">
+                <xsl:sequence select="48 + r2m:romanToInteger(substring($r, 1, string-length($r) - 3))"/>
+            </xsl:when>
+            <xsl:when test="ends-with($r, 'IIC')">
+                <xsl:sequence select="98 + r2m:romanToInteger(substring($r, 1, string-length($r) - 3))"/>
+            </xsl:when>
+            <xsl:when test="ends-with($r, 'IID')">
+                <xsl:sequence select="498 + r2m:romanToInteger(substring($r, 1, string-length($r) - 3))"/>
+            </xsl:when>
+            <xsl:when test="ends-with($r, 'IIM')">
+                <xsl:sequence select="998 + r2m:romanToInteger(substring($r, 1, string-length($r) - 3))"/>
+            </xsl:when>
+
+            <xsl:when test="ends-with($r, 'IV')">
+                <xsl:sequence select="4 + r2m:romanToInteger(substring($r, 1, string-length($r) - 2))"/>
+            </xsl:when>
+            <xsl:when test="ends-with($r, 'IX')">
+                <xsl:sequence select="9 + r2m:romanToInteger(substring($r, 1, string-length($r) - 2))"/>
+            </xsl:when>
+
+            <xsl:when test="ends-with($r, 'IC')">
+                <xsl:sequence select="99 + r2m:romanToInteger(substring($r, 1, string-length($r) - 2))"/>
+            </xsl:when>
+            <xsl:when test="ends-with($r, 'VC')">
+                <xsl:sequence select="95 + r2m:romanToInteger(substring($r, 1, string-length($r) - 2))"/>
+            </xsl:when>
+            <xsl:when test="ends-with($r, 'XC')">
+                <xsl:sequence select="90 + r2m:romanToInteger(substring($r, 1, string-length($r) - 2))"/>
+            </xsl:when>
+
+            <xsl:when test="ends-with($r, 'ID')">
+                <xsl:sequence select="499 + r2m:romanToInteger(substring($r, 1, string-length($r) - 2))"/>
+            </xsl:when>
+            <xsl:when test="ends-with($r, 'VD')">
+                <xsl:sequence select="495 + r2m:romanToInteger(substring($r, 1, string-length($r) - 2))"/>
+            </xsl:when>
+            <xsl:when test="ends-with($r, 'XD')">
+                <xsl:sequence select="490 + r2m:romanToInteger(substring($r, 1, string-length($r) - 2))"/>
+            </xsl:when>
+            <xsl:when test="ends-with($r, 'LD')">
+                <xsl:sequence select="450 + r2m:romanToInteger(substring($r, 1, string-length($r) - 2))"/>
+            </xsl:when>
+            <xsl:when test="ends-with($r, 'CD')">
+                <xsl:sequence select="400 + r2m:romanToInteger(substring($r, 1, string-length($r) - 2))"/>
+            </xsl:when>
+
+            <xsl:when test="ends-with($r, 'IM')">
+                <xsl:sequence select="999 + r2m:romanToInteger(substring($r, 1, string-length($r) - 2))"/>
+            </xsl:when>
+            <xsl:when test="ends-with($r, 'VM')">
+                <xsl:sequence select="995 + r2m:romanToInteger(substring($r, 1, string-length($r) - 2))"/>
+            </xsl:when>
+            <xsl:when test="ends-with($r, 'XM')">
+                <xsl:sequence select="990 + r2m:romanToInteger(substring($r, 1, string-length($r) - 2))"/>
+            </xsl:when>
+            <xsl:when test="ends-with($r, 'LM')">
+                <xsl:sequence select="950 + r2m:romanToInteger(substring($r, 1, string-length($r) - 2))"/>
+            </xsl:when>
+            <xsl:when test="ends-with($r, 'CM')">
+                <xsl:sequence select="900 + r2m:romanToInteger(substring($r, 1, string-length($r) - 2))"/>
+            </xsl:when>
+
+            <xsl:when test="ends-with($r, 'I')">
+                <xsl:sequence select="1 + r2m:romanToInteger(substring($r, 1, string-length($r) - 1))"/>
+            </xsl:when>
+            <xsl:when test="ends-with($r, 'V')">
+                <xsl:sequence select="5 + r2m:romanToInteger(substring($r, 1, string-length($r) - 1))"/>
+            </xsl:when>
+            <xsl:when test="ends-with($r, 'X')">
+                <xsl:sequence select="10 + r2m:romanToInteger(substring($r, 1, string-length($r) - 1))"/>
+            </xsl:when>
+            <xsl:when test="ends-with($r, 'L')">
+                <xsl:sequence select="50 + r2m:romanToInteger(substring($r, 1, string-length($r) - 1))"/>
+            </xsl:when>
+            <xsl:when test="ends-with($r, 'C')">
+                <xsl:sequence select="100 + r2m:romanToInteger(substring($r, 1, string-length($r) - 1))"/>
+            </xsl:when>
+            <xsl:when test="ends-with($r, 'D')">
+                <xsl:sequence select="500 + r2m:romanToInteger(substring($r, 1, string-length($r) - 1))"/>
+            </xsl:when>
+            <xsl:when test="ends-with($r, 'M')">
+                <xsl:sequence select="1000 + r2m:romanToInteger(substring($r, 1, string-length($r) - 1))"/>
+            </xsl:when>
+
+            <xsl:otherwise>
+                <xsl:sequence select="0"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
+
+    <xsl:function name="r2m:lastCharIndex">
+        <xsl:param name="str" as="xs:string"/>
+        <xsl:param name="char" as="xs:string"/>
+
+        <xsl:call-template name="lastCharIndex">
+            <xsl:with-param name="pText" select="$str" />
+            <xsl:with-param name="pChar" select="$char" />
+        </xsl:call-template>
+     </xsl:function>
+
+    <!-- From Dimitre Novatchev, https://stackoverflow.com/questions/12642166/how-to-get-the-last-index-of-a-char-in-a-string -->
+    <xsl:template name="lastCharIndex">
+        <xsl:param name="pText" />
+        <xsl:param name="pChar" />
+
+        <xsl:variable name="vRev">
+            <xsl:call-template name="reverse">
+                <xsl:with-param name="pStr" select="$pText"/>
+            </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:value-of select="string-length($pText) - string-length(substring-before($vRev, $pChar))"/>
+    </xsl:template>
+
+    <xsl:template name="reverse">
+        <xsl:param name="pStr"/>
+
+        <xsl:variable name="vLength" select="string-length($pStr)"/>
+        <xsl:choose>
+            <xsl:when test="$vLength = 1">
+                <xsl:value-of select="$pStr"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:variable name="vHalfLength" select="floor($vLength div 2)"/>
+                <xsl:variable name="vrevHalf1">
+                    <xsl:call-template name="reverse">
+                        <xsl:with-param name="pStr"
+                            select="substring($pStr, 1, $vHalfLength)"/>
+                    </xsl:call-template>
+                </xsl:variable>
+                <xsl:variable name="vrevHalf2">
+                    <xsl:call-template name="reverse">
+                        <xsl:with-param name="pStr"
+                        select="substring($pStr, $vHalfLength + 1)"/>
+                    </xsl:call-template>
+                </xsl:variable>
+
+                <xsl:value-of select="concat($vrevHalf2, $vrevHalf1)"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
 
 </xsl:stylesheet>

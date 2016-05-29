@@ -391,7 +391,8 @@ Elle permet de normaliser certaines données du refNum.
 
         <xsl:variable name="nomPage">
             <xsl:choose>
-                <xsl:when test="$objet/@numeroPage and $objet/@numeroPage != '' and $objet/@numeroPage != 'NP'">
+                <xsl:when test="$objet/@numeroPage and $objet/@numeroPage != ''
+                        and $objet/@numeroPage != 'NP' and $objet/@numeroPage != '0'">
                     <xsl:choose>
                         <xsl:when test="$format/titreFichier = 'numéro'">
                             <xsl:choose>
@@ -481,7 +482,7 @@ Elle permet de normaliser certaines données du refNum.
             </xsl:when>
             <xsl:when test="$format/titreFichierNP = 'numéro NP'">
                 <xsl:variable name="numeroPage" select="string(count(
-                        $objet/preceding-sibling::refNum:vueObjet[not(@numeroPage) or @numeroPage = '' or @numeroPage = 'NP']
+                        $objet/preceding-sibling::refNum:vueObjet[not(@numeroPage) or @numeroPage = '' or @numeroPage = 'NP' or @numeroPage = '0']
                     ) + 1)" />
                 <xsl:value-of select="normalize-space(concat(
                         $format/titreFichierNPTexte,

@@ -24,10 +24,10 @@ refNum en notices Mets. Son nom constitue le seul paramètre de la feuille "refN
     Le détail des paramètres se trouve dans le format "Archive".
     -->
     <format>
-        <!-- <profil chemin="xsl">profils/profil_archive.xml</profil> -->
+        <profil chemin="xsl">profils/profil_archive.xml</profil>
         <!-- <profil chemin="xsl">profils/profil_bnf_sip.xml</profil> -->
         <!-- <profil chemin="xsl">profils/profil_dev.xml</profil> -->
-        <profil chemin="xsl">profils/profil_diffusion.xml</profil>
+        <!-- <profil chemin="xsl">profils/profil_diffusion.xml</profil> -->
         <!-- <profil chemin="xsl">profils/profil_oaipmh.xml</profil> -->
     </format>
 

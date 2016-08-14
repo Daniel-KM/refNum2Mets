@@ -8,8 +8,6 @@
 # - Les noms de fichiers ne doivent pas contenir d'espace (problème dans
 # l'extraction des tailles de fichiers).
 # - Si un paramètre est absent et qu'il y en a d'autres après, indiquer "".
-# - Le paramètre xslpre permet de réaliser un prétraitrement xsl sur les refnum.
-# Les refnum ainsi modifiés peuvent être conservés (extension ".pre.xml").
 #
 # Il est recommandé d'avoir un sous-dossier par document, sinon les hashs sont
 # calculés sur tous les fichiers pour chaque refNum.
@@ -28,10 +26,9 @@
 # Licence CeCILL v2.1
 #
 # Commande :
-# refNum2Mets.sh dossier xslpre
+# refNum2Mets.sh dossier
 
 dossier=$1
-xslpre=$2
 
 prepareTailles='true'
 prepareHashs='true'
@@ -97,17 +94,6 @@ SCRIPT=$(readlink -f "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
 
 xslpath="$SCRIPTPATH/refNum2Mets.xsl"
-
-if [ -n "$xslpre" ]; then
-    if [ ! -e "$xslpre" ]; then
-        if [ ! -e "$SCRIPTPATH/$xslpre" ]; then
-            echo "La feuille \"$xslpre\" n\'existe pas."
-            exit 1
-        else
-            xslpre="$SCRIPTPATH/$xslpre"
-        fi
-    fi
-fi
 
 xslidentitypath="$SCRIPTPATH/identity.xsl"
 
@@ -208,15 +194,6 @@ do
         find "$dirname" -type f -print0 | xargs -0 sha1sum | awk '{print $2"  "$1}' | cut -c ${tailleDir}- | sort > "$hashspath"
     fi
 
-    if [ -n "$xslpre" ]; then
-        echo "  Prétraitrement des fichiers refNum via \"$xslpre\"..."
-        filebis="${file%.*}.pre.xml"
-
-        xslProcess "$file" "$xslpre" "$filebis"
-
-        file=$filebis
-    fi
-
     xslProcess "$file" "$xslpath" "$metspath"
 
     # Améliore l'indentation, ce qui est impossible avec la version libre de
@@ -239,9 +216,6 @@ do
         fi
         if [ "$prepareHashs" = 'true' ]; then
             rm -f "$hashspath"
-        fi
-        if [ -n "$xslpre" ]; then
-            rm -f "$filebis"
         fi
     fi
 

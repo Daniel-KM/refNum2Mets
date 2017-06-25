@@ -79,18 +79,18 @@ certaines informations sur les images. Elles sont explicitées dans cette table
 de conversion des informations sur les objets numérisés avec refNum, Mets et
 Dublin Core Terms pour Omeka.
 
-                         | Exemple         | refNum [Mines]                                                                  | Mets                                            | Dublin Core Terms [dans Omeka]
--------------------------|-----------------|---------------------------------------------------------------------------------|-------------------------------------------------|---------------------------------------------------------
-Total des vues           | 20              | production/nombreVueObjets                                                      | count(structMap//div[not(div)])                 | count(HasPart) (niveau document) [interne]
-Total des images         | 24              | production/nombreImages                                                         | count(fileSec/fileGrp[@USE="master"]/file)      | count(IsPartOf) (niveau fichier) [interne]
-Ordre d’une image        | 13              | structure/vueObjet/@ordre                                                       | structMap//div/@ORDER                           | ordre de HasPart (niveau document) [interne]
-Type d’image générique   | Page            | structure/vueObjet/@typePage (par déduction)                                    | structMap//div/@TYPE (et dans dmdSec)           | Type
-Numéro de page           | iii             | structure/vueObjet/@numeroPage ("3") + structure/vueObjet/@typePagination ("R") | structMap//div/@ORDERLABEL (et dans dmdSec)     | Title
-Type précis, s’il existe | Index           | structure/vueObjet/@typePage ("I")                                              | structMap//div/@LABEL (partiel, et dans dmdSec) | Description (partie du nom de page après le premier ":")
-Nom de page              | Page iii: Index | structure/vueObjet/@typePage + numéro de page + type précis                     | structMap//div/@LABEL (et dans dmdSec)          | Description
-Sens de lecture          | 90°             | [structure/vueObjet/@orientation ("P")]                                         | dmdSec/mdWrap/xmlData/dc:dc/dc:format           | Format ("Orientation: 90°)
-Position de la page      | Droite          | [structure/vueObjet/@position]                                                  | dmdSec/mdWrap/xmlData/dc:dc/dc:format           | Format ("Position: Right")
-Première page à afficher | 2               | structure/vueObjet/@typePage ("E")                                              | ?                                               | ? [ou Format ("First to display") au niveau document]
+|                          | Exemple         | refNum [Mines]                                                                  | Mets                                            | Dublin Core Terms [dans Omeka]                           |
+|--------------------------|-----------------|---------------------------------------------------------------------------------|-------------------------------------------------|----------------------------------------------------------|
+| Total des vues           | 20              | production/nombreVueObjets                                                      | count(structMap//div[not(div)])                 | count(HasPart) (niveau document) [interne]               |
+| Total des images         | 24              | production/nombreImages                                                         | count(fileSec/fileGrp[@USE="master"]/file)      | count(IsPartOf) (niveau fichier) [interne]               |
+| Ordre d’une image        | 13              | structure/vueObjet/@ordre                                                       | structMap//div/@ORDER                           | ordre de HasPart (niveau document) [interne]             |
+| Type d’image générique   | Page            | structure/vueObjet/@typePage (par déduction)                                    | structMap//div/@TYPE (et dans dmdSec)           | Type                                                     |
+| Numéro de page           | iii             | structure/vueObjet/@numeroPage ("3") + structure/vueObjet/@typePagination ("R") | structMap//div/@ORDERLABEL (et dans dmdSec)     | Title                                                    |
+| Type précis, s’il existe | Index           | structure/vueObjet/@typePage ("I")                                              | structMap//div/@LABEL (partiel, et dans dmdSec) | Description (partie du nom de page après le premier ":") |
+| Nom de page              | Page iii: Index | structure/vueObjet/@typePage + numéro de page + type précis                     | structMap//div/@LABEL (et dans dmdSec)          | Description                                              |
+| Sens de lecture          | 90°             | [structure/vueObjet/@orientation ("P")]                                         | dmdSec/mdWrap/xmlData/dc:dc/dc:format           | Format ("Orientation: 90°)                               |
+| Position de la page      | Droite          | [structure/vueObjet/@position]                                                  | dmdSec/mdWrap/xmlData/dc:dc/dc:format           | Format ("Position: Right")                               |
+| Première page à afficher | 2               | structure/vueObjet/@typePage ("E")                                              | ?                                               | ? [ou Format ("First to display") au niveau document]    |
 
 Notes :
 - En Mets, les métadonnées descriptives reprennent les attributs de la division
